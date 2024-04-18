@@ -16,8 +16,8 @@
 </script>
 
 <AuthPage type="register" {session} {user}>
-	<p>(auth)/register/page</p>
-	<pre> {JSON.stringify(session, null, 2)}</pre>
+	<!-- <p>(auth)/register/page</p> -->
+	<!-- <pre> {JSON.stringify(session, null, 2)}</pre> -->
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Create an account</h1>
 		<p class="text-sm text-muted-foreground">Start building your digital community today.</p>
@@ -25,22 +25,24 @@
 	<form method="POST" use:enhance class="w-full space-y-4">
 		<Form.Field {form} name="email">
 			<Form.Control let:attrs>
-				<Form.Label>Email</Form.Label>
+				<Form.Label>Email Address</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.email} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Errors errors={$errors._errors} />
-		<Form.Button>Register</Form.Button>
+		<div>
+			<Form.Button>Register</Form.Button>
+			<span class="text-sm text-muted-foreground">
+				We will send a token to your email address for verification</span
+			>
+		</div>
 	</form>
-	<p class="px-8 text-center text-sm text-muted-foreground">
+	<p class="py-4 text-sm text-muted-foreground">
 		By clicking continue, you agree to our{' '}
-		<a href="/terms" class="underline underline-offset-4 hover:text-primary">
-			Terms of Service
-		</a>{' '}
-		and{' '}
-		<a href="/privacy" class="underline underline-offset-4 hover:text-primary"> Privacy Policy </a>
-		.
+		<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service</a>
+		{' '}and{' '}
+		<a href="/privacy" class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a>
 	</p>
 </AuthPage>

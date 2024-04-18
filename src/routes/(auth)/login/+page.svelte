@@ -17,12 +17,12 @@
 </script>
 
 <AuthPage type="login" {session} {user}>
-	<p>(auth)/login/page</p>
-	<pre> {JSON.stringify(session, null, 2)}</pre>
-	<pre> {JSON.stringify(user, null, 2)}</pre>
+	<!-- <p>(auth)/login/page</p> -->
+	<!-- <pre> {JSON.stringify(session, null, 2)}</pre> -->
+	<!-- <pre> {JSON.stringify(user, null, 2)}</pre> -->
 	<div class="flex flex-col space-y-2 text-center">
-		<h1 class="text-2xl font-semibold tracking-tight">Login to your account</h1>
-		<p class="text-sm text-muted-foreground">Start participating in the conversation.</p>
+		<h1 class="text-2xl font-semibold tracking-tight">Login to an existing registration</h1>
+		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<form method="POST" use:enhance class="w-full space-y-4">
 		<Form.Field {form} name="email">
@@ -33,6 +33,17 @@
 			<Form.FieldErrors />
 		</Form.Field>
 		<Form.Errors errors={$errors._errors} />
-		<Form.Button>Login</Form.Button>
+		<div>
+			<Form.Button>Login</Form.Button>
+			<span class="text-sm text-muted-foreground">
+				We will send a token to your email address for verification</span
+			>
+		</div>
 	</form>
+	<p class="py-4 text-sm text-muted-foreground">
+		By clicking continue, you agree to our{' '}
+		<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service</a>
+		{' '}and{' '}
+		<a href="/privacy" class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a>
+	</p>
 </AuthPage>

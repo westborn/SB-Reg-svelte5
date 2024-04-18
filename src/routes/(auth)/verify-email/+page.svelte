@@ -15,30 +15,34 @@
 	const { form: formData, enhance, errors } = form;
 </script>
 
-Verify email
 <AuthPage type="verify-email" {session} {user}>
-	<p>(auth)/verify-email/page</p>
-	<pre> {JSON.stringify(session, null, 2)}</pre>
-
+	<!-- <p>(auth)/verify-email/page</p> -->
+	<!-- <pre> {JSON.stringify(session, null, 2)}</pre> -->
+	<div class="flex flex-col space-y-2 text-center">
+		<h1 class="text-2xl font-semibold tracking-tight">Verify your account</h1>
+		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
+	</div>
 	<form method="POST" use:enhance class="w-full space-y-4">
 		<Form.Field {form} name="token">
 			<Form.Control let:attrs>
-				<Form.Label>Token</Form.Label>
+				<Form.Label
+					>6 Digit Token
+					<span class="py-4 text-xs text-muted-foreground"
+						>(that we sent to your email address)</span
+					>
+				</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.token} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Errors errors={$errors._errors} />
-		<Form.Button>Verify email address with this token</Form.Button>
+		<Form.Button>Verify email address</Form.Button>
 	</form>
-	<p class="px-8 text-center text-sm text-muted-foreground">
+	<p class="py-4 text-sm text-muted-foreground">
 		By clicking continue, you agree to our{' '}
-		<a href="/terms" class="underline underline-offset-4 hover:text-primary">
-			Terms of Service
-		</a>{' '}
-		and{' '}
-		<a href="/privacy" class="underline underline-offset-4 hover:text-primary"> Privacy Policy </a>
-		.
+		<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service </a>
+		and
+		<a href="/privacy" class="underline underline-offset-4 hover:text-primary"> Privacy Policy.</a>
 	</p>
 </AuthPage>

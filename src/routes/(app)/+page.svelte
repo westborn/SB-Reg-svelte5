@@ -7,7 +7,7 @@
 	import ThemeToggle from '$lib/components/theme-toggle.svelte';
 </script>
 
-<section class="flex flex-row items-center justify-between">
+<section class="container flex flex-row items-center justify-between">
 	<div>
 		<a href="/" class="text-2xl font-bold leading-tight tracking-tighter text-primary md:text-3xl">
 			SB Register
@@ -31,7 +31,9 @@
 		<ThemeToggle></ThemeToggle>
 	</div>
 </section>
-<p class="text-2xl">This is (app) PAGE</p>
-<p>(app) +page.svelte</p>
+<section class="container">
+	<p class="text-2xl">This is (app) PAGE</p>
+	<p>(app) +page.svelte</p>
+</section>
 <!-- <pre> Session  - {JSON.stringify(session, null, 2)}</pre> -->
 <!-- <pre> User - {JSON.stringify(user, null, 2)}</pre> -->
