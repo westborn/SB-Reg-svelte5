@@ -1,11 +1,49 @@
-import { registerSchema } from '$lib/zod-schemas';
+import { loginSchema } from '$lib/zod-schemas';
 import { fail, redirect } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import type { PageServerLoad } from './$types';
 
-export const load = async (event) => {
-	// if (event.locals.user) redirect(302, '/');
+export const load: PageServerLoad = async (event) => {
+	const { session, user } = await event.locals.safeGetSession();
+	if (user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	return {
-		form: await superValidate(zod(registerSchema))
+		session,
+		user,
+		form: await superValidate(zod(loginSchema))
 	};
+};
+export const actions = {
+	default: async (event) => {
+		const { supabase, safeGetSession } = event.locals;
+
+		const { user } = await safeGetSession();
+		if (user) redirect(302, '/');
+
+		const form = await superValidate(event, zod(loginSchema));
+
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+		const url = new URL(event.request.url);
+		const { data, error } = await supabase.auth.signInWithOtp({
+			email: form.data.email,
+			options: {
+				emailRedirectTo: `${url.origin}/auth/callback`,
+				shouldCreateUser: true
+			}
+		});
+
+		if (error) {
+			console.log('login:', error);
+			setError(form, 'email', error.message);
+			return fail(400, {
+				form
+			});
+		}
+		console.log('login:', data);
+		redirect(302, '/verify-email');
+	}
 };

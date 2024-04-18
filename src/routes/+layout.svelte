@@ -1,13 +1,29 @@
 <script lang="ts">
 	import '../app.pcss';
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
+
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import TopNav from '$lib/components/top-nav.svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
+	let { supabase, session } = data;
+
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+
+		return () => data.subscription.unsubscribe();
+	});
 </script>
+
+<svelte:head>
+	<title>User Management</title>
+</svelte:head>
 
 <ModeWatcher />
 <Toaster />
-<TopNav />
 {@render children()}

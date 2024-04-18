@@ -19,6 +19,7 @@
 <AuthPage type="login" {session} {user}>
 	<p>(auth)/login/page</p>
 	<pre> {JSON.stringify(session, null, 2)}</pre>
+	<pre> {JSON.stringify(user, null, 2)}</pre>
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Login to your account</h1>
 		<p class="text-sm text-muted-foreground">Start participating in the conversation.</p>
@@ -28,13 +29,6 @@
 			<Form.Control let:attrs>
 				<Form.Label>Email Address</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.email} />
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-		<Form.Field {form} name="password">
-			<Form.Control let:attrs>
-				<Form.Label>Password</Form.Label>
-				<Input type="password" {...attrs} bind:value={$formData.password} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>

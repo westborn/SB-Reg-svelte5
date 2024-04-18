@@ -1,36 +1,23 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import type { Snippet } from 'svelte';
+	import ThemeToggle from '$lib/components/theme-toggle.svelte';
 
 	type Props = {
 		children: Snippet;
-		type: 'login' | 'register';
+		type: 'login' | 'register' | 'verify-email';
 		session: Record<string, any>;
 		user: Record<string, any>;
 	};
 
 	let { type, children, session, user }: Props = $props();
-
-	type Link = {
-		text: string;
-		href: string;
-	};
-
-	const altLink: Link = $derived(
-		type === 'register'
-			? { href: '/login', text: 'Login' }
-			: { href: '/register', text: 'Register' }
-	);
 </script>
 
-<p>(auth) auth-page.svelte</p>
-<pre> {JSON.stringify(session, null, 2)}</pre>
+<!-- <p>(auth) auth-page.svelte</p>
+<pre> {JSON.stringify(session, null, 2)}</pre> -->
 <div
-	class="container relative hidden h-full flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
+	class="container relative hidden h-full flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2"
 >
-	<Button href={altLink.href} variant="ghost" class="absolute right-4 top-4 md:right-8 md:top-8">
-		{altLink.text}
-	</Button>
 	<div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
 		<div
 			class="absolute inset-0 bg-cover"
@@ -39,7 +26,7 @@
 					url(https://images.unsplash.com/photo-1534515538060-80212d73acb6?q=80&auto=format&fit=crop&w=1376&q=80);"
 		/>
 		<div class="relative z-20 flex items-center text-lg font-medium">
-			<a href="/" class="underline-offset-4 hover:underline"> Purple </a>
+			<a href="/" class="underline-offset-4 hover:underline"> Sculpture Bermagui </a>
 		</div>
 		<div class="relative z-20 mt-auto">
 			<blockquote class="space-y-2">
@@ -52,6 +39,21 @@
 		</div>
 	</div>
 	<div class="lg:p-8">
+		<div class="absolute right-4 top-4 md:right-8 md:top-8">
+			{#if type === 'login'}
+				<Button href="/register" variant="ghost">Register</Button>
+				<Button href="/verify-email" variant="ghost">Verify Email</Button>
+			{/if}
+			{#if type === 'register'}
+				<Button href="/login" variant="ghost">Login</Button>
+				<Button href="/verify-email" variant="ghost">Verify Email</Button>
+			{/if}
+			{#if type === 'verify-email'}
+				<Button href="/login" variant="ghost">Login</Button>
+				<Button href="/register" variant="ghost">Register</Button>
+			{/if}
+			<ThemeToggle />
+		</div>
 		<div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
 			{@render children()}
 		</div>

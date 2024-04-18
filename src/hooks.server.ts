@@ -32,7 +32,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			error
 		} = await event.locals.supabase.auth.getUser();
 		if (error) {
-			return { session: { status: 'ok' }, user: null };
+			return { session: null, user: null };
 		}
 
 		const {

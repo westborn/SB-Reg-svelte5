@@ -23,11 +23,13 @@ pnpm i -D zod
 pnpm i formsnap sveltekit-superforms zod
 pnpm i mode-watcher
 
-pnpm dlx shadcn-svelte@latest add alert-dialog button card dialog form input lable textarea sonner
+pnpm dlx shadcn-svelte@latest add alert-dialog avatar button card dialog form input lable textarea tooltip sonner
 
 ```
 
 ## Update the Shadcn theme to the colours you like.
+
+### Use this website - https://ui.jln.dev/
 
 ```
 @tailwind base;
