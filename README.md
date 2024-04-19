@@ -106,3 +106,41 @@ pnpm dlx shadcn-svelte@latest add alert-dialog avatar button card dialog form in
 form errors fix in huntabyte's youtube
 https://www.youtube.com/watch?v=vz8y2Nnz7T4&t=406s
 3:12:28 you can extend Shadcn to add our own little errors
+
+## Add prisma
+
+prisma db pull - turn your database schema into a Prisma schema.  
+prisma generate - generate the Prisma Client.
+
+```
+pnpm install prisma --save-dev
+pnpm dlx prisma init
+```
+
+edit the prisma.schenas file to add provision for auth
+
+```
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["auth", "public"]
+}
+
+```
+
+### Prisma fix for supabase Auth
+
+We need to setup an initial migration to make sure the auth tables are in our schema, but, we don't ever update them
+
+Use prisma pull to sync existing supabase with prisma and then tell prisma that we have completed this migation
+
+```
+pnpm prisma db pull
+pnpm prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script --output prisma/migrations/0_init/migration.sql
+pnpm pnpm prisma migrate resolve --applied 0_init
+```
