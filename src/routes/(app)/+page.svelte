@@ -10,7 +10,7 @@
 <section class="container flex flex-row items-center justify-between">
 	<div>
 		<a href="/" class="text-2xl font-bold leading-tight tracking-tighter text-primary md:text-3xl">
-			SB Register
+			SB Exhibit Registration
 		</a>
 	</div>
 	<div class="flex items-center gap-2">

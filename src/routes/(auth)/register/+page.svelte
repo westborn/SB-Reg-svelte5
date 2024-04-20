@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input';
-	import { registerSchema } from '$lib/zod-schemas.js';
+	import { signupSchema } from '$lib/zod-schemas.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
@@ -9,14 +9,14 @@
 	let { data } = $props();
 	let { session, user } = data;
 	const form = superForm(data.form, {
-		validators: zodClient(registerSchema)
+		validators: zodClient(signupSchema)
 	});
 
 	const { form: formData, enhance, errors } = form;
 </script>
 
-<AuthPage type="register" {session} {user}>
-	<!-- <p>(auth)/register/page</p> -->
+<AuthPage type="signup" {session} {user}>
+	<!-- <p>(auth)/signup/page</p> -->
 	<!-- <pre> {JSON.stringify(session, null, 2)}</pre> -->
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Create an account</h1>

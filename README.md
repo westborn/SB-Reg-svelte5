@@ -142,5 +142,5 @@ Use prisma pull to sync existing supabase with prisma and then tell prisma that 
 ```
 pnpm prisma db pull
 pnpm prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script --output prisma/migrations/0_init/migration.sql
-pnpm pnpm prisma migrate resolve --applied 0_init
+pnpm prisma migrate resolve --applied 0_init
 ```

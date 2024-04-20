@@ -44,6 +44,6 @@ export const actions = {
 			});
 		}
 		console.log('verify-email:', data);
-		redirect(302, '/register');
+		redirect(302, '/signup');
 	}
 };

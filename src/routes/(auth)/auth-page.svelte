@@ -5,7 +5,7 @@
 
 	type Props = {
 		children: Snippet;
-		type: 'login' | 'register' | 'verify-email';
+		type: 'login' | 'signup' | 'verify-email';
 		session: Record<string, any>;
 		user: Record<string, any>;
 	};
@@ -15,8 +15,8 @@
 
 <!-- <p>(auth) auth-page.svelte</p>
 <pre> {JSON.stringify(session, null, 2)}</pre> -->
-<div class="container relative flex-col items-center justify-center h-full sm:grid lg:grid-cols-2">
-	<div class="relative flex-col hidden h-full p-10 text-white bg-muted dark:border-r lg:flex">
+<div class="container relative h-full flex-col items-center justify-center sm:grid lg:grid-cols-2">
+	<div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
 		<div
 			class="absolute inset-0 bg-cover"
 			style="
@@ -40,21 +40,21 @@
 		<div class="absolute right-4 top-4 md:right-8 md:top-8">
 			<div class="flex items-center gap-2">
 				{#if type === 'login'}
-					<Button href="/register" variant="ghost">Register</Button>
+					<Button href="/signup" variant="ghost">Register</Button>
 					<Button href="/verify-email" variant="ghost">Verify Email</Button>
 				{/if}
-				{#if type === 'register'}
+				{#if type === 'signup'}
 					<Button href="/login" variant="ghost">Login</Button>
 					<Button href="/verify-email" variant="ghost">Verify Email</Button>
 				{/if}
 				{#if type === 'verify-email'}
 					<Button href="/login" variant="ghost">Login</Button>
-					<Button href="/register" variant="ghost">Register</Button>
+					<Button href="/signup" variant="ghost">Register</Button>
 				{/if}
 				<ThemeToggle />
 			</div>
 		</div>
-		<div class="flex flex-col w-full mx-auto">
+		<div class="mx-auto flex w-full flex-col">
 			{@render children()}
 		</div>
 	</div>

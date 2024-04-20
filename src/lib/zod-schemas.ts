@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const registerSchema = z.object({
+export const signupSchema = z.object({
 	email: z.string().email({ message: 'Please enter a valid email address.' })
 });
 
@@ -76,7 +76,7 @@ export const registrationSchema = z.object({
 	accommodation: z.string().trim(),
 	confirmation: z.string().trim()
 });
-export type registerRecord = z.infer<typeof registrationSchema>;
+export type signupRecord = z.infer<typeof registrationSchema>;
 
 export const entrySchema = z.object({
 	entryId: z.string().trim(),
@@ -108,7 +108,7 @@ export const entryWithImagesSchema = entrySchema.extend({
 export type entryWithImagesRecord = z.infer<typeof entryWithImagesSchema>;
 
 export const registrationWithEntriesSchema = z.object({
-	registration: registerSchema.partial(),
+	registration: signupSchema.partial(),
 	entries: z.array(entryWithImagesSchema).optional()
 });
 export type registrationWithEntriesRecord = z.infer<typeof registrationWithEntriesSchema>;

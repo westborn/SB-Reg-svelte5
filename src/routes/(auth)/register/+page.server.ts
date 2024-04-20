@@ -1,4 +1,4 @@
-import { registerSchema } from '$lib/zod-schemas';
+import { signupSchema } from '$lib/zod-schemas';
 import { fail, redirect } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -10,7 +10,7 @@ export const load: PageServerLoad = async (event) => {
 	return {
 		session,
 		user,
-		form: await superValidate(zod(registerSchema))
+		form: await superValidate(zod(signupSchema))
 	};
 };
 
@@ -21,7 +21,7 @@ export const actions = {
 		const { user } = await safeGetSession();
 		if (user) redirect(302, '/');
 
-		const form = await superValidate(event, zod(registerSchema));
+		const form = await superValidate(event, zod(signupSchema));
 
 		if (!form.valid) {
 			return fail(400, {
@@ -38,13 +38,13 @@ export const actions = {
 		});
 
 		if (error) {
-			console.log('register:', error);
+			console.log('signup:', error);
 			setError(form, 'email', error.message);
 			return fail(400, {
 				form
 			});
 		}
-		console.log('register:', data);
+		console.log('signup:', data);
 		redirect(302, '/verify-email');
 	}
 };
