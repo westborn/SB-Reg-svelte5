@@ -8,8 +8,10 @@
 
 	let { children, data } = $props();
 	let { supabase, session } = data;
+	console.log('+layout.svelte', 'Commencing');
 
 	onMount(() => {
+		console.log('+layout.svelte', 'On Mount');
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');

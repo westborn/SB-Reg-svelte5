@@ -1,10 +1,12 @@
 <script lang="ts">
-	let { data } = $props();
-	const { session, user } = data;
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import ThemeToggle from '$lib/components/theme-toggle.svelte';
+	console.log('(app) +page.svelte', 'Commencing');
+
+	let { data } = $props();
+	const { session, user } = data;
 </script>
 
 <section class="container flex flex-row items-center justify-between">

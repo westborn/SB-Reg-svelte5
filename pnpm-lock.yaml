@@ -10,10 +10,10 @@ dependencies:
     version: 5.12.1(prisma@5.12.1)
   '@supabase/ssr':
     specifier: ^0.3.0
-    version: 0.3.0(@supabase/supabase-js@2.42.3)
+    version: 0.3.0(@supabase/supabase-js@2.42.5)
   '@supabase/supabase-js':
-    specifier: ^2.42.3
-    version: 2.42.3
+    specifier: ^2.42.5
+    version: 2.42.5
   bits-ui:
     specifier: ^0.21.3
     version: 0.21.3(svelte@5.0.0-next.102)
@@ -689,8 +689,8 @@ packages:
     dev: false
     optional: true
 
-  /@sinclair/typebox@0.32.20:
-    resolution: {integrity: sha512-ziK497ILSIYMxD/thl496idIb03IZPlha04itLQu1xAFQbumWZ+Dj4PMMCkDRpAYhvVSdmRlTjGu2B2MA5RplQ==}
+  /@sinclair/typebox@0.32.21:
+    resolution: {integrity: sha512-mIJHip7dc98j2KAUvwqmkSn02R8dNk7698g5Vb7J58fLLMSEBNi1ps10WzNM5HcKH90SvyFb3Vny6BvBmt5GnQ==}
     requiresBuild: true
     dev: false
     optional: true
@@ -701,14 +701,14 @@ packages:
     dev: false
     optional: true
 
-  /@supabase/auth-js@2.63.0:
-    resolution: {integrity: sha512-yIgcHnlgv24GxHtVGUhwGqAFDyJkPIC/xjx7HostN08A8yCy8HIfl4JEkTKyBqD1v1L05jNEJOUke4Lf4O1+Qg==}
+  /@supabase/auth-js@2.63.1:
+    resolution: {integrity: sha512-iwdmIc/w5QN7aMfYThEgUt1l2i0KuohZ4XNk1adECg0LETQYEzmbVToKFKZLLZ+GyNtpsExSgVY/AUWOwubGXA==}
     dependencies:
       '@supabase/node-fetch': 2.6.15
     dev: false
 
-  /@supabase/functions-js@2.2.2:
-    resolution: {integrity: sha512-sJGq1nludmi7pY/fdtCpyY/pYonx7MfHdN408bqb736guWcVI1AChYVbI4kUM978EuOE4Ci6l7bUudfGg07QRw==}
+  /@supabase/functions-js@2.3.0:
+    resolution: {integrity: sha512-GPXzSl4MXdc0P7q+TvE8XgaPdvGBeAJ0p6AN0tbKcezpkp32mpsDf58JXaWOJGyiWSVJn6z1W73eKxf6NZNaFA==}
     dependencies:
       '@supabase/node-fetch': 2.6.15
     dev: false
@@ -738,12 +738,12 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@supabase/ssr@0.3.0(@supabase/supabase-js@2.42.3):
+  /@supabase/ssr@0.3.0(@supabase/supabase-js@2.42.5):
     resolution: {integrity: sha512-lcVyQ7H6eumb2FB1Wa2N+jYWMfq6CFza3KapikT0fgttMQ+QvDgpNogx9jI8bZgKds+XFSMCojxFvFb+gwdbfA==}
     peerDependencies:
       '@supabase/supabase-js': ^2.33.1
     dependencies:
-      '@supabase/supabase-js': 2.42.3
+      '@supabase/supabase-js': 2.42.5
       cookie: 0.5.0
       ramda: 0.29.1
     dev: false
@@ -754,11 +754,11 @@ packages:
       '@supabase/node-fetch': 2.6.15
     dev: false
 
-  /@supabase/supabase-js@2.42.3:
-    resolution: {integrity: sha512-/o52L/ngsGapcOUygWigvxzBo/bUVM4bubZMsUSZqZc+9sgjXZsgP/cwyggWUv3QOIqmbBrfSPgDLUh+Ofgi7Q==}
+  /@supabase/supabase-js@2.42.5:
+    resolution: {integrity: sha512-T/FlVmNHR/MDl8KhmNLb94dh+cTpqyvFlNI/Zd97dwS1yCm59xM+sTzmQLKnGNY5sPuwp40/w52bWrczdjOYtA==}
     dependencies:
-      '@supabase/auth-js': 2.63.0
-      '@supabase/functions-js': 2.2.2
+      '@supabase/auth-js': 2.63.1
+      '@supabase/functions-js': 2.3.0
       '@supabase/node-fetch': 2.6.15
       '@supabase/postgrest-js': 1.15.2
       '@supabase/realtime-js': 2.9.4
@@ -2738,7 +2738,7 @@ packages:
       ts-deepmerge: 7.0.0
     optionalDependencies:
       '@gcornut/valibot-json-schema': 0.0.27(@types/json-schema@7.0.15)(esbuild-runner@2.2.2)(esbuild@0.20.2)(valibot@0.30.0)
-      '@sinclair/typebox': 0.32.20
+      '@sinclair/typebox': 0.32.21
       '@sodaru/yup-to-json-schema': 2.0.1
       '@vinejs/vine': 1.8.0
       arktype: 1.0.29-alpha

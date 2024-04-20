@@ -5,6 +5,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
+	console.log('(auth)/login +page.svelte', 'Commencing');
 
 	let { data } = $props();
 	let { session, user } = data;

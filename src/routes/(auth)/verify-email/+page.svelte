@@ -11,7 +11,7 @@
 	const form = superForm(data.form, {
 		validators: zodClient(tokenSchema)
 	});
-
+	console.log('(auth)/verify-email +page.svelte', 'Commencing');
 	const { form: formData, enhance, errors } = form;
 </script>
 

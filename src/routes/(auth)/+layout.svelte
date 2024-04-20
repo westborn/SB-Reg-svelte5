@@ -1,4 +1,5 @@
 <script lang="ts">
+	console.log('(auth) +layout.svelte', 'Commencing');
 	let { children } = $props();
 </script>
 
