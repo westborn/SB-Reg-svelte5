@@ -4,7 +4,7 @@
 	import { signupSchema } from '$lib/zod-schemas.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import AuthPage from '../auth-page.svelte';
+	import AuthPage from '../auth-page.svelte.js';
 
 	let { data } = $props();
 	let { session, user } = data;
