@@ -1,15 +1,25 @@
 import { z } from 'zod';
 
 export const signupSchema = z.object({
-	email: z.string().email({ message: 'Please enter a valid email address.' })
+	email: z
+		.string({ required_error: 'Email is required' })
+		.email({ message: 'Email must be a valid email' })
+		.trim()
 });
 
 export const tokenSchema = z.object({
+	email: z
+		.string({ required_error: 'Email is required' })
+		.email({ message: 'Email must be a valid email' })
+		.trim(),
 	token: z.string().min(6, 'Please enter the token you received in your email.')
 });
 
 export const loginSchema = z.object({
-	email: z.string().email({ message: 'Please enter a valid email address.' })
+	email: z
+		.string({ required_error: 'Email is required' })
+		.email({ message: 'Email must be a valid email' })
+		.trim()
 });
 
 const imageTypes = [
@@ -45,8 +55,8 @@ const blobSchema = z.object({
 		})
 });
 
-export const registrationSchema = z.object({
-	registrationId: z.string(),
+export const artistSchema = z.object({
+	id: z.number().int(),
 	firstName: z
 		.string({ required_error: 'First Name is required' })
 		.regex(/^[a-z ,.'-]+$/i, { message: 'First Name can only contain letters and spaces.' })
@@ -76,26 +86,42 @@ export const registrationSchema = z.object({
 	accommodation: z.string().trim(),
 	confirmation: z.string().trim()
 });
-export type signupRecord = z.infer<typeof registrationSchema>;
+export type artistRecord = z.infer<typeof artistSchema>;
+
+export const registrationSchema = z.object({
+	id: z.number().int(),
+	artistId: z.number().int(),
+	registrationYear: z.string().trim(),
+	closed: z.boolean({ required_error: 'closed response is required' }),
+	bumpIn: z.string().trim(),
+	bumpOut: z.string().trim(),
+	displayRequirements: z.string().trim(),
+	accomodation: z.boolean({ required_error: 'accomodation response is required' }),
+	crane: z.boolean({ required_error: 'transport response is required' }),
+	transport: z.boolean({ required_error: 'transport response is required' })
+});
+export type registrationRecord = z.infer<typeof registrationSchema>;
 
 export const entrySchema = z.object({
-	entryId: z.string().trim(),
-	registrationId: z.string().trim(),
-	inOrOut: z.enum(inOrOutTypes),
-	email: z.string().trim(),
-	title: z.string().trim(),
+	id: z.number().int(),
+	registrationId: z.number().int(),
+	artistId: z.number().int(),
+	accepted: z.boolean(),
+	inOrOut: z.string().trim(),
+	title: z.string({ required_error: 'Title is required' }).trim(),
 	material: z.string().trim(),
 	dimensions: z.string().trim(),
 	description: z.string().trim(),
 	specialRequirements: z.string().trim(),
-	enterMajorPrize: z.string().trim(),
+	enterMajorPrize: z.boolean(),
 	price: z.coerce.string({ required_error: 'Price is required' }).trim()
 });
 export type entryRecord = z.infer<typeof entrySchema>;
 
 export const imageSchema = z.object({
-	imageId: z.string({ required_error: 'imageId is required' }).trim(),
-	entryId: z.string({ required_error: 'entryId is required' }).trim(),
+	id: z.number().int(),
+	entryId: z.number().int(),
+	registrationId: z.number().int(),
 	imageURL: z.string({ required_error: 'URL is required' }).url().trim(),
 	imageFileName: z.string().trim(),
 	originalFileName: z.string().trim()
@@ -107,17 +133,9 @@ export const entryWithImagesSchema = entrySchema.extend({
 });
 export type entryWithImagesRecord = z.infer<typeof entryWithImagesSchema>;
 
-export const registrationWithEntriesSchema = z.object({
-	registration: signupSchema.partial(),
+export const artistDetailsSchema = z.object({
+	artist: artistSchema,
+	registration: registrationSchema.optional(),
 	entries: z.array(entryWithImagesSchema).optional()
 });
-export type registrationWithEntriesRecord = z.infer<typeof registrationWithEntriesSchema>;
-
-export const acceptUserEmail = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
-		.trim()
-		.optional()
-});
-export type acceptUserEmailMessage = z.infer<typeof acceptUserEmail>;
+export type artistDetailsRecord = z.infer<typeof artistDetailsSchema>;

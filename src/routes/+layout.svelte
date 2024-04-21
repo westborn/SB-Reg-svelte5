@@ -23,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>User Management</title>
+	<title>Registration</title>
 </svelte:head>
 
 <ModeWatcher />

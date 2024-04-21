@@ -3,24 +3,18 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-enum FirstNations {
-  YES
-  NO
-  DECLINED
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model artistTable {
   id                Int                 @id @default(autoincrement())
-  email             String
+  email             String              @unique
   firstName         String?             @map("first_name")
   lastName          String?             @map("last_name")
+  phone             String?
   postcode          String?
-  firstNations      FirstNations?       @default(NO) @map("first_nations")
+  firstNations      Indigenous?         @default(NO) @map("first_nations")
   bankAccountName   String?             @map("bank_account_name")
   bankBSB           String?             @map("bank_bsb")
   bankAccount       String?             @map("bank_account")
@@ -28,15 +22,14 @@ model artistTable {
   updatedAt         DateTime            @updatedAt @map("updated_at")
   registrationTable registrationTable[]
 
-  @@map("artists")
+  @@map("artist")
 }
 
 model registrationTable {
   id                  Int          @id @default(autoincrement())
   artistId            Int          @map("artist_id")
-  artist              artistTable  @relation(fields: [artistId], references: [id])
   registrationYear    String       @map("registration_year")
-  paidFor             Boolean      @default(false) @map("paid_for")
+  closed              Boolean      @default(false)
   bumpIn              String?      @map("bump_in")
   bumpOut             String?      @map("bump_out")
   displayRequirements String?      @map("display_requirements")
@@ -46,14 +39,15 @@ model registrationTable {
   createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime     @updatedAt @map("updated_at")
   entryTable          entryTable[]
+  artist              artistTable  @relation(fields: [artistId], references: [id])
 
-  @@map("registrations")
+  @@map("registration")
 }
 
 model entryTable {
   id                  Int               @id @default(autoincrement())
   registrationId      Int               @map("registration_id")
-  registration        registrationTable @relation(fields: [registrationId], references: [id])
+  accepted            Boolean           @default(false)
   description         String?
   dimensions          String?
   enterMajorPrize     String?           @map("enter_major_prize")
@@ -64,20 +58,29 @@ model entryTable {
   title               String
   createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime          @updatedAt @map("updated_at")
-  image               image[]
+  registration        registrationTable @relation(fields: [registrationId], references: [id])
+  image               imageTable[]
 
-  @@map("entries")
+  @@map("entry")
 }
 
-model image {
+model imageTable {
   id               Int        @id @default(autoincrement())
   entryId          Int        @map("entry_id")
-  entry            entryTable @relation(fields: [entryId], references: [id])
   imageURL         String     @map("image_url")
   imageFileName    String?    @map("image_file_name")
   originalFileName String?    @map("original_file_name")
   createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt        DateTime   @updatedAt @map("updated_at")
+  entry            entryTable @relation(fields: [entryId], references: [id])
 
-  @@map("images")
+  @@map("image")
+}
+
+enum Indigenous {
+  YES
+  NO
+  DECLINED
+
+  @@map("indigenous")
 }
