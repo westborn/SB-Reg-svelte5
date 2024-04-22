@@ -75,16 +75,9 @@ export const artistSchema = z.object({
 		.trim(),
 	phone: z.coerce.string({ required_error: 'Phone number is required' }).trim(),
 	postcode: z.coerce.string({ required_error: 'Postcode is required' }).trim(),
-	bumpIn: z.string().trim(),
-	bumpOut: z.string().trim(),
-	crane: z.string().trim(),
-	displayRequirements: z.string().trim(),
 	bankAccountName: z.string().trim(),
 	bankBSB: z.coerce.string().trim(),
-	bankAccount: z.coerce.string().trim(),
-	transport: z.string().trim(),
-	accommodation: z.string().trim(),
-	confirmation: z.string().trim()
+	bankAccount: z.coerce.string().trim()
 });
 export type artistRecord = z.infer<typeof artistSchema>;
 

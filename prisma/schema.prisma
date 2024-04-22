@@ -20,7 +20,9 @@ model artistTable {
   bankAccount       String?             @map("bank_account")
   createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt         DateTime            @updatedAt @map("updated_at")
-  registrationTable registrationTable[]
+  registrationArray registrationTable[]
+  imageTable        imageTable[]
+  entryTable        entryTable[]
 
   @@map("artist")
 }
@@ -38,41 +40,48 @@ model registrationTable {
   transport           Boolean?
   createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime     @updatedAt @map("updated_at")
-  entryTable          entryTable[]
-  artist              artistTable  @relation(fields: [artistId], references: [id])
+  entryArray          entryTable[]
+  artistTable         artistTable  @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  imageTable          imageTable[]
 
   @@map("registration")
 }
 
 model entryTable {
   id                  Int               @id @default(autoincrement())
-  registrationId      Int               @map("registration_id")
+  artistId            Int               @map("artist_id")
   accepted            Boolean           @default(false)
+  registrationId      Int               @map("registration_id")
   description         String?
   dimensions          String?
-  enterMajorPrize     String?           @map("enter_major_prize")
-  inOrOut             String            @map("in_or_out")
+  enterMajorPrize     Boolean           @default(false) @map("enter_major_prize")
+  inOrOut             EntryType?        @map("in_or_out")
   material            String?
   price               Int?
   specialRequirements String?           @map("special_requirements")
   title               String
   createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime          @updatedAt @map("updated_at")
-  registration        registrationTable @relation(fields: [registrationId], references: [id])
-  image               imageTable[]
+  imageArray          imageTable[]
+  artistTable         artistTable       @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  registrationTable   registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("entry")
 }
 
 model imageTable {
-  id               Int        @id @default(autoincrement())
-  entryId          Int        @map("entry_id")
-  imageURL         String     @map("image_url")
-  imageFileName    String?    @map("image_file_name")
-  originalFileName String?    @map("original_file_name")
-  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt        DateTime   @updatedAt @map("updated_at")
-  entry            entryTable @relation(fields: [entryId], references: [id])
+  id                Int                @id @default(autoincrement())
+  artistId          Int                @map("artist_id")
+  registrationId    Int?               @map("registration_id")
+  entryId           Int?               @map("entry_id")
+  imageURL          String             @map("image_url")
+  imageFileName     String?            @map("image_file_name")
+  originalFileName  String?            @map("original_file_name")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  artistTable       artistTable        @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  registrationTable registrationTable? @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  entryTable        entryTable?        @relation(fields: [entryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("image")
 }
@@ -83,4 +92,11 @@ enum Indigenous {
   DECLINED
 
   @@map("indigenous")
+}
+
+enum EntryType {
+  Indoor
+  Outdoor
+
+  @@map("entry_type")
 }

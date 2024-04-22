@@ -1,80 +1,90 @@
-// import { faker } from "@faker-js/faker";
-// import { regstrationTable, entryTable } from '$lib/components/server/db';
-import { mockArtistData, mockRegistrationData, mockEntryData, mockImageData } from './data.ts';
-import { artistSchema } from '$lib/zod-schemas.ts';
-
+import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
+
+import { Indigenous, EntryType } from '$lib/constants';
+
 const prisma = new PrismaClient();
 
-async function main1() {
-	const users = await prisma.artistTable.findMany();
-	console.log(users);
-}
-
-async function main2() {
-	const {
+function makeArtist() {
+	const firstName = faker.person.firstName();
+	// const firstNations = faker.helpers.enumValue(Indigenous);
+	return {
 		firstName,
-		lastName,
-		email,
-		postcode,
-		bankAccountName,
-		bankBSB,
-		bankAccount,
-		firstNations
-	} = mockArtistData[0];
-	const data = {
-		firstName,
-		lastName,
-		email,
-		postcode,
-		bankAccountName,
-		bankBSB,
-		bankAccount,
-		firstNations: firstNations.toUpperCase()
+		lastName: faker.person.lastName(),
+		email: faker.internet.exampleEmail({ firstName }).toLowerCase(),
+		firstNations: faker.helpers.enumValue(Indigenous),
+		phone: '04' + faker.string.numeric(8),
+		postcode: faker.string.numeric(4),
+		bankAccountName: faker.finance.accountName(),
+		bankBSB: faker.string.numeric(6),
+		bankAccount: faker.finance.accountNumber()
 	};
-	const result = await prisma.artistTable.create({ data });
 }
 
-main2()
-	.then(async () => {
-		await prisma.$disconnect();
-	})
-	.catch(async (e) => {
-		console.error(e);
-		await prisma.$disconnect();
-		process.exit(1);
+function makeRegistration(artistId: number) {
+	return {
+		artistId,
+		registrationYear: '2025',
+		bumpIn: faker.date.future().toString(),
+		bumpOut: faker.date.future().toString(),
+		crane: faker.datatype.boolean(),
+		displayRequirements: faker.lorem.words(),
+		transport: faker.datatype.boolean(),
+		accommodation: faker.datatype.boolean(),
+		closed: false
+	};
+}
+
+function makeEntry(artistId: number, registrationId: number) {
+	return {
+		artistId,
+		registrationId,
+		accepted: false,
+		enterMajorPrize: faker.datatype.boolean(),
+		inOrOut: faker.helpers.enumValue(EntryType),
+		title: faker.lorem.words(3),
+		material: faker.lorem.words(3),
+		dimensions: `${faker.number.int({ min: 10, max: 100 })}x${faker.number.int({ min: 10, max: 100 })}x${faker.number.int({ min: 10, max: 100 })}`,
+		description: faker.lorem.sentence({ min: 8, max: 20 }),
+		specialRequirements: faker.lorem.words(),
+		price: faker.number.int({ min: 100, max: 10000 }) * 100
+	};
+}
+
+function makeImage(artistId: number, registrationId: number, entryId: number) {
+	return {
+		artistId,
+		registrationId,
+		entryId,
+		imageURL: faker.image.url(),
+		imageFileName: faker.system.fileName(),
+		originalFileName: faker.system.fileName()
+	};
+}
+
+// create an Artist record, a Registration record, and three Entry records with an associated Image record
+try {
+	const result1 = await prisma.artistTable.create({
+		data: makeArtist()
 	});
+	console.log(`Artist: ${result1.id}`);
 
-async function runSeeders() {
-	// registrations
-	await Promise.all(
-		mockRegistrationData.map(async (registration) =>
-			prisma.registrationTable.upsert({
-				where: { id: registration.id },
-				update: {},
-				create: registration
-			})
-		)
-	);
+	const result2 = await prisma.registrationTable.create({
+		data: makeRegistration(result1.id)
+	});
+	console.log(`Registration: ${result2.id}`);
 
-	// Posts
-	await Promise.all(
-		mockEntryData.map(async (entry) =>
-			prisma.entryTable.upsert({
-				where: { id: entry.id },
-				update: {},
-				create: entry
-			})
-		)
-	);
+	for (let i = 0; i < 3; i++) {
+		const result3 = await prisma.entryTable.create({
+			data: makeEntry(result1.id, result2.id)
+		});
+		const result4 = await prisma.imageTable.create({ data: makeImage(result1.id, result2.id, result3.id) });
+		console.log(`Entry: ${result3.id}`);
+		console.log(`Image: ${result4.id}`);
+	}
+} catch (e) {
+	console.error(e);
+	process.exit(1);
 }
 
-// runSeeders()
-// 	.catch((e) => {
-// 		console.error(`There was an error while seeding: ${e}`);
-// 		process.exit(1);
-// 	})
-// 	.finally(async () => {
-// 		console.log('Successfully seeded database. Closing connection.');
-// 		await prisma.$disconnect();
-// 	});
+await prisma.$disconnect();
