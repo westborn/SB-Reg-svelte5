@@ -46,7 +46,7 @@ pnpm dlx shadcn-svelte@latest add alert-dialog avatar button card dialog form in
 		--background: 0 0% 100%;
 		--foreground: 222.2 84% 4.9%;
 		--card: 0 0% 100%;
-		--card-foreground: 222.2 84% 4.9%;
+		--card-foreground: 222.2 84% 80%;
 		--popover: 0 0% 100%;
 		--popover-foreground: 222.2 84% 4.9%;
 		--primary: 221.2 83.2% 53.3%;

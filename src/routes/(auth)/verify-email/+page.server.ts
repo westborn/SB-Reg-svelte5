@@ -7,8 +7,8 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	console.log('(auth)/verify-email +page.server.ts', 'Commencing');
 	const { session, user } = await event.locals.safeGetSession();
-	// console.log('verify-email:', session);
-	// console.log('verify-email:', user);
+	console.log('verify-email:', session);
+	console.log('verify-email:', user);
 	if (user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	return {
 		session,

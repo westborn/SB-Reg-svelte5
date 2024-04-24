@@ -21,10 +21,10 @@ function makeArtist() {
 	};
 }
 
-function makeRegistration(artistId: number) {
+function makeRegistration(artistId: number, year: string = '2025') {
 	return {
 		artistId,
-		registrationYear: '2025',
+		registrationYear: year,
 		bumpIn: faker.date.future().toString(),
 		bumpOut: faker.date.future().toString(),
 		crane: faker.datatype.boolean(),
@@ -69,18 +69,23 @@ try {
 	});
 	console.log(`Artist: ${result1.id}`);
 
-	const result2 = await prisma.registrationTable.create({
-		data: makeRegistration(result1.id)
-	});
-	console.log(`Registration: ${result2.id}`);
-
-	for (let i = 0; i < 3; i++) {
-		const result3 = await prisma.entryTable.create({
-			data: makeEntry(result1.id, result2.id)
+	for (let i = 0; i < 2; i++) {
+		const year = (2024 + i).toString();
+		const result2 = await prisma.registrationTable.create({
+			data: makeRegistration(result1.id, year)
 		});
-		const result4 = await prisma.imageTable.create({ data: makeImage(result1.id, result2.id, result3.id) });
-		console.log(`Entry: ${result3.id}`);
-		console.log(`Image: ${result4.id}`);
+		console.log(`Registration: ${result2.id}`);
+
+		for (let i = 0; i < 3; i++) {
+			const result3 = await prisma.entryTable.create({
+				data: makeEntry(result1.id, result2.id)
+			});
+			const result4 = await prisma.imageTable.create({
+				data: makeImage(result1.id, result2.id, result3.id)
+			});
+			console.log(`Entry: ${result3.id}`);
+			console.log(`Image: ${result4.id}`);
+		}
 	}
 } catch (e) {
 	console.error(e);

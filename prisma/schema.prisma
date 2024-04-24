@@ -8,21 +8,21 @@ datasource db {
 }
 
 model artistTable {
-  id                Int                 @id @default(autoincrement())
-  email             String              @unique
-  firstName         String?             @map("first_name")
-  lastName          String?             @map("last_name")
-  phone             String?
-  postcode          String?
-  firstNations      Indigenous?         @default(NO) @map("first_nations")
-  bankAccountName   String?             @map("bank_account_name")
-  bankBSB           String?             @map("bank_bsb")
-  bankAccount       String?             @map("bank_account")
-  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  registrationArray registrationTable[]
-  imageTable        imageTable[]
-  entryTable        entryTable[]
+  id              Int                 @id @default(autoincrement())
+  email           String              @unique
+  firstName       String              @map("first_name")
+  lastName        String              @map("last_name")
+  phone           String
+  postcode        String
+  firstNations    Indigenous          @default(No) @map("first_nations")
+  bankAccountName String?             @map("bank_account_name")
+  bankBSB         String?             @map("bank_bsb")
+  bankAccount     String?             @map("bank_account")
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  registrations   registrationTable[]
+  images          imageTable[]
+  entries         entryTable[]
 
   @@map("artist")
 }
@@ -40,9 +40,9 @@ model registrationTable {
   transport           Boolean?
   createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime     @updatedAt @map("updated_at")
-  entryArray          entryTable[]
-  artistTable         artistTable  @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  imageTable          imageTable[]
+  artist              artistTable  @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  entries             entryTable[]
+  images              imageTable[]
 
   @@map("registration")
 }
@@ -62,34 +62,34 @@ model entryTable {
   title               String
   createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime          @updatedAt @map("updated_at")
-  imageArray          imageTable[]
-  artistTable         artistTable       @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  registrationTable   registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  images              imageTable[]
+  artist              artistTable       @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  registration        registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("entry")
 }
 
 model imageTable {
-  id                Int                @id @default(autoincrement())
-  artistId          Int                @map("artist_id")
-  registrationId    Int?               @map("registration_id")
-  entryId           Int?               @map("entry_id")
-  imageURL          String             @map("image_url")
-  imageFileName     String?            @map("image_file_name")
-  originalFileName  String?            @map("original_file_name")
-  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt         DateTime           @updatedAt @map("updated_at")
-  artistTable       artistTable        @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  registrationTable registrationTable? @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  entryTable        entryTable?        @relation(fields: [entryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id               Int                @id @default(autoincrement())
+  artistId         Int                @map("artist_id")
+  registrationId   Int?               @map("registration_id")
+  entryId          Int?               @map("entry_id")
+  imageURL         String             @map("image_url")
+  imageFileName    String?            @map("image_file_name")
+  originalFileName String?            @map("original_file_name")
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  artist           artistTable        @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  registration     registrationTable? @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  entry            entryTable?        @relation(fields: [entryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("image")
 }
 
 enum Indigenous {
-  YES
-  NO
-  DECLINED
+  Yes
+  No
+  Declined
 
   @@map("indigenous")
 }

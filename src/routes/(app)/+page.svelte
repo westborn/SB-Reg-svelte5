@@ -11,7 +11,10 @@
 
 <section class="container flex flex-row items-center justify-between">
 	<div>
-		<a href="/" class="text-2xl font-bold leading-tight tracking-tighter text-primary md:text-3xl">
+		<a
+			href="/"
+			class="text-2xl font-bold leading-tight tracking-tighter text-primary md:text-3xl"
+		>
 			SB Exhibit Registration
 		</a>
 	</div>
@@ -38,4 +41,4 @@
 	<p>(app) +page.svelte</p>
 </section>
 <!-- <pre> Session  - {JSON.stringify(session, null, 2)}</pre> -->
-<!-- <pre> User - {JSON.stringify(user, null, 2)}</pre> -->
+<pre> User - {JSON.stringify(user, null, 2)}</pre>
