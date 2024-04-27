@@ -13,7 +13,7 @@
 	let { type, children, session, user }: Props = $props();
 </script>
 
-<div class="container max-w-xl mx-auto">
+<div class="container mx-auto max-w-xl">
 	<div class="absolute right-2 top-2">
 		<div class="flex items-center gap-2">
 			{#if type === 'login'}
@@ -31,10 +31,7 @@
 			<ThemeToggle />
 		</div>
 	</div>
-	<div class="w-full max-w-xl mx-auto mt-20">
-		{console.log('(auth)auth-page.svelte', 'Rendering')}
-		<br />
-		child goes here (auth)auth-page.svelte
+	<div class="mx-auto mt-20 w-full max-w-xl">
 		{@render children()}
 	</div>
 	<p class="py-4 text-sm text-muted-foreground">
@@ -44,6 +41,3 @@
 		<a href="/privacy" class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a>
 	</p>
 </div>
-
-<!-- <p>(auth) auth-page.svelte</p>
-<pre> {JSON.stringify(session, null, 2)}</pre> -->

@@ -3,10 +3,9 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import ThemeToggle from '$lib/components/theme-toggle.svelte';
-	console.log('(app) +layout.svelte', 'Commencing');
 	let { children, data } = $props();
 	const { session, user } = data;
-	const loggedInEmail = user ? user.email : 'george@westborn.com.au';
+	const loggedInEmail = user ? user.email : 'dulce21@example.com';
 	const avatar = loggedInEmail.slice(0, 2);
 </script>
 
@@ -34,12 +33,7 @@
 	</div>
 </section>
 <section class="container">
-	<p class="text-2xl">This is (app) PAGE</p>
-	<p>(app) +page.svelte</p>
+	<main class="h-screen">
+		{@render children()}
+	</main>
 </section>
-
-<main class="h-screen">
-	{console.log('(app)+layout.svelte', 'Rendering')}
-	child goes here (app)+layout.svelte'
-	{@render children()}
-</main>

@@ -5,10 +5,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	console.log('(auth)/verify-email +page.server.ts', 'Commencing');
 	const { session, user } = await event.locals.safeGetSession();
-	console.log('verify-email:', session);
-	console.log('verify-email:', user);
 	if (user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	return {
 		session,
@@ -19,14 +16,11 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
 	default: async (event) => {
-		console.log('(auth)/verify-email +page.server.ts', 'Action Commencing');
 		const { supabase, safeGetSession } = event.locals;
-
 		const { user } = await safeGetSession();
 		if (user) redirect(302, '/');
 
 		const form = await superValidate(event, zod(tokenSchema));
-
 		if (!form.valid) {
 			return fail(400, {
 				form

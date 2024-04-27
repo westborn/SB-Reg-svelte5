@@ -8,16 +8,13 @@
 
 	let { children, data } = $props();
 	let { supabase, session } = data;
-	console.log('+layout.svelte', 'Commencing');
 
 	onMount(() => {
-		console.log('+layout.svelte', 'On Mount');
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
 		});
-
 		return () => data.subscription.unsubscribe();
 	});
 </script>
@@ -28,6 +25,4 @@
 
 <ModeWatcher />
 <Toaster />
-{console.log('+layout.svelte', 'Rendering')}
-OK child goes here '+layout.svelte'
 {@render children()}

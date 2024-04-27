@@ -6,8 +6,6 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
 
-	console.log('(auth)/signup +page.svelte', 'Commencing');
-
 	let { data } = $props();
 	let { session, user } = data;
 	const form = superForm(data.form, {
@@ -18,8 +16,6 @@
 </script>
 
 <AuthPage type="signup" {session} {user}>
-	<!-- <p>(auth)/signup/page</p> -->
-	<!-- <pre> {JSON.stringify(session, null, 2)}</pre> -->
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Create an account</h1>
 		<p class="text-sm text-muted-foreground">Start building your digital community today.</p>
@@ -33,15 +29,10 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-
 		<Form.Errors errors={$errors._errors} />
-
 		<div>
 			<Form.Button>Register</Form.Button>
 			<span class="text-sm text-muted-foreground"> We will send a token to your email address for verification</span>
 		</div>
 	</form>
-	{console.log('+(auth)signup.svelte', 'Rendering AuthPage')}
-	<br />
-	+(auth)signup - Rendering inside AuthPage
 </AuthPage>

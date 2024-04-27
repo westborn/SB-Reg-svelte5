@@ -11,13 +11,10 @@
 	const form = superForm(data.form, {
 		validators: zodClient(tokenSchema)
 	});
-	console.log('(auth)/verify-email +page.svelte', 'Commencing');
 	const { form: formData, enhance, errors } = form;
 </script>
 
 <AuthPage type="verify-email" {session} {user}>
-	<!-- <p>(auth)/verify-email/page</p> -->
-	<!-- <pre> {JSON.stringify(session, null, 2)}</pre> -->
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Verify your account</h1>
 		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
@@ -37,5 +34,4 @@
 		<Form.Errors errors={$errors._errors} />
 		<Form.Button>Verify email address</Form.Button>
 	</form>
-	{console.log('+(auth)verify-email.svelte', 'Rendering AuthPage')}
 </AuthPage>
