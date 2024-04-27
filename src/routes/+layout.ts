@@ -5,7 +5,12 @@ import { createBrowserClient, isBrowser, parse } from '@supabase/ssr';
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends('supabase:auth');
-	console.log('+layout.ts', 'Commencing');
+	if (isBrowser()) {
+		console.log('+layout.ts Commencing', 'Browser');
+	} else {
+		console.log('+layout.ts Commencing', 'Server');
+	}
+
 	const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		global: {
 			fetch
@@ -30,6 +35,10 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	const {
 		data: { session }
 	} = await supabase.auth.getSession();
-
+	if (isBrowser()) {
+		console.log('+layout.ts Session', 'Browser', session);
+	} else {
+		console.log('+layout.ts Session', 'Server', session);
+	}
 	return { supabase, session };
 };

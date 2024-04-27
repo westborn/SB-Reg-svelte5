@@ -27,9 +27,7 @@
 			<Form.Control let:attrs>
 				<Form.Label
 					>6 Digit Token
-					<span class="py-4 text-xs text-muted-foreground"
-						>(that we sent to your email address)</span
-					>
+					<span class="py-4 text-xs text-muted-foreground">(that we sent to your email address)</span>
 				</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.token} />
 			</Form.Control>
@@ -39,10 +37,5 @@
 		<Form.Errors errors={$errors._errors} />
 		<Form.Button>Verify email address</Form.Button>
 	</form>
-	<p class="py-4 text-sm text-muted-foreground">
-		By clicking continue, you agree to our{' '}
-		<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service </a>
-		and
-		<a href="/privacy" class="underline underline-offset-4 hover:text-primary"> Privacy Policy.</a>
-	</p>
+	{console.log('+(auth)verify-email.svelte', 'Rendering AuthPage')}
 </AuthPage>

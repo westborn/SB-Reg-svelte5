@@ -5,8 +5,8 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
-	console.log('(auth)/login +page.svelte', 'Commencing');
 
+	console.log('(auth)/login +page.svelte', 'Commencing');
 	let { data } = $props();
 	let { session, user } = data;
 
@@ -36,15 +36,10 @@
 		<Form.Errors errors={$errors._errors} />
 		<div>
 			<Form.Button>Login</Form.Button>
-			<span class="text-sm text-muted-foreground">
-				We will send a token to your email address for verification</span
-			>
+			<span class="text-sm text-muted-foreground"> We will send a token to your email address for verification</span>
 		</div>
 	</form>
-	<p class="py-4 text-sm text-muted-foreground">
-		By clicking continue, you agree to our{' '}
-		<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service</a>
-		{' '}and{' '}
-		<a href="/privacy" class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a>
-	</p>
+	{console.log('+(auth)login.svelte - Rendering AuthPage')}
+	<br />
+	+(auth)login - Rendering inside AuthPage
 </AuthPage>

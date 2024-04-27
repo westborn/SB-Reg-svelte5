@@ -28,4 +28,6 @@
 
 <ModeWatcher />
 <Toaster />
+{console.log('+layout.svelte', 'Rendering')}
+OK child goes here '+layout.svelte'
 {@render children()}

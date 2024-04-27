@@ -3,10 +3,11 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import ThemeToggle from '$lib/components/theme-toggle.svelte';
-	console.log('(app) +page.svelte', 'Commencing');
-
-	let { data } = $props();
+	console.log('(app) +layout.svelte', 'Commencing');
+	let { children, data } = $props();
 	const { session, user } = data;
+	const loggedInEmail = user ? user.email : 'george@westborn.com.au';
+	const avatar = loggedInEmail.slice(0, 2);
 </script>
 
 <section class="container flex flex-row items-center justify-between">
@@ -16,18 +17,17 @@
 		</a>
 	</div>
 	<div class="flex items-center gap-2">
-		<p>{user.email}</p>
 		<Button href={'/logout'} variant="ghost">Logout</Button>
 		<Tooltip.Root openDelay={0}>
 			<Tooltip.Trigger>
 				<Avatar.Root>
 					<Avatar.Fallback class="uppercase">
-						{user.email.slice(0, 2)}
+						{avatar}
 					</Avatar.Fallback>
 				</Avatar.Root>
 			</Tooltip.Trigger>
 			<Tooltip.Content>
-				<p>{user.email}</p>
+				<p>{loggedInEmail}</p>
 			</Tooltip.Content>
 		</Tooltip.Root>
 		<ThemeToggle></ThemeToggle>
@@ -37,7 +37,9 @@
 	<p class="text-2xl">This is (app) PAGE</p>
 	<p>(app) +page.svelte</p>
 </section>
-{console.log('+(app)+page.svelte', 'Rendering')}
-(app)/ +page.svelte
-<!-- <pre> Session  - {JSON.stringify(session, null, 2)}</pre> -->
-<!-- <pre> User - {JSON.stringify(user, null, 2)}</pre> -->
+
+<main class="h-screen">
+	{console.log('(app)+layout.svelte', 'Rendering')}
+	child goes here (app)+layout.svelte'
+	{@render children()}
+</main>

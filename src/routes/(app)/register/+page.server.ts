@@ -6,10 +6,11 @@ import { prisma } from '$lib/components/server/prisma';
 import { getArtistCollection } from '$lib/components/server/artist';
 
 export const load: PageServerLoad = async (event) => {
-	console.log('(app)/register +page.server.ts', 'Commencing');
+	console.log('(app)/register +page.server.ts - Loading');
 	const { session, user } = await event.locals.safeGetSession();
-	console.log('loading (user is)', user);
+	// console.log('loading (user is)', user);
 	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
+	console.log('(app)/register +page.server.ts', 'Session:', { session, user });
 
 	const artistEmail = 'dulce21@example.com';
 	const artistCollection = await getArtistCollection(artistEmail);
@@ -22,8 +23,8 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	updateArtist: async (event) => {
+		console.log('(app)/register +page.server.ts', 'UpdateArtist');
 		// const { supabase, safeGetSession } = event.locals;
-
 		// const { user } = await safeGetSession();
 		// console.log('updateArtist (event is): ', Object.keys(event));
 		// console.log('updateArtist (event is): ', JSON.stringify(event, null, 2));
@@ -49,10 +50,10 @@ export const actions: Actions = {
 				return message(form, 'Successfully updated the profile.');
 			}
 		} catch (reason) {
-			console.log('No reason - (app)/register +page.server.ts', reason);
+			console.log('Prisma Error? (app)/register +page.server.ts', reason);
 			return message(form, "Something went wrong. Sorry, we're broken!.");
 		}
-		console.log('how did we get here (app)/register +page.server.ts', result);
+		console.log('Generic Error? (app)/register +page.server.ts', result);
 		return message(form, 'Something went wrong. Please try again later.');
 	}
 };
