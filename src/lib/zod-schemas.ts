@@ -1,34 +1,24 @@
 import { z } from 'zod';
 
 export const signupSchema = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
+	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
 });
 
 export const tokenSchema = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' }),
+	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
 	token: z.string().min(6, 'Please enter the token you received in your email.')
 });
 
 export const loginSchema = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
+	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
 });
 
-const imageTypes = [
-	'image/jpeg',
-	'image/jpg',
-	'image/png',
-	'image/webp',
-	'image/svg+xml',
-	'image/gif'
-];
+const imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
 
 const inOrOutTypes = ['Indoor', 'Outdoor'] as const;
+
+export const IndigenousSchema = z.enum(['Yes', 'No', 'Declined']);
+export type IndigenousType = `${z.infer<typeof IndigenousSchema>}`;
 
 const blobSchema = z.object({
 	blob: z
@@ -45,8 +35,7 @@ const blobSchema = z.object({
 				if (!imageTypes.includes(val.type)) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message:
-							'Unsupported Image type. Supported formats: jpeg, jpg, png, webp, svg, gif'
+						message: 'Unsupported Image type. Supported formats: jpeg, jpg, png, webp, svg, gif'
 					});
 				}
 			}
@@ -64,6 +53,7 @@ export const artistPublicSchema = z.object({
 		.max(64, { message: 'Last Name must be less than 64 characters' }),
 	phone: z.coerce.string({ required_error: 'Phone number is required' }),
 	postcode: z.coerce.string({ required_error: 'Postcode is required' }),
+	firstNations: z.lazy(() => IndigenousSchema).default('No'),
 	bankAccountName: z.string().nullish(),
 	bankBSB: z.coerce.string().nullish(),
 	bankAccount: z.coerce.string().nullish()
@@ -71,9 +61,7 @@ export const artistPublicSchema = z.object({
 
 const artistSchema = artistPublicSchema.extend({
 	id: z.number().int(),
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
+	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
 });
 export type artistRecord = z.infer<typeof artistSchema>;
 export type artistPublicRecord = z.infer<typeof artistPublicSchema>;

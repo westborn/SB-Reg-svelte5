@@ -11,6 +11,7 @@ export const load: PageServerLoad = async (event) => {
 	const artistEmail = 'dulce21@example.com';
 	const artistCollection = await getArtistCollection(artistEmail);
 
+	console.log('(app)/register/+page.server.ts LOAD - DONE');
 	return {
 		artistCollection,
 		form: await superValidate(artistCollection, zod(artistPublicSchema))
@@ -29,7 +30,7 @@ export const actions: Actions = {
 				data: form.data
 			});
 			if (result) {
-				return message(form, 'Successfully updated the profile.');
+				return message(form, 'Success');
 			}
 		} catch (reason) {
 			console.log('Prisma Error? (app)/register +page.server.ts', reason);

@@ -24,5 +24,14 @@
 </svelte:head>
 
 <ModeWatcher />
-<Toaster />
-{@render children()}
+<Toaster
+	toastOptions={{
+		unstyled: true,
+		classes: {
+			error: 'bg-red-400',
+			success: 'text-green-400',
+			warning: 'text-yellow-400',
+			info: 'bg-blue-400'
+		}
+	}}
+/>{@render children()}
