@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
@@ -11,13 +11,14 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	import { artistPublicSchema } from '$lib/zod-schemas';
+	import { artistSchema } from '$lib/zod-schemas';
+	import Sonner from './ui/sonner/sonner.svelte';
 
 	// TODO add an interface type for $props to avoid an error
 	let { data } = $props();
 	let dialogOpen = $state(false);
 	const form = superForm(data.form, {
-		validators: zodClient(artistPublicSchema),
+		validators: zodClient(artistSchema),
 		resetForm: false,
 		onUpdated: () => {
 			toast.success('Profile Updated');
@@ -27,30 +28,31 @@
 	const { form: formData, enhance, errors, message, delayed } = form;
 </script>
 
+<Superdubug>{data}</Superdubug>
 <Card.Root>
 	<Card.Header>
 		<Card.Title class="text-xl">Registration Management</Card.Title>
 	</Card.Header>
 	<Card.Content>
 		<p class="text-sm text-muted-foreground">Some information we use to contact you:</p>
-		{#if data.artistCollection}
+		{#if data.submission}
 			<div class="mb-3 grid grid-cols-[20ch_1fr] items-center p-4">
 				<p class="text-sm">First Name:</p>
-				<p class="">{data.artistCollection.firstName}</p>
+				<p class="">{data.submission.firstName}</p>
 				<p class="text-sm">Last Name:</p>
-				<p class="">{data.artistCollection.lastName}</p>
+				<p class="">{data.submission.lastName}</p>
 				<p class="text-sm">Phone:</p>
-				<p class="">{data.artistCollection.phone}</p>
+				<p class="">{data.submission.phone}</p>
 				<p class="text-sm">Postcode:</p>
-				<p class="">{data.artistCollection.postcode}</p>
+				<p class="">{data.submission.postcode}</p>
 				<p class="text-sm">First Nation:</p>
-				<p class="">{data.artistCollection.firstNations}</p>
+				<p class="">{data.submission.firstNations}</p>
 				<p class="text-sm">Bank Account Name:</p>
-				<p class="">{data.artistCollection.bankAccountName}</p>
+				<p class="">{data.submission.bankAccountName}</p>
 				<p class="text-sm">BSB:</p>
-				<p class="">{data.artistCollection.bankBSB}</p>
+				<p class="">{data.submission.bankBSB}</p>
 				<p class="text-sm">Account:</p>
-				<p class="">{data.artistCollection.bankAccount}</p>
+				<p class="">{data.submission.bankAccount}</p>
 			</div>
 			<script lang="ts">
 			</script>
@@ -62,12 +64,7 @@
 						<Dialog.Description>Make changes to your profile here. Click save when you're done.</Dialog.Description>
 					</Dialog.Header>
 
-					<form
-						method="POST"
-						action="?/updateArtist&id={data.artistCollection.id}"
-						use:enhance
-						class="w-full space-y-4"
-					>
+					<form method="POST" action="?/updateArtist&id={data.submission.id}" use:enhance class="w-full space-y-4">
 						<Form.Field {form} name="firstName">
 							<Form.Control let:attrs>
 								<Form.Label>First Name</Form.Label>

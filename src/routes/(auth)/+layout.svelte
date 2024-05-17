@@ -2,6 +2,7 @@
 	let { children } = $props();
 </script>
 
-<main class="h-screen">
+<!-- <main class="h-screen">TODO -->
+<main class="">
 	{@render children()}
 </main>

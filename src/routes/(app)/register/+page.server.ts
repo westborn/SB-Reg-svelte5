@@ -1,27 +1,34 @@
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, message, superValidate } from 'sveltekit-superforms';
+import { message, superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
-import { artistPublicSchema } from '$lib/zod-schemas';
+import { artistUpdateSchema } from '$lib/zod-schemas';
 import { prisma } from '$lib/components/server/prisma';
-import { getArtistCollection } from '$lib/components/server/artist';
+import { getSubmission } from '$lib/components/server/artist';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.safeGetSession();
 	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
-	const artistEmail = 'dulce21@example.com';
-	const artistCollection = await getArtistCollection(artistEmail);
+	const artistEmail = 'dulce21@example.com1'; //TODO: replace with user.email
 
+	const submission = await getSubmission(artistEmail);
+	console.log(submission);
 	console.log('(app)/register/+page.server.ts LOAD - DONE');
+	const form = await superValidate(submission, zod(artistUpdateSchema));
 	return {
-		artistCollection,
-		form: await superValidate(artistCollection, zod(artistPublicSchema))
+		submission,
+		form
 	};
 };
 
 export const actions: Actions = {
 	updateArtist: async (event) => {
-		const form = await superValidate(event, zod(artistPublicSchema));
-		if (!form.valid) return fail(400, { form });
+		const form = await superValidate(event, zod(artistUpdateSchema));
+		if (!form.valid) {
+			console.log('Registration is Invalid', form.data);
+			return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', {
+				status: 400
+			});
+		}
 		let result;
 		try {
 			const artistEmail = 'dulce21@example.com';
@@ -34,7 +41,7 @@ export const actions: Actions = {
 			}
 		} catch (reason) {
 			console.log('Prisma Error? (app)/register +page.server.ts', reason);
-			return message(form, "Something went wrong. Sorry, we're broken!.");
+			return message(form, "Something went wrong. Sorry, we're broken!");
 		}
 		console.log('Generic Error? (app)/register +page.server.ts', result);
 		return message(form, 'Something went wrong. Please try again later.');
