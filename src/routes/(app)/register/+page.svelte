@@ -1,48 +1,28 @@
 <script lang="ts">
-	import { getRegisterState } from '$lib/state.svelte.js';
+	import { setRegisterState, getRegisterState } from '$lib/state.svelte.js';
+
+	import { Button } from '$lib/components/ui/button';
+
+	import ArtistCreateDialog from '$lib/components/artist-create-dialog.svelte';
+	import SuperDebug from 'sveltekit-superforms';
 
 	let { data } = $props();
-	let submission = data.submission;
-
+	setRegisterState({ submission: data.submission, createArtistForm: data.createArtistForm });
 	let state = getRegisterState();
 
-	if (data.submission) {
-		// state.registrationExists = true;
-		console.log('got it');
-	} else {
-		// state.registrationExists = false;
-		console.log('NOT got it');
-	}
-
-	const steps = ['Register', 'Entries', 'Confirm', 'Complete'];
-
-	function setCurrent(newStep = 1) {
-		let next = newStep;
-		// if (newStep < 0) {
-		//   next = 0
-		// }
-		// if (next > steps.length - 1) {
-		//   next = steps.length - 1
-		// }
-		// if ($registrationExists?.email == null) {
-		//   return 0
-		// }
-		// if (next > 1 && $entryStore.length == 0) {
-		//   return 1
-		// }
-		// if (next > 1 && $registrationExists.bumpIn === '') {
-		//   return 2
-		// }
-		// if ($registrationExists.complete === 'Y') {
-		//   return 3
-		// }
-		return next;
-	}
-
-	// const handleProgress = (stepIncrement: number) => {
-	// 	setCurrent = setCurrent(setCurrent + stepIncrement);
-	// };
+	$effect(() => {
+		state.registrationExists = data.submission ? true : false;
+	});
 </script>
 
-<h1>Register</h1>
-<pre>{JSON.stringify(data, null, 2)} </pre>
+<div class="container mx-auto mt-10 max-w-xl">
+	<h1>Register</h1>
+	{#if state.registrationExists}
+		<p>Registration exists load up the first step</p>
+	{:else}
+		<Button variant="default" on:click={() => (state.createOpen = true)}>Create a New Registration</Button>
+		<ArtistCreateDialog />
+	{/if}
+</div>
+<SuperDebug data={state} />
+<!-- <pre>{JSON.stringify(data.submission, null, 2)}</pre> -->

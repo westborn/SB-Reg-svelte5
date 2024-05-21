@@ -62,3 +62,10 @@ export const getSubmission = async (artistEmail: string) => {
 	});
 	return submission;
 };
+// https://www.prisma.io/docs/orm/prisma-client/type-safety/operating-against-partial-structures-of-model-types
+// Extract Type `Submission` from result of the "getSubmission" function
+type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
+// OR
+import { Prisma } from '@prisma/client';
+type Submisssion_alt = Prisma.PromiseReturnType<typeof getSubmission>;

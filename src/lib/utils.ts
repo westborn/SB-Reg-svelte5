@@ -1,7 +1,7 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { cubicOut } from "svelte/easing";
-import type { TransitionConfig } from "svelte/transition";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { cubicOut } from 'svelte/easing';
+import type { TransitionConfig } from 'svelte/transition';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -19,13 +19,9 @@ export const flyAndScale = (
 	params: FlyAndScaleParams = { y: -8, x: 0, start: 0.95, duration: 150 }
 ): TransitionConfig => {
 	const style = getComputedStyle(node);
-	const transform = style.transform === "none" ? "" : style.transform;
+	const transform = style.transform === 'none' ? '' : style.transform;
 
-	const scaleConversion = (
-		valueA: number,
-		scaleA: [number, number],
-		scaleB: [number, number]
-	) => {
+	const scaleConversion = (valueA: number, scaleA: [number, number], scaleB: [number, number]) => {
 		const [minA, maxA] = scaleA;
 		const [minB, maxB] = scaleB;
 
@@ -35,13 +31,11 @@ export const flyAndScale = (
 		return valueB;
 	};
 
-	const styleToString = (
-		style: Record<string, number | string | undefined>
-	): string => {
+	const styleToString = (style: Record<string, number | string | undefined>): string => {
 		return Object.keys(style).reduce((str, key) => {
 			if (style[key] === undefined) return str;
 			return str + `${key}:${style[key]};`;
-		}, "");
+		}, '');
 	};
 
 	return {
@@ -60,3 +54,28 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+export function sleep(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// https://github.com/mats852/doublet
+type Callback = (...args: any) => any;
+type Result<R> = [Error, null] | [null, R];
+type MaybeAsyncResult<R> = R extends Promise<infer U> ? Promise<Result<U>> : Result<R>;
+export default function doublet<TCallback extends Callback>(
+	cb: TCallback,
+	...args: Parameters<TCallback>
+): MaybeAsyncResult<ReturnType<TCallback>> {
+	try {
+		const result = cb(...(args as Array<unknown>));
+
+		if (result instanceof Promise) {
+			return result.then((rx) => [null, rx]).catch((error) => [error, null]) as MaybeAsyncResult<ReturnType<TCallback>>;
+		}
+
+		return [null, result] as MaybeAsyncResult<ReturnType<TCallback>>;
+	} catch (error) {
+		return [error, null] as MaybeAsyncResult<ReturnType<TCallback>>;
+	}
+}

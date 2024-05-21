@@ -1,18 +1,23 @@
-import { getContext, setContext } from 'svelte';
-import type { Submission } from './zod-schemas';
+import { getContext, hasContext, setContext } from 'svelte';
+import type { Infer, SuperValidated } from 'sveltekit-superforms';
+import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+import type { Submission } from '$lib/components/server/artist';
 
 type SetRegisterState = {
-	submission: Submission | null;
+	submission: Submission;
+	createArtistForm: SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;
 };
-
 export class RegisterState {
-	currentUserEmail = false;
-	registrationExists = false;
-	stepsAllowed = false;
+	currentUserEmail = $state(false);
+	registrationExists = $state(false);
+	stepsAllowed = $state(false);
+	createOpen = $state(false);
 	submission = $state() as Submission;
+	createArtistForm = $state() as SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;
 
 	constructor(init: SetRegisterState) {
 		this.submission = init.submission;
+		this.createArtistForm = init.createArtistForm;
 	}
 }
 

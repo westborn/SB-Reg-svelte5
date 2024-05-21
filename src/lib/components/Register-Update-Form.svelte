@@ -28,7 +28,7 @@
 	const { form: formData, enhance, errors, message, delayed } = form;
 </script>
 
-<Superdubug>{data}</Superdubug>
+<Superdebug>{data}</Superdebug>
 <Card.Root>
 	<Card.Header>
 		<Card.Title class="text-xl">Registration Management</Card.Title>

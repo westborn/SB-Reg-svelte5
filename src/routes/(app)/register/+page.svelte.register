@@ -14,13 +14,13 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	import { artistUpdateSchema } from '$lib/zod-schemas';
+	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
 
 	let { data } = $props();
 	let submission = data.submission;
 	let dialogOpen = $state(false);
 	const form = superForm(data.form, {
-		validators: zodClient(artistUpdateSchema),
+		validators: zodClient(artistAddOrUpdateSchema),
 		resetForm: false,
 		onUpdated: () => {
 			if ($message === 'Success') {

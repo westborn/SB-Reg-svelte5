@@ -65,11 +65,11 @@ export type RegistrationTable = z.infer<typeof registrationTableSchema>;
 // ENTRY TABLE SCHEMA
 /////////////////////////////////////////
 export const entryTableSchema = z.object({
-	inOrOut: EntryTypeSchema.nullable(),
 	id: z.number().int(),
-	artistId: z.number().int(),
 	accepted: z.boolean(),
+	artistId: z.number().int(),
 	registrationId: z.number().int(),
+	inOrOut: EntryTypeSchema.nullable(),
 	description: z.string().nullable(),
 	dimensions: z.string().nullable(),
 	enterMajorPrize: z.boolean(),
@@ -121,8 +121,8 @@ export const artistSchema = z.object({
 });
 export type Artist = z.infer<typeof artistSchema>;
 
-export const artistUpdateSchema = artistSchema.omit({ id: true, email: true });
-export type ArtistUpdate = z.infer<typeof artistUpdateSchema>;
+export const artistAddOrUpdateSchema = artistSchema.omit({ id: true, email: true });
+export type ArtistUpdate = z.infer<typeof artistAddOrUpdateSchema>;
 
 export const registrationSchema = z.object({
 	id: z.number().int(),
@@ -152,7 +152,7 @@ export const entrySchema = z.object({
 	description: z.string().nullish(),
 	specialRequirements: z.string().nullish(),
 	enterMajorPrize: z.boolean(),
-	price: z.coerce.string({ required_error: 'Price is required' }).nullish()
+	price: z.string({ required_error: 'Price is required' }).nullish()
 });
 export type Entry = z.infer<typeof entrySchema>;
 
@@ -169,10 +169,10 @@ export type Image = z.infer<typeof imageSchema>;
 /////////////////////////////////////////
 // WORKING SCHEMA for APIs, state, validators
 /////////////////////////////////////////
-export const submissionSchema = z.object({
-	...artistSchema.shape,
-	registration: registrationSchema.optional(),
-	entries: z.array(entrySchema).optional(),
-	images: z.array(imageSchema).optional()
-});
-export type Submission = z.infer<typeof submissionSchema>;
+// export const submissionSchema = z.object({
+// 	...artistSchema.shape,
+// 	registration: registrationSchema.optional(),
+// 	entries: z.array(entrySchema).optional(),
+// 	images: z.array(imageSchema).optional()
+// });
+// export type Submission = z.infer<typeof submissionSchema>;
