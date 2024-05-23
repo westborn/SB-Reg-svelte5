@@ -6,18 +6,21 @@ import type { Submission } from '$lib/components/server/artist';
 type SetRegisterState = {
 	submission: Submission;
 	createArtistForm: SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;
+	updateArtistForm: SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;
 };
 export class RegisterState {
 	currentUserEmail = $state(false);
 	registrationExists = $state(false);
 	stepsAllowed = $state(false);
-	createOpen = $state(false);
+	dialogOpen = $state(false);
 	submission = $state() as Submission;
 	createArtistForm = $state() as SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;
+	updateArtistForm = $state() as SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;
 
 	constructor(init: SetRegisterState) {
 		this.submission = init.submission;
 		this.createArtistForm = init.createArtistForm;
+		this.updateArtistForm = init.updateArtistForm;
 	}
 }
 

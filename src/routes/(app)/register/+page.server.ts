@@ -10,9 +10,12 @@ export const load: PageServerLoad = async (event) => {
 	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	console.log('Register +page.server.ts LOAD - START');
 
-	const [createArtistForm] = await Promise.all([superValidate(zod(artistAddOrUpdateSchema))]);
+	const [createArtistForm, updateArtistForm] = await Promise.all([
+		superValidate(zod(artistAddOrUpdateSchema)),
+		superValidate(zod(artistAddOrUpdateSchema))
+	]);
 
-	const artistEmail = 'newOne@example.com'; //TODO: replace with user.email
+	const artistEmail = 'robert_champlin@example.com'; //TODO: replace with user.email
 
 	const submission = await getSubmission(artistEmail);
 	!submission ? console.log('No Submission Found') : console.log('Submission Found', submission.id);
@@ -21,22 +24,23 @@ export const load: PageServerLoad = async (event) => {
 	return {
 		submission,
 		form,
-		createArtistForm
+		createArtistForm,
+		updateArtistForm
 	};
 };
 
 export const actions: Actions = {
 	updateArtist: async (event) => {
+		const submissionId = event.url.searchParams.get('id');
 		const form = await superValidate(event, zod(artistAddOrUpdateSchema));
 		if (!form.valid) {
-			console.log('Registration is Invalid', form.data);
 			return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', {
 				status: 400
 			});
 		}
 		let result;
 		try {
-			const artistEmail = 'robert_champlin@example.com1'; //TODO: replace with user.email
+			const artistEmail = 'robert_champlin@example.com'; //TODO: replace with user.email
 			result = await prisma.artistTable.update({
 				where: { email: artistEmail },
 				data: form.data
@@ -51,8 +55,10 @@ export const actions: Actions = {
 		console.log('Generic Error? (app)/register +page.server.ts', result);
 		return message(form, 'Something went wrong. Please try again later.');
 	},
+
 	createArtist: async (event) => {
 		const form = await superValidate(event, zod(artistAddOrUpdateSchema));
+		console.log('Create Form:', form.data);
 		if (!form.valid) {
 			console.log('Registration is Invalid', form.data);
 			return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -60,7 +66,7 @@ export const actions: Actions = {
 			});
 		}
 		let result;
-		const artistEmail = 'newOne@example.com';
+		const artistEmail = 'robert_champlin@example.com';
 		let newRegister = { ...form.data, email: artistEmail };
 		try {
 			result = await prisma.artistTable.create({

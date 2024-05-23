@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
@@ -10,29 +10,46 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	import { getRegisterState } from '$lib/state.svelte.js';
 	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+	import { getRegisterState } from '$lib/state.svelte';
+	import { untrack } from 'svelte';
 
+	// TODO add an interface type for $props to avoid an error
 	let data = getRegisterState();
 
-	const form = superForm(data.createArtistForm, {
-		id: `createArtistForm`,
+	const form = superForm(data.updateArtistForm, {
+		id: `updateArtistForm-${data?.submission?.id}`,
 		validators: zodClient(artistAddOrUpdateSchema),
+		resetForm: false,
 		onUpdated: () => {
-			if ($message === 'Success') {
-				toast.success('Profile Added');
-				$message = null;
-				data.dialogOpen = false;
-			} else {
-				toast.error('Profile Create Failed!');
-			}
+			toast.success('Profile Updated');
+			data.dialogOpen = false;
 		}
 	});
+	const { form: formData, enhance, errors, message } = form;
 
-	const { form: formData, enhance, message, errors } = form;
+	// grab the form field values from the submission object
+	$effect(() => {
+		const firstName = untrack(() => data?.submission?.firstName || '');
+		const lastName = untrack(() => data?.submission?.lastName || '');
+		const phone = untrack(() => data?.submission?.phone || '');
+		const postcode = untrack(() => data?.submission?.postcode || '');
+		const firstNations = untrack(() => data?.submission?.firstNations || 'Declined');
+		const bankAccountName = untrack(() => data?.submission?.bankAccountName || '');
+		const bankBSB = untrack(() => data?.submission?.bankBSB || '');
+		const bankAccount = untrack(() => data?.submission?.bankAccount || '');
+		$formData.firstName = firstName;
+		$formData.lastName = lastName;
+		$formData.phone = phone;
+		$formData.postcode = postcode;
+		$formData.firstNations = firstNations;
+		$formData.bankAccountName = bankAccountName;
+		$formData.bankBSB = bankBSB;
+		$formData.bankAccount = bankAccount;
+	});
 </script>
 
-<form method="POST" action="?/createArtist" use:enhance class="w-full space-y-4">
+<form method="POST" action="?/updateArtist&id={data?.submission?.id}" use:enhance class="w-full space-y-4">
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>
@@ -84,7 +101,7 @@
 		</RadioGroup.Root>
 	</Form.Field>
 
-	<p class="pt-4 text-sm text-muted-foreground">(You can add this bank stuff later if you like...)</p>
+	<p class="pt-6 text-sm text-muted-foreground">(You can add this bank stuff later if you like...)</p>
 
 	<Form.Field {form} name="bankAccountName">
 		<Form.Control let:attrs>
@@ -113,9 +130,10 @@
 	<Form.Errors errors={$errors._errors} />
 	{#if !$message}
 		<div>
-			<Form.Button>Update?</Form.Button>
+			<Form.Button>Save?</Form.Button>
 			<span class="text-sm text-muted-foreground"> Just a little note</span>
 		</div>
+		<SuperDebug {data} />
 	{:else}
 		<div class="font-semibold text-red-700">{$message}</div>
 		<Button disabled>
