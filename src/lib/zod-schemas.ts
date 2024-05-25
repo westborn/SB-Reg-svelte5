@@ -152,7 +152,7 @@ export const entrySchema = z.object({
 	description: z.string().nullish(),
 	specialRequirements: z.string().nullish(),
 	enterMajorPrize: z.boolean(),
-	price: z.string({ required_error: 'Price is required' }).nullish()
+	price: z.number({ required_error: 'Price is required' }).nullish()
 });
 export type Entry = z.infer<typeof entrySchema>;
 

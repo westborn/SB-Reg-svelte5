@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { setRegisterState, getRegisterState } from '$lib/state.svelte.js';
-
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card/index.js';
 
 	import ArtistCreateDialog from '$lib/components/artist-create-dialog.svelte';
 	import ArtistUpdateDialog from '$lib/components/artist-update-dialog.svelte';
-	import SuperDebug from 'sveltekit-superforms';
 	import { ExhibitionYear } from '$lib/constants.js';
+	import EntryAccordion from '$lib/components/Entry-Accordion.svelte';
+	import SuperDebug from 'sveltekit-superforms';
 
 	let { data } = $props();
 	setRegisterState({
@@ -15,19 +15,29 @@
 		createArtistForm: data.createArtistForm,
 		updateArtistForm: data.updateArtistForm
 	});
-	let state = getRegisterState();
+	let myState = getRegisterState();
+
+	let showButtons = true;
 
 	$effect(() => {
-		state.artistExists = data.submission ? true : false;
+		myState.artistExists = data.submission ? true : false;
 	});
 
 	$effect(() => {
-		state.registrationExists = data.submission?.registrations?.length ?? 0 > 0 ? true : false;
+		myState.registrationExists = data.submission?.registrations?.length ?? 0 > 0 ? true : false;
 	});
 
 	$effect(() => {
-		state.entriesExist = data.submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
+		myState.entriesExist = data.submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
 	});
+
+	function doUpdate(id: number) {
+		console.log('doUpdate for ', id);
+	}
+
+	function doDelete(id: number) {
+		console.log('doDelete for ', id);
+	}
 </script>
 
 <div class="container mx-auto mt-10 max-w-xl">
@@ -36,9 +46,9 @@
 			<Card.Title class="text-xl">Registration Management</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			{#if state.artistExists && data.submission}
-				<pre>{`Registration Exists: ${state.registrationExists}`}</pre>
-				<pre>{`Entries Exist: ${state.entriesExist}`}</pre>
+			<pre>{`Registration Exists: ${myState.registrationExists}`}</pre>
+			<pre>{`Entries Exist: ${myState.entriesExist}`}</pre>
+			{#if myState.artistExists && data.submission}
 				<p class="text-sm text-muted-foreground">Some basic information we use to contact you:</p>
 				<div class="mb-3 grid grid-cols-[20ch_1fr] items-center p-4">
 					<p class="text-sm">Email:</p>
@@ -61,8 +71,14 @@
 					<p class="">{data.submission.bankAccount}</p>
 				</div>
 				<ArtistUpdateDialog />
+				<EntryAccordion
+					{showButtons}
+					{doUpdate}
+					{doDelete}
+					submissionEntries={data.submission?.registrations?.[0]?.entries ?? []}
+				/>
 			{:else}
-				<Button variant="default" on:click={() => (state.dialogOpen = true)}
+				<Button variant="default" on:click={() => (myState.dialogOpen = true)}
 					>Register for the {ExhibitionYear} Exhibition?</Button
 				>
 				<ArtistCreateDialog />
@@ -70,5 +86,5 @@
 		</Card.Content>
 	</Card.Root>
 </div>
-<SuperDebug data={state} />
+<SuperDebug data={myState} />
 <!-- <pre>{JSON.stringify(data.submission, null, 2)}</pre> -->
