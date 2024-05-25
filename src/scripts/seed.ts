@@ -5,13 +5,13 @@ import { Indigenous, EntryType } from '$lib/constants';
 
 const prisma = new PrismaClient();
 
-function makeArtist() {
+function makeArtist(email: string) {
 	const firstName = faker.person.firstName();
 	// const firstNations = faker.helpers.enumValue(Indigenous);
 	return {
 		firstName,
 		lastName: faker.person.lastName(),
-		email: faker.internet.exampleEmail({ firstName }).toLowerCase(),
+		email,
 		firstNations: faker.helpers.enumValue(Indigenous),
 		phone: '04' + faker.string.numeric(8),
 		postcode: faker.string.numeric(4),
@@ -62,31 +62,71 @@ function makeImage(artistId: number, registrationId: number, entryId: number) {
 	};
 }
 
-// create an Artist record, a Registration record, and three Entry records with an associated Image record
-try {
-	const result1 = await prisma.artistTable.create({
-		data: makeArtist()
+async function createArtist(email: string) {
+	const artist = await prisma.artistTable.create({
+		data: makeArtist(email)
 	});
-	console.log(`Artist: ${result1.id}`);
+	console.log(`Artist: ${artist.id}`);
+	return artist;
+}
 
+async function createRegistration(artistId: number, year: string) {
+	const registration = await prisma.registrationTable.create({
+		data: makeRegistration(artistId, year)
+	});
+	console.log(`Registration: ${registration.id}`);
+	return registration;
+}
+
+async function createEntry(artistId: number, registrationId: number) {
+	const entry = await prisma.entryTable.create({
+		data: makeEntry(artistId, registrationId)
+	});
+	console.log(`Entry: ${entry.id}`);
+	return entry;
+}
+
+async function createImage(artistId: number, registrationId: number, entryId: number) {
+	const image = await prisma.imageTable.create({
+		data: makeImage(artistId, registrationId, entryId)
+	});
+	console.log(`Image: ${image.id}`);
+	return image;
+}
+
+// create an Artist record, 2 Registration records (2024 and 2025), and three Entry records each with an associated Image record
+try {
+	const artist = await createArtist('full@example.com');
 	for (let i = 0; i < 2; i++) {
 		const year = (2024 + i).toString();
-		const result2 = await prisma.registrationTable.create({
-			data: makeRegistration(result1.id, year)
-		});
-		console.log(`Registration: ${result2.id}`);
-
+		const registration = await createRegistration(artist.id, year);
 		for (let i = 0; i < 3; i++) {
-			const result3 = await prisma.entryTable.create({
-				data: makeEntry(result1.id, result2.id)
-			});
-			const result4 = await prisma.imageTable.create({
-				data: makeImage(result1.id, result2.id, result3.id)
-			});
-			console.log(`Entry: ${result3.id}`);
-			console.log(`Image: ${result4.id}`);
+			const entry = await createEntry(artist.id, registration.id);
+			const image = await createImage(artist.id, registration.id, entry.id);
 		}
 	}
+} catch (e) {
+	console.error(e);
+	process.exit(1);
+}
+
+// create an Artist record only
+try {
+	const artist = await createArtist('artist@example.com');
+} catch (e) {
+	console.error(e);
+	process.exit(1);
+}
+
+// create an Artist record, with 2 Registration records (2024 and 2025) - entries for 2024 only
+try {
+	const artist = await createArtist('regOnly@example.com');
+	const registration = await createRegistration(artist.id, '2024');
+	for (let i = 0; i < 3; i++) {
+		const entry = await createEntry(artist.id, registration.id);
+		const image = await createImage(artist.id, registration.id, entry.id);
+	}
+	const registration2 = await createRegistration(artist.id, '2025');
 } catch (e) {
 	console.error(e);
 	process.exit(1);

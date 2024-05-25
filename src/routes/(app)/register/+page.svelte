@@ -18,7 +18,15 @@
 	let state = getRegisterState();
 
 	$effect(() => {
-		state.registrationExists = data.submission ? true : false;
+		state.artistExists = data.submission ? true : false;
+	});
+
+	$effect(() => {
+		state.registrationExists = data.submission?.registrations?.length ?? 0 > 0 ? true : false;
+	});
+
+	$effect(() => {
+		state.entriesExist = data.submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
 	});
 </script>
 
@@ -28,7 +36,9 @@
 			<Card.Title class="text-xl">Registration Management</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			{#if state.registrationExists && data.submission}
+			{#if state.artistExists && data.submission}
+				<pre>{`Registration Exists: ${state.registrationExists}`}</pre>
+				<pre>{`Entries Exist: ${state.entriesExist}`}</pre>
 				<p class="text-sm text-muted-foreground">Some basic information we use to contact you:</p>
 				<div class="mb-3 grid grid-cols-[20ch_1fr] items-center p-4">
 					<p class="text-sm">Email:</p>
@@ -60,5 +70,5 @@
 		</Card.Content>
 	</Card.Root>
 </div>
-<!-- <SuperDebug data={state} /> -->
+<SuperDebug data={state} />
 <!-- <pre>{JSON.stringify(data.submission, null, 2)}</pre> -->

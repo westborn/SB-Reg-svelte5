@@ -13,16 +13,16 @@
 	import { getRegisterState } from '$lib/state.svelte.js';
 	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
 
-	let data = getRegisterState();
+	let state = getRegisterState();
 
-	const form = superForm(data.createArtistForm, {
+	const form = superForm(state.createArtistForm, {
 		id: `createArtistForm`,
 		validators: zodClient(artistAddOrUpdateSchema),
 		onUpdated: () => {
 			if ($message === 'Success') {
 				toast.success('Profile Added');
 				$message = null;
-				data.dialogOpen = false;
+				state.dialogOpen = false;
 			} else {
 				toast.error('Profile Create Failed!');
 			}

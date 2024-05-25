@@ -5,7 +5,7 @@
 	import ThemeToggle from '$lib/components/theme-toggle.svelte';
 	let { children, data } = $props();
 	const { session, user } = data;
-	const loggedInEmail = user ? user.email : 'robert_champlin@example.com';
+	const loggedInEmail = user ? user.email : 'artist@example.com';
 	const avatar = loggedInEmail.slice(0, 2);
 </script>
 

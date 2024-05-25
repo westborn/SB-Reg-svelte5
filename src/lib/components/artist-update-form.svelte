@@ -15,29 +15,29 @@
 	import { untrack } from 'svelte';
 
 	// TODO add an interface type for $props to avoid an error
-	let data = getRegisterState();
+	let state = getRegisterState();
 
-	const form = superForm(data.updateArtistForm, {
-		id: `updateArtistForm-${data?.submission?.id}`,
+	const form = superForm(state.updateArtistForm, {
+		id: `updateArtistForm-${state?.submission?.id}`,
 		validators: zodClient(artistAddOrUpdateSchema),
 		resetForm: false,
 		onUpdated: () => {
 			toast.success('Profile Updated');
-			data.dialogOpen = false;
+			state.dialogOpen = false;
 		}
 	});
 	const { form: formData, enhance, errors, message } = form;
 
 	// grab the form field values from the submission object
 	$effect(() => {
-		const firstName = untrack(() => data?.submission?.firstName || '');
-		const lastName = untrack(() => data?.submission?.lastName || '');
-		const phone = untrack(() => data?.submission?.phone || '');
-		const postcode = untrack(() => data?.submission?.postcode || '');
-		const firstNations = untrack(() => data?.submission?.firstNations || 'Declined');
-		const bankAccountName = untrack(() => data?.submission?.bankAccountName || '');
-		const bankBSB = untrack(() => data?.submission?.bankBSB || '');
-		const bankAccount = untrack(() => data?.submission?.bankAccount || '');
+		const firstName = untrack(() => state?.submission?.firstName || '');
+		const lastName = untrack(() => state?.submission?.lastName || '');
+		const phone = untrack(() => state?.submission?.phone || '');
+		const postcode = untrack(() => state?.submission?.postcode || '');
+		const firstNations = untrack(() => state?.submission?.firstNations || 'Declined');
+		const bankAccountName = untrack(() => state?.submission?.bankAccountName || '');
+		const bankBSB = untrack(() => state?.submission?.bankBSB || '');
+		const bankAccount = untrack(() => state?.submission?.bankAccount || '');
 		$formData.firstName = firstName;
 		$formData.lastName = lastName;
 		$formData.phone = phone;
@@ -49,7 +49,7 @@
 	});
 </script>
 
-<form method="POST" action="?/updateArtist&id={data?.submission?.id}" use:enhance class="w-full space-y-4">
+<form method="POST" action="?/updateArtist&id={state?.submission?.id}" use:enhance class="w-full space-y-4">
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>
@@ -133,7 +133,7 @@
 			<Form.Button>Save?</Form.Button>
 			<span class="text-sm text-muted-foreground"> Just a little note</span>
 		</div>
-		<SuperDebug {data} />
+		<SuperDebug {state} />
 	{:else}
 		<div class="font-semibold text-red-700">{$message}</div>
 		<Button disabled>

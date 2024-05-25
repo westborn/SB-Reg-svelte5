@@ -10,9 +10,11 @@ type SetRegisterState = {
 };
 export class RegisterState {
 	currentUserEmail = $state(false);
+	artistExists = $state(false);
 	registrationExists = $state(false);
-	stepsAllowed = $state(false);
+	entriesExist = $state(false);
 	dialogOpen = $state(false);
+	stepsAllowed = $state(false);
 	submission = $state() as Submission;
 	createArtistForm = $state() as SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;
 	updateArtistForm = $state() as SuperValidated<Infer<typeof artistAddOrUpdateSchema>>;

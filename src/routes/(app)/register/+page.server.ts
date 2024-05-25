@@ -15,7 +15,7 @@ export const load: PageServerLoad = async (event) => {
 		superValidate(zod(artistAddOrUpdateSchema))
 	]);
 
-	const artistEmail = 'robert_champlin@example.com'; //TODO: replace with user.email
+	const artistEmail = 'artist@example.com'; //TODO: replace with user.email
 
 	const submission = await getSubmission(artistEmail);
 	!submission ? console.log('No Submission Found') : console.log('Submission Found', submission.id);
@@ -40,7 +40,7 @@ export const actions: Actions = {
 		}
 		let result;
 		try {
-			const artistEmail = 'robert_champlin@example.com'; //TODO: replace with user.email
+			const artistEmail = 'artist@example.com'; //TODO: replace with user.email
 			result = await prisma.artistTable.update({
 				where: { email: artistEmail },
 				data: form.data
@@ -66,7 +66,7 @@ export const actions: Actions = {
 			});
 		}
 		let result;
-		const artistEmail = 'robert_champlin@example.com';
+		const artistEmail = 'artist@example.com';
 		let newRegister = { ...form.data, email: artistEmail };
 		try {
 			result = await prisma.artistTable.create({
