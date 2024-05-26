@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
-
 	import type { Entry, Image } from '$lib/zod-schemas.ts';
 	type EntryItem = (Entry & { active?: boolean }) & { images?: Image[] };
 	type EntryArray = EntryItem[];
@@ -12,15 +10,11 @@
 		submissionEntries: EntryArray;
 	};
 
+	import { Button } from '$lib/components/ui/button';
+	import * as Accordion from '$lib/components/ui/accordion/index.js';
+	import * as Card from '$lib/components/ui/card/index.js';
+
 	let { showButtons, doUpdate, doDelete, submissionEntries }: Props = $props();
-	const expand = (entryDisplayed: EntryItem) => {
-		submissionEntries = submissionEntries.map((s) => {
-			if (s.id === entryDisplayed.id) {
-				s.active ? (s.active = false) : (s.active = true);
-			}
-			return s;
-		});
-	};
 
 	const convertToDollars = (price: number | null | undefined) => {
 		if (!price) return '';
@@ -31,64 +25,46 @@
 	};
 </script>
 
-<div class=" rounded-lg border bg-gray-50">
+<Accordion.Root class="w-full">
 	{#each submissionEntries as entryDisplayed}
-		<div class="m-2 bg-gray-100 p-2 text-gray-800">
-			<button class="w-full text-left text-lg hover:bg-blue-100" onclick={() => expand(entryDisplayed)}>
-				<span>
-					{#if entryDisplayed.active}
-						<span class="text-accent-600">&#9650;</span>
-					{:else}
-						<span>&#9654;</span>
-					{/if}
-				</span>
+		<Accordion.Item value={entryDisplayed.id.toString()}>
+			<Accordion.Trigger>{entryDisplayed.title}</Accordion.Trigger>
+			<Accordion.Content>
+				<Card.Root class="w-[400px]">
+					<Card.Content class="text-sm">
+						<p class="text-xs">({entryDisplayed.inOrOut})</p>
+						<p>{entryDisplayed.description}</p>
 
-				{entryDisplayed.title}
-				<span class="text-xs">
-					({entryDisplayed.inOrOut})
-				</span>
-			</button>
-			{#if entryDisplayed.active}
-				<div class="mb-2 bg-slate-50 px-5 py-2 text-sm" transition:slide>
-					<p>{entryDisplayed.description}</p>
-					<div class="mx-auto flex items-center justify-between">
-						<p class="text-lg">
-							{convertToDollars(entryDisplayed.price)}
-						</p>
-						<p>{entryDisplayed?.enterMajorPrize ? 'Entered in Major Prize' : ''}</p>
-						<p>({entryDisplayed.dimensions})</p>
-					</div>
+						<div class="m-2 mx-auto flex items-center justify-between">
+							<p class="text-lg">{convertToDollars(entryDisplayed.price)}</p>
+							<p class="text-xs">{entryDisplayed?.enterMajorPrize ? 'Major Prize Entry' : ''}</p>
+							<p>({entryDisplayed.dimensions})</p>
+						</div>
 
-					<p>{entryDisplayed.material}</p>
-					<p>{entryDisplayed?.specialRequirements}</p>
+						<p>{entryDisplayed.material}</p>
+						<p>{entryDisplayed?.specialRequirements}</p>
 
-					<div
-						class="mx-auto mt-10 flex h-48 w-48 flex-col items-center justify-center border-2 border-solid border-slate-200 text-slate-400"
-					>
-						{#if entryDisplayed?.images?.[0]?.imageURL}
-							<img class="h-48 w-48 object-scale-down p-1" src={entryDisplayed?.images[0]?.imageURL} alt="Preview" />
-						{:else}
-							<span>Image Preview</span>
+						<div class="mx-auto mt-6 flex h-48 w-48 flex-col items-center justify-center">
+							{#if entryDisplayed?.images?.[0]?.imageURL}
+								<img class="h-48 w-48 object-scale-down p-1" src={entryDisplayed?.images[0]?.imageURL} alt="Preview" />
+							{:else}
+								<span>Image Preview</span>
+							{/if}
+						</div>
+						<!-- <pre>{JSON.stringify(entryDisplayed, null, 2)}</pre> -->
+						{#if showButtons}
+							<div class="flex justify-between py-2">
+								<Button variant="outline" size="sm" class=" text-sm" onclick={() => doUpdate(entryDisplayed.id)}>
+									<span class="text-xs"> Edit </span></Button
+								>
+								<Button class="bg-red-700" size="sm" onclick={() => doDelete(entryDisplayed.id)}
+									><span class="text-xs"> Delete </span>
+								</Button>
+							</div>
 						{/if}
-					</div>
-					<!-- <pre>{JSON.stringify(entryDisplayed, null, 2)}</pre> -->
-				</div>
-				{#if showButtons}
-					<div class="flex justify-between px-8">
-						<button
-							onclick={() => doUpdate(entryDisplayed.id)}
-							class="bg-accent-200 hover:bg-accent-300 focus:bg-accent-300 active:bg-accent-100 rounded px-7 text-sm text-black shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg disabled:opacity-25"
-							>Edit</button
-						>
-
-						<button
-							onclick={() => doDelete(entryDisplayed.id)}
-							class="rounded bg-red-600 px-7 text-sm text-white shadow-md transition duration-150 ease-in-out hover:bg-red-300 hover:shadow-lg focus:bg-red-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-100 active:shadow-lg disabled:opacity-25"
-							>Delete</button
-						>
-					</div>
-				{/if}
-			{/if}
-		</div>
+					</Card.Content>
+				</Card.Root>
+			</Accordion.Content>
+		</Accordion.Item>
 	{/each}
-</div>
+</Accordion.Root>
