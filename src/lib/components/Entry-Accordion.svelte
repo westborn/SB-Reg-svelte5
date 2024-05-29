@@ -30,12 +30,12 @@
 		<Accordion.Item value={entryDisplayed.id.toString()}>
 			<Accordion.Trigger>{entryDisplayed.title}</Accordion.Trigger>
 			<Accordion.Content>
-				<Card.Root class="w-[400px]">
-					<Card.Content class="text-sm">
+				<Card.Root>
+					<Card.Content class="p-2 text-sm sm:p-6">
 						<p class="text-xs">({entryDisplayed.inOrOut})</p>
 						<p>{entryDisplayed.description}</p>
 
-						<div class="m-2 mx-auto flex items-center justify-between">
+						<div class="mx-auto flex items-center justify-between">
 							<p class="text-lg">{convertToDollars(entryDisplayed.price)}</p>
 							<p class="text-xs">{entryDisplayed?.enterMajorPrize ? 'Major Prize Entry' : ''}</p>
 							<p>({entryDisplayed.dimensions})</p>
@@ -44,7 +44,7 @@
 						<p>{entryDisplayed.material}</p>
 						<p>{entryDisplayed?.specialRequirements}</p>
 
-						<div class="mx-auto mt-6 flex h-48 w-48 flex-col items-center justify-center">
+						<div class="mx-auto flex h-48 w-48 flex-col items-center justify-center">
 							{#if entryDisplayed?.images?.[0]?.imageURL}
 								<img class="h-48 w-48 object-scale-down p-1" src={entryDisplayed?.images[0]?.imageURL} alt="Preview" />
 							{:else}

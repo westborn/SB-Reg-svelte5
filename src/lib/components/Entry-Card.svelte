@@ -9,7 +9,6 @@
 <span class="text-xs">
   ({entry.inOrOut})
 </span>
-</button>
 {#if entry.active}
 <div class="mb-2 bg-slate-50 px-5 py-2 text-sm" transition:slide>
   <p>{entry.description}</p>
@@ -39,4 +38,5 @@
     {:else}
       <span>Image Preview</span>
     {/if}
+  </div>
   </div>

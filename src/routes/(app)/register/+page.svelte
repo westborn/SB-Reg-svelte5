@@ -6,7 +6,7 @@
 	import ArtistCreateDialog from '$lib/components/artist-create-dialog.svelte';
 	import ArtistUpdateDialog from '$lib/components/artist-update-dialog.svelte';
 	import { ExhibitionYear } from '$lib/constants.js';
-	import EntryAccordion from '$lib/components/Entry-Accordion.svelte';
+	import EntryAccordion from '$lib/components/entry-accordion.svelte';
 	import SuperDebug from 'sveltekit-superforms';
 
 	let { data } = $props();
@@ -40,17 +40,17 @@
 	}
 </script>
 
-<div class="container mx-auto mt-10 max-w-xl">
+<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<Card.Root>
-		<Card.Header class="py-2">
+		<Card.Header class="p-2 sm:p-6">
 			<Card.Title class="text-xl">Registration Management</Card.Title>
 		</Card.Header>
-		<Card.Content>
+		<Card.Content class="p-2 sm:p-6">
 			<pre>{`Registration Exists: ${myState.registrationExists}`}</pre>
 			<pre>{`Entries Exist: ${myState.entriesExist}`}</pre>
 			{#if myState.artistExists && data.submission}
 				<p class="text-sm text-muted-foreground">Some basic information we use to contact you:</p>
-				<div class="mb-3 grid grid-cols-[20ch_1fr] items-center p-4">
+				<div class="mb-3 grid grid-cols-[14ch_1fr] items-center">
 					<p class="text-sm">Email:</p>
 					<p class="mb-2">{data.submission.email}</p>
 					<p class="text-sm">First Name:</p>
@@ -63,12 +63,12 @@
 					<p class="">{data.submission.postcode}</p>
 					<p class="text-sm">First Nation:</p>
 					<p class="">{data.submission.firstNations}</p>
-					<p class="text-sm">Bank Account Name:</p>
-					<p class="">{data.submission.bankAccountName}</p>
 					<p class="text-sm">BSB:</p>
 					<p class="">{data.submission.bankBSB}</p>
 					<p class="text-sm">Account:</p>
 					<p class="">{data.submission.bankAccount}</p>
+					<p class="text-sm">Account Name:</p>
+					<p class="">{data.submission.bankAccountName}</p>
 				</div>
 				<ArtistUpdateDialog />
 				<EntryAccordion

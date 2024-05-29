@@ -9,7 +9,7 @@
 	const avatar = loggedInEmail.slice(0, 2);
 </script>
 
-<section class="container flex flex-row items-center justify-between">
+<section class="flex flex-row items-center justify-between sm:container">
 	<div>
 		<a href="/" class="text-2xl font-bold leading-tight tracking-tighter text-primary md:text-3xl">
 			SB Exhibit Registration
@@ -32,7 +32,7 @@
 		<ThemeToggle></ThemeToggle>
 	</div>
 </section>
-<section class="container">
+<section class="sm:container">
 	<main class="h-screen">
 		{@render children()}
 	</main>

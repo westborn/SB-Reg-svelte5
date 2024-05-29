@@ -13,7 +13,7 @@
 	let { type, children, session, user }: Props = $props();
 </script>
 
-<div class="container mx-auto max-w-xl">
+<div class="mx-auto max-w-xl sm:container">
 	<div class="absolute right-2 top-2">
 		<div class="flex items-center gap-2">
 			{#if type === 'login'}
