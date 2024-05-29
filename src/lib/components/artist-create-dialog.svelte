@@ -8,7 +8,7 @@
 </script>
 
 <Dialog.Root bind:open={state.dialogOpen}>
-	<Dialog.Content class="bg-card sm:max-w-[425px]">
+	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
 		<Dialog.Header>
 			<Dialog.Title>Create a New Registration</Dialog.Title>
 			<Dialog.Description>Click save when you're done.</Dialog.Description>

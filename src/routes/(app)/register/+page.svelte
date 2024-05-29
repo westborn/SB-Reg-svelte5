@@ -42,10 +42,10 @@
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<Card.Root>
-		<Card.Header class="p-2 sm:p-6">
+		<Card.Header class="p-2 sm:px-6">
 			<Card.Title class="text-xl">Registration Management</Card.Title>
 		</Card.Header>
-		<Card.Content class="p-2 sm:p-6">
+		<Card.Content class="p-2 sm:px-6">
 			<pre>{`Registration Exists: ${myState.registrationExists}`}</pre>
 			<pre>{`Entries Exist: ${myState.entriesExist}`}</pre>
 			{#if myState.artistExists && data.submission}
