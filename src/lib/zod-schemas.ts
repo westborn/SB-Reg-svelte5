@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { string, z } from 'zod';
 
 export const signupSchema = z.object({
 	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
@@ -90,9 +90,9 @@ export const imageTableSchema = z.object({
 	artistId: z.number().int(),
 	registrationId: z.number().int().nullable(),
 	entryId: z.number().int().nullable(),
-	imageURL: z.string(),
-	imageFileName: z.string().nullable(),
-	originalFileName: z.string().nullable(),
+	cloudId: z.string(),
+	cloudURL: z.string(),
+	originalFileName: z.string(),
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date()
 });
@@ -160,9 +160,9 @@ export const imageSchema = z.object({
 	id: z.number().int(),
 	entryId: z.number().int(),
 	registrationId: z.number().int(),
-	imageURL: z.string({ required_error: 'URL is required' }).url().nullish(),
-	imageFileName: z.string().nullish(),
-	originalFileName: z.string().nullish()
+	cloudId: z.string(),
+	cloudURL: z.string(),
+	originalFileName: z.string()
 });
 export type Image = z.infer<typeof imageSchema>;
 

@@ -18,7 +18,7 @@ export const RegistrationTableScalarFieldEnumSchema = z.enum(['id','artistId','r
 
 export const EntryTableScalarFieldEnumSchema = z.enum(['id','artistId','accepted','registrationId','description','dimensions','enterMajorPrize','inOrOut','material','price','specialRequirements','title','createdAt','updatedAt']);
 
-export const ImageTableScalarFieldEnumSchema = z.enum(['id','artistId','registrationId','entryId','imageURL','imageFileName','originalFileName','createdAt','updatedAt']);
+export const ImageTableScalarFieldEnumSchema = z.enum(['id','artistId','registrationId','entryId','cloudId','cloudURL','originalFileName','createdAt','updatedAt']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -112,9 +112,9 @@ export const imageTableSchema = z.object({
   artistId: z.number().int(),
   registrationId: z.number().int().nullable(),
   entryId: z.number().int().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().nullable(),
-  originalFileName: z.string().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -275,8 +275,8 @@ export const imageTableSelectSchema: z.ZodType<Prisma.imageTableSelect> = z.obje
   artistId: z.boolean().optional(),
   registrationId: z.boolean().optional(),
   entryId: z.boolean().optional(),
-  imageURL: z.boolean().optional(),
-  imageFileName: z.boolean().optional(),
+  cloudId: z.boolean().optional(),
+  cloudURL: z.boolean().optional(),
   originalFileName: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
@@ -620,9 +620,9 @@ export const imageTableWhereInputSchema: z.ZodType<Prisma.imageTableWhereInput> 
   artistId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   registrationId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
   entryId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
-  imageURL: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  imageFileName: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  originalFileName: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  cloudId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  cloudURL: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  originalFileName: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   artist: z.union([ z.lazy(() => ArtistTableRelationFilterSchema),z.lazy(() => artistTableWhereInputSchema) ]).optional(),
@@ -635,9 +635,9 @@ export const imageTableOrderByWithRelationInputSchema: z.ZodType<Prisma.imageTab
   artistId: z.lazy(() => SortOrderSchema).optional(),
   registrationId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   entryId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  imageURL: z.lazy(() => SortOrderSchema).optional(),
-  imageFileName: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  originalFileName: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  cloudId: z.lazy(() => SortOrderSchema).optional(),
+  cloudURL: z.lazy(() => SortOrderSchema).optional(),
+  originalFileName: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   artist: z.lazy(() => artistTableOrderByWithRelationInputSchema).optional(),
@@ -656,9 +656,9 @@ export const imageTableWhereUniqueInputSchema: z.ZodType<Prisma.imageTableWhereU
   artistId: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   registrationId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
   entryId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
-  imageURL: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  imageFileName: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  originalFileName: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  cloudId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  cloudURL: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  originalFileName: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   artist: z.union([ z.lazy(() => ArtistTableRelationFilterSchema),z.lazy(() => artistTableWhereInputSchema) ]).optional(),
@@ -671,9 +671,9 @@ export const imageTableOrderByWithAggregationInputSchema: z.ZodType<Prisma.image
   artistId: z.lazy(() => SortOrderSchema).optional(),
   registrationId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   entryId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  imageURL: z.lazy(() => SortOrderSchema).optional(),
-  imageFileName: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  originalFileName: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  cloudId: z.lazy(() => SortOrderSchema).optional(),
+  cloudURL: z.lazy(() => SortOrderSchema).optional(),
+  originalFileName: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => imageTableCountOrderByAggregateInputSchema).optional(),
@@ -691,9 +691,9 @@ export const imageTableScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.im
   artistId: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
   registrationId: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
   entryId: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
-  imageURL: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
-  imageFileName: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
-  originalFileName: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  cloudId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  cloudURL: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  originalFileName: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
@@ -1040,9 +1040,9 @@ export const entryTableUncheckedUpdateManyInputSchema: z.ZodType<Prisma.entryTab
 }).strict();
 
 export const imageTableCreateInputSchema: z.ZodType<Prisma.imageTableCreateInput> = z.object({
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   artist: z.lazy(() => artistTableCreateNestedOneWithoutImagesInputSchema),
@@ -1055,17 +1055,17 @@ export const imageTableUncheckedCreateInputSchema: z.ZodType<Prisma.imageTableUn
   artistId: z.number().int(),
   registrationId: z.number().int().optional().nullable(),
   entryId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
 
 export const imageTableUpdateInputSchema: z.ZodType<Prisma.imageTableUpdateInput> = z.object({
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   artist: z.lazy(() => artistTableUpdateOneRequiredWithoutImagesNestedInputSchema).optional(),
@@ -1078,9 +1078,9 @@ export const imageTableUncheckedUpdateInputSchema: z.ZodType<Prisma.imageTableUn
   artistId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   registrationId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   entryId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -1090,17 +1090,17 @@ export const imageTableCreateManyInputSchema: z.ZodType<Prisma.imageTableCreateM
   artistId: z.number().int(),
   registrationId: z.number().int().optional().nullable(),
   entryId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
 
 export const imageTableUpdateManyMutationInputSchema: z.ZodType<Prisma.imageTableUpdateManyMutationInput> = z.object({
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -1110,9 +1110,9 @@ export const imageTableUncheckedUpdateManyInputSchema: z.ZodType<Prisma.imageTab
   artistId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   registrationId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   entryId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -1555,8 +1555,8 @@ export const imageTableCountOrderByAggregateInputSchema: z.ZodType<Prisma.imageT
   artistId: z.lazy(() => SortOrderSchema).optional(),
   registrationId: z.lazy(() => SortOrderSchema).optional(),
   entryId: z.lazy(() => SortOrderSchema).optional(),
-  imageURL: z.lazy(() => SortOrderSchema).optional(),
-  imageFileName: z.lazy(() => SortOrderSchema).optional(),
+  cloudId: z.lazy(() => SortOrderSchema).optional(),
+  cloudURL: z.lazy(() => SortOrderSchema).optional(),
   originalFileName: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
@@ -1574,8 +1574,8 @@ export const imageTableMaxOrderByAggregateInputSchema: z.ZodType<Prisma.imageTab
   artistId: z.lazy(() => SortOrderSchema).optional(),
   registrationId: z.lazy(() => SortOrderSchema).optional(),
   entryId: z.lazy(() => SortOrderSchema).optional(),
-  imageURL: z.lazy(() => SortOrderSchema).optional(),
-  imageFileName: z.lazy(() => SortOrderSchema).optional(),
+  cloudId: z.lazy(() => SortOrderSchema).optional(),
+  cloudURL: z.lazy(() => SortOrderSchema).optional(),
   originalFileName: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
@@ -1586,8 +1586,8 @@ export const imageTableMinOrderByAggregateInputSchema: z.ZodType<Prisma.imageTab
   artistId: z.lazy(() => SortOrderSchema).optional(),
   registrationId: z.lazy(() => SortOrderSchema).optional(),
   entryId: z.lazy(() => SortOrderSchema).optional(),
-  imageURL: z.lazy(() => SortOrderSchema).optional(),
-  imageFileName: z.lazy(() => SortOrderSchema).optional(),
+  cloudId: z.lazy(() => SortOrderSchema).optional(),
+  cloudURL: z.lazy(() => SortOrderSchema).optional(),
   originalFileName: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
@@ -2249,9 +2249,9 @@ export const registrationTableCreateManyArtistInputEnvelopeSchema: z.ZodType<Pri
 }).strict();
 
 export const imageTableCreateWithoutArtistInputSchema: z.ZodType<Prisma.imageTableCreateWithoutArtistInput> = z.object({
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   registration: z.lazy(() => registrationTableCreateNestedOneWithoutImagesInputSchema).optional(),
@@ -2262,9 +2262,9 @@ export const imageTableUncheckedCreateWithoutArtistInputSchema: z.ZodType<Prisma
   id: z.number().int().optional(),
   registrationId: z.number().int().optional().nullable(),
   entryId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -2380,9 +2380,9 @@ export const imageTableScalarWhereInputSchema: z.ZodType<Prisma.imageTableScalar
   artistId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   registrationId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
   entryId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
-  imageURL: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  imageFileName: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  originalFileName: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  cloudId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  cloudURL: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  originalFileName: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
@@ -2505,9 +2505,9 @@ export const entryTableCreateManyRegistrationInputEnvelopeSchema: z.ZodType<Pris
 }).strict();
 
 export const imageTableCreateWithoutRegistrationInputSchema: z.ZodType<Prisma.imageTableCreateWithoutRegistrationInput> = z.object({
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   artist: z.lazy(() => artistTableCreateNestedOneWithoutImagesInputSchema),
@@ -2518,9 +2518,9 @@ export const imageTableUncheckedCreateWithoutRegistrationInputSchema: z.ZodType<
   id: z.number().int().optional(),
   artistId: z.number().int(),
   entryId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -2612,9 +2612,9 @@ export const imageTableUpdateManyWithWhereWithoutRegistrationInputSchema: z.ZodT
 }).strict();
 
 export const imageTableCreateWithoutEntryInputSchema: z.ZodType<Prisma.imageTableCreateWithoutEntryInput> = z.object({
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   artist: z.lazy(() => artistTableCreateNestedOneWithoutImagesInputSchema),
@@ -2625,9 +2625,9 @@ export const imageTableUncheckedCreateWithoutEntryInputSchema: z.ZodType<Prisma.
   id: z.number().int().optional(),
   artistId: z.number().int(),
   registrationId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -3078,9 +3078,9 @@ export const imageTableCreateManyArtistInputSchema: z.ZodType<Prisma.imageTableC
   id: z.number().int().optional(),
   registrationId: z.number().int().optional().nullable(),
   entryId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -3147,9 +3147,9 @@ export const registrationTableUncheckedUpdateManyWithoutArtistInputSchema: z.Zod
 }).strict();
 
 export const imageTableUpdateWithoutArtistInputSchema: z.ZodType<Prisma.imageTableUpdateWithoutArtistInput> = z.object({
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   registration: z.lazy(() => registrationTableUpdateOneWithoutImagesNestedInputSchema).optional(),
@@ -3160,9 +3160,9 @@ export const imageTableUncheckedUpdateWithoutArtistInputSchema: z.ZodType<Prisma
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   registrationId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   entryId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -3171,9 +3171,9 @@ export const imageTableUncheckedUpdateManyWithoutArtistInputSchema: z.ZodType<Pr
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   registrationId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   entryId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -3247,9 +3247,9 @@ export const imageTableCreateManyRegistrationInputSchema: z.ZodType<Prisma.image
   id: z.number().int().optional(),
   artistId: z.number().int(),
   entryId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -3304,9 +3304,9 @@ export const entryTableUncheckedUpdateManyWithoutRegistrationInputSchema: z.ZodT
 }).strict();
 
 export const imageTableUpdateWithoutRegistrationInputSchema: z.ZodType<Prisma.imageTableUpdateWithoutRegistrationInput> = z.object({
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   artist: z.lazy(() => artistTableUpdateOneRequiredWithoutImagesNestedInputSchema).optional(),
@@ -3317,9 +3317,9 @@ export const imageTableUncheckedUpdateWithoutRegistrationInputSchema: z.ZodType<
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   artistId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   entryId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -3328,9 +3328,9 @@ export const imageTableUncheckedUpdateManyWithoutRegistrationInputSchema: z.ZodT
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   artistId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   entryId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -3339,17 +3339,17 @@ export const imageTableCreateManyEntryInputSchema: z.ZodType<Prisma.imageTableCr
   id: z.number().int().optional(),
   artistId: z.number().int(),
   registrationId: z.number().int().optional().nullable(),
-  imageURL: z.string(),
-  imageFileName: z.string().optional().nullable(),
-  originalFileName: z.string().optional().nullable(),
+  cloudId: z.string(),
+  cloudURL: z.string(),
+  originalFileName: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
 
 export const imageTableUpdateWithoutEntryInputSchema: z.ZodType<Prisma.imageTableUpdateWithoutEntryInput> = z.object({
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   artist: z.lazy(() => artistTableUpdateOneRequiredWithoutImagesNestedInputSchema).optional(),
@@ -3360,9 +3360,9 @@ export const imageTableUncheckedUpdateWithoutEntryInputSchema: z.ZodType<Prisma.
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   artistId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   registrationId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -3371,9 +3371,9 @@ export const imageTableUncheckedUpdateManyWithoutEntryInputSchema: z.ZodType<Pri
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   artistId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   registrationId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  imageURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  imageFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  originalFileName: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cloudId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cloudURL: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  originalFileName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();

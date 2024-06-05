@@ -50,8 +50,8 @@ export const getSubmission = async (artistEmail: string) => {
 									registrationId: true,
 									entryId: true,
 									originalFileName: true,
-									imageFileName: true,
-									imageURL: true
+									cloudId: true,
+									cloudURL: true
 								}
 							}
 						}
@@ -69,3 +69,19 @@ export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
 // OR
 import { Prisma } from '@prisma/client';
 type Submisssion_alt = Prisma.PromiseReturnType<typeof getSubmission>;
+
+async function createImage(image) {
+	try {
+		const artistEmail = 'full@example.com'; //TODO: replace with user.email
+		result = await prisma.artistTable.update({
+			where: { email: artistEmail },
+			data: form.data
+		});
+		if (result) {
+			return message(form, 'Success');
+		}
+	} catch (reason) {
+		console.log('Prisma Error? (app)/register +page.server.ts', reason);
+		return message(form, "Something went wrong. Sorry, we're broken!");
+	}
+}

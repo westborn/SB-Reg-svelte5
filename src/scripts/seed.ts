@@ -56,8 +56,8 @@ function makeImage(artistId: number, registrationId: number, entryId: number) {
 		artistId,
 		registrationId,
 		entryId,
-		imageURL: faker.image.url(),
-		imageFileName: faker.system.fileName(),
+		cloudId: faker.string.alphanumeric(20),
+		cloudURL: faker.image.url(),
 		originalFileName: faker.system.fileName()
 	};
 }
