@@ -3,10 +3,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card/index.js';
 
-	import ArtistCreateDialog from '$lib/components/artist-create-dialog.svelte';
-	import ArtistUpdateDialog from '$lib/components/artist-update-dialog.svelte';
+	import { ArtistCreateDialog, ArtistUpdateDialog } from '$lib/components';
+
 	import { ExhibitionYear } from '$lib/constants.js';
-	import EntryAccordion from '$lib/components/entry-accordion.svelte';
+	import { EntryAccordion } from '$lib/components';
 	import SuperDebug from 'sveltekit-superforms';
 
 	let { data } = $props();
@@ -16,20 +16,11 @@
 		updateArtistForm: data.updateArtistForm
 	});
 	let myState = getRegisterState();
+	myState.artistExists = data.submission ? true : false;
+	myState.registrationExists = data.submission?.registrations?.length ?? 0 > 0 ? true : false;
+	myState.entriesExist = data.submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
 
 	let showButtons = true;
-
-	$effect(() => {
-		myState.artistExists = data.submission ? true : false;
-	});
-
-	$effect(() => {
-		myState.registrationExists = data.submission?.registrations?.length ?? 0 > 0 ? true : false;
-	});
-
-	$effect(() => {
-		myState.entriesExist = data.submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
-	});
 
 	function doUpdate(id: number) {
 		console.log('doUpdate for ', id);

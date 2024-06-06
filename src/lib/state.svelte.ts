@@ -1,7 +1,7 @@
 import { getContext, hasContext, setContext } from 'svelte';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
 import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
-import type { Submission } from '$lib/components/server/artist';
+import type { Submission } from '$lib/components/server/registrationDB';
 
 type SetRegisterState = {
 	submission: Submission;

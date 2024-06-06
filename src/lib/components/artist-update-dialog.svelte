@@ -3,7 +3,7 @@
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
 	import { getRegisterState } from '$lib/state.svelte.js';
-	import ArtistUpdateForm from '$lib/components/artist-update-form.svelte';
+	import { ArtistUpdateForm } from '$lib/components';
 
 	let state = getRegisterState();
 </script>

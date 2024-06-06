@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import type { Snippet } from 'svelte';
-	import ThemeToggle from '$lib/components/theme-toggle.svelte';
+	import { ThemeToggle } from '$lib/components';
 
 	type Props = {
 		children: Snippet;

@@ -1,4 +1,4 @@
-import { string, z } from 'zod';
+import { z } from 'zod';
 
 export const signupSchema = z.object({
 	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
@@ -12,10 +12,6 @@ export const tokenSchema = z.object({
 export const loginSchema = z.object({
 	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
 });
-
-const imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
-
-const inOrOutTypes = ['Indoor', 'Outdoor'] as const;
 
 export const IndigenousSchema = z.enum(['Yes', 'No', 'Declined']);
 export type IndigenousType = `${z.infer<typeof IndigenousSchema>}`;
@@ -158,8 +154,9 @@ export type Entry = z.infer<typeof entrySchema>;
 
 export const imageSchema = z.object({
 	id: z.number().int(),
-	entryId: z.number().int(),
-	registrationId: z.number().int(),
+	artistId: z.number().int(),
+	entryId: z.number().int().nullish(),
+	registrationId: z.number().int().nullish(),
 	cloudId: z.string(),
 	cloudURL: z.string(),
 	originalFileName: z.string()

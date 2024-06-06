@@ -45,8 +45,8 @@
 						<p>{entryDisplayed?.specialRequirements}</p>
 
 						<div class="mx-auto flex h-48 w-48 flex-col items-center justify-center">
-							{#if entryDisplayed?.images?.[0]?.imageURL}
-								<img class="h-48 w-48 object-scale-down p-1" src={entryDisplayed?.images[0]?.imageURL} alt="Preview" />
+							{#if entryDisplayed?.images?.[0]?.cloudURL}
+								<img class="h-48 w-48 object-scale-down p-1" src={entryDisplayed?.images[0]?.cloudURL} alt="Preview" />
 							{:else}
 								<span>Image Preview</span>
 							{/if}

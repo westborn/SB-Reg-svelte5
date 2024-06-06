@@ -285,6 +285,113 @@ export const imageTableSelectSchema: z.ZodType<Prisma.imageTableSelect> = z.obje
   entry: z.union([z.boolean(),z.lazy(() => entryTableArgsSchema)]).optional(),
 }).strict()
 
+// CREATE MANYARTIST TABLE AND RETURN OUTPUT TYPE
+//------------------------------------------------------
+
+export const CreateManyartistTableAndReturnOutputTypeSelectSchema: z.ZodType<Prisma.CreateManyartistTableAndReturnOutputTypeSelect> = z.object({
+  id: z.boolean().optional(),
+  email: z.boolean().optional(),
+  firstName: z.boolean().optional(),
+  lastName: z.boolean().optional(),
+  phone: z.boolean().optional(),
+  postcode: z.boolean().optional(),
+  firstNations: z.boolean().optional(),
+  bankAccountName: z.boolean().optional(),
+  bankBSB: z.boolean().optional(),
+  bankAccount: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  updatedAt: z.boolean().optional(),
+}).strict()
+
+// CREATE MANYREGISTRATION TABLE AND RETURN OUTPUT TYPE
+//------------------------------------------------------
+
+export const CreateManyregistrationTableAndReturnOutputTypeIncludeSchema: z.ZodType<Prisma.CreateManyregistrationTableAndReturnOutputTypeInclude> = z.object({
+  artist: z.union([z.boolean(),z.lazy(() => artistTableArgsSchema)]).optional(),
+}).strict()
+
+export const CreateManyregistrationTableAndReturnOutputTypeArgsSchema: z.ZodType<Prisma.CreateManyregistrationTableAndReturnOutputTypeDefaultArgs> = z.object({
+  select: z.lazy(() => CreateManyregistrationTableAndReturnOutputTypeSelectSchema).optional(),
+  include: z.lazy(() => CreateManyregistrationTableAndReturnOutputTypeIncludeSchema).optional(),
+}).strict();
+
+export const CreateManyregistrationTableAndReturnOutputTypeSelectSchema: z.ZodType<Prisma.CreateManyregistrationTableAndReturnOutputTypeSelect> = z.object({
+  id: z.boolean().optional(),
+  artistId: z.boolean().optional(),
+  registrationYear: z.boolean().optional(),
+  closed: z.boolean().optional(),
+  bumpIn: z.boolean().optional(),
+  bumpOut: z.boolean().optional(),
+  displayRequirements: z.boolean().optional(),
+  accommodation: z.boolean().optional(),
+  crane: z.boolean().optional(),
+  transport: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  updatedAt: z.boolean().optional(),
+  artist: z.union([z.boolean(),z.lazy(() => artistTableArgsSchema)]).optional(),
+}).strict()
+
+// CREATE MANYENTRY TABLE AND RETURN OUTPUT TYPE
+//------------------------------------------------------
+
+export const CreateManyentryTableAndReturnOutputTypeIncludeSchema: z.ZodType<Prisma.CreateManyentryTableAndReturnOutputTypeInclude> = z.object({
+  artist: z.union([z.boolean(),z.lazy(() => artistTableArgsSchema)]).optional(),
+  registration: z.union([z.boolean(),z.lazy(() => registrationTableArgsSchema)]).optional(),
+}).strict()
+
+export const CreateManyentryTableAndReturnOutputTypeArgsSchema: z.ZodType<Prisma.CreateManyentryTableAndReturnOutputTypeDefaultArgs> = z.object({
+  select: z.lazy(() => CreateManyentryTableAndReturnOutputTypeSelectSchema).optional(),
+  include: z.lazy(() => CreateManyentryTableAndReturnOutputTypeIncludeSchema).optional(),
+}).strict();
+
+export const CreateManyentryTableAndReturnOutputTypeSelectSchema: z.ZodType<Prisma.CreateManyentryTableAndReturnOutputTypeSelect> = z.object({
+  id: z.boolean().optional(),
+  artistId: z.boolean().optional(),
+  accepted: z.boolean().optional(),
+  registrationId: z.boolean().optional(),
+  description: z.boolean().optional(),
+  dimensions: z.boolean().optional(),
+  enterMajorPrize: z.boolean().optional(),
+  inOrOut: z.boolean().optional(),
+  material: z.boolean().optional(),
+  price: z.boolean().optional(),
+  specialRequirements: z.boolean().optional(),
+  title: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  updatedAt: z.boolean().optional(),
+  artist: z.union([z.boolean(),z.lazy(() => artistTableArgsSchema)]).optional(),
+  registration: z.union([z.boolean(),z.lazy(() => registrationTableArgsSchema)]).optional(),
+}).strict()
+
+// CREATE MANYIMAGE TABLE AND RETURN OUTPUT TYPE
+//------------------------------------------------------
+
+export const CreateManyimageTableAndReturnOutputTypeIncludeSchema: z.ZodType<Prisma.CreateManyimageTableAndReturnOutputTypeInclude> = z.object({
+  artist: z.union([z.boolean(),z.lazy(() => artistTableArgsSchema)]).optional(),
+  registration: z.union([z.boolean(),z.lazy(() => registrationTableArgsSchema)]).optional(),
+  entry: z.union([z.boolean(),z.lazy(() => entryTableArgsSchema)]).optional(),
+}).strict()
+
+export const CreateManyimageTableAndReturnOutputTypeArgsSchema: z.ZodType<Prisma.CreateManyimageTableAndReturnOutputTypeDefaultArgs> = z.object({
+  select: z.lazy(() => CreateManyimageTableAndReturnOutputTypeSelectSchema).optional(),
+  include: z.lazy(() => CreateManyimageTableAndReturnOutputTypeIncludeSchema).optional(),
+}).strict();
+
+export const CreateManyimageTableAndReturnOutputTypeSelectSchema: z.ZodType<Prisma.CreateManyimageTableAndReturnOutputTypeSelect> = z.object({
+  id: z.boolean().optional(),
+  artistId: z.boolean().optional(),
+  registrationId: z.boolean().optional(),
+  entryId: z.boolean().optional(),
+  cloudId: z.boolean().optional(),
+  cloudURL: z.boolean().optional(),
+  originalFileName: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  updatedAt: z.boolean().optional(),
+  artist: z.union([z.boolean(),z.lazy(() => artistTableArgsSchema)]).optional(),
+  registration: z.union([z.boolean(),z.lazy(() => registrationTableArgsSchema)]).optional(),
+  entry: z.union([z.boolean(),z.lazy(() => entryTableArgsSchema)]).optional(),
+}).strict()
+
 
 /////////////////////////////////////////
 // INPUT TYPES
@@ -3649,6 +3756,11 @@ export const artistTableCreateManyArgsSchema: z.ZodType<Prisma.artistTableCreate
   skipDuplicates: z.boolean().optional(),
 }).strict() ;
 
+export const artistTableAndReturnCreateManyArgsSchema: z.ZodType<Prisma.artistTableAndReturnCreateManyArgs> = z.object({
+  data: z.union([ artistTableCreateManyInputSchema,artistTableCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
 export const artistTableDeleteArgsSchema: z.ZodType<Prisma.artistTableDeleteArgs> = z.object({
   select: artistTableSelectSchema.optional(),
   include: artistTableIncludeSchema.optional(),
@@ -3686,6 +3798,11 @@ export const registrationTableUpsertArgsSchema: z.ZodType<Prisma.registrationTab
 }).strict() ;
 
 export const registrationTableCreateManyArgsSchema: z.ZodType<Prisma.registrationTableCreateManyArgs> = z.object({
+  data: z.union([ registrationTableCreateManyInputSchema,registrationTableCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const registrationTableAndReturnCreateManyArgsSchema: z.ZodType<Prisma.registrationTableAndReturnCreateManyArgs> = z.object({
   data: z.union([ registrationTableCreateManyInputSchema,registrationTableCreateManyInputSchema.array() ]),
   skipDuplicates: z.boolean().optional(),
 }).strict() ;
@@ -3731,6 +3848,11 @@ export const entryTableCreateManyArgsSchema: z.ZodType<Prisma.entryTableCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict() ;
 
+export const entryTableAndReturnCreateManyArgsSchema: z.ZodType<Prisma.entryTableAndReturnCreateManyArgs> = z.object({
+  data: z.union([ entryTableCreateManyInputSchema,entryTableCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
 export const entryTableDeleteArgsSchema: z.ZodType<Prisma.entryTableDeleteArgs> = z.object({
   select: entryTableSelectSchema.optional(),
   include: entryTableIncludeSchema.optional(),
@@ -3768,6 +3890,11 @@ export const imageTableUpsertArgsSchema: z.ZodType<Prisma.imageTableUpsertArgs> 
 }).strict() ;
 
 export const imageTableCreateManyArgsSchema: z.ZodType<Prisma.imageTableCreateManyArgs> = z.object({
+  data: z.union([ imageTableCreateManyInputSchema,imageTableCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const imageTableAndReturnCreateManyArgsSchema: z.ZodType<Prisma.imageTableAndReturnCreateManyArgs> = z.object({
   data: z.union([ imageTableCreateManyInputSchema,imageTableCreateManyInputSchema.array() ]),
   skipDuplicates: z.boolean().optional(),
 }).strict() ;

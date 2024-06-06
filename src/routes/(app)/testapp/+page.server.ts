@@ -6,7 +6,7 @@ import type { PageServerLoad } from '../$types';
 import { v2 as cloudinary, type UploadApiErrorResponse, type UploadApiResponse } from 'cloudinary';
 import { CLOUDINARY_API_SECRET, CLOUDINARY_API_KEY } from '$env/static/private';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
-import { createImage } from '$lib/components/server/artist';
+import { createImage } from '$lib/components/server/registrationDB';
 
 cloudinary.config({
 	cloud_name: PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -33,6 +33,17 @@ export const load: PageServerLoad = async (event) => {
 
 const getURL = (imagePath: string) => {
 	return cloudinary.url(imagePath, { secure: true });
+};
+
+const insertImage = async (cloudId: string, cloudURL: string, originalFileName: string) => {
+	const workingImage = {
+		id: 0,
+		artistId: 1,
+		cloudId,
+		cloudURL,
+		originalFileName
+	};
+	return await createImage(workingImage);
 };
 
 export const actions = {
@@ -65,7 +76,11 @@ export const actions = {
 
 		console.log('cloudId:', cloudId);
 		console.log('cloudURL:', cloudURL);
+		console.log('originalFileName:', form.data.image.name);
 
+		const image = await insertImage(cloudId, cloudURL, form.data.image.name);
+
+		console.log('image:', image);
 		return message(form, 'You have uploaded a valid file!');
 	}
 };

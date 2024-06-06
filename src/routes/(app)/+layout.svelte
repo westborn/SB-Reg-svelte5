@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import ThemeToggle from '$lib/components/theme-toggle.svelte';
+	import { ThemeToggle } from '$lib/components';
 	let { children, data } = $props();
 	const { session, user } = data;
 	const loggedInEmail = user ? user.email : 'full@example.com';

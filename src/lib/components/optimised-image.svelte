@@ -8,8 +8,6 @@
 	};
 
 	let { path, alt, width, height, class: className } = $props<Props>();
-
-	const newPath = path.replace('.jpg', '.webp');
 </script>
 
 <picture>

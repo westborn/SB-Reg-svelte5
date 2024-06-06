@@ -1,6 +1,8 @@
 import { prisma } from '$lib/components/server/prisma';
 import { ExhibitionYear } from '$lib/constants';
 
+import type { Image } from '$lib/zod-schemas';
+
 export const getSubmission = async (artistEmail: string) => {
 	const submission = await prisma.artistTable.findFirst({
 		where: {
@@ -70,18 +72,17 @@ export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
 import { Prisma } from '@prisma/client';
 type Submisssion_alt = Prisma.PromiseReturnType<typeof getSubmission>;
 
-async function createImage(image) {
-	try {
-		const artistEmail = 'full@example.com'; //TODO: replace with user.email
-		result = await prisma.artistTable.update({
-			where: { email: artistEmail },
-			data: form.data
-		});
-		if (result) {
-			return message(form, 'Success');
+export const createImage = async (workingImage: Image) => {
+	const { artistId, registrationId = null, entryId = null, cloudId, cloudURL, originalFileName } = workingImage;
+	const image = await prisma.imageTable.create({
+		data: {
+			artistId,
+			registrationId,
+			entryId,
+			cloudId,
+			cloudURL,
+			originalFileName
 		}
-	} catch (reason) {
-		console.log('Prisma Error? (app)/register +page.server.ts', reason);
-		return message(form, "Something went wrong. Sorry, we're broken!");
-	}
-}
+	});
+	return image;
+};

@@ -3,7 +3,7 @@
 	import SuperDebug, { superForm, fileProxy } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
-	import OptimisedImage from '$lib/components/optimised-image.svelte';
+	import { OptimisedImage } from '$lib/components';
 
 	const fileSchema = z.object({
 		image: z

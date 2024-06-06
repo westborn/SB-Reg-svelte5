@@ -2,7 +2,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 
 	import { getRegisterState } from '$lib/state.svelte.js';
-	import ArtistCreateForm from '$lib/components/artist-create-form.svelte';
+	import { ArtistCreateForm } from '$lib/components';
 
 	let state = getRegisterState();
 </script>

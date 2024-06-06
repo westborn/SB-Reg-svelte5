@@ -2,7 +2,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/components/server/prisma';
-import { getSubmission } from '$lib/components/server/artist';
+import { getSubmission } from '$lib/components/server/registrationDB';
 
 import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
 export const load: PageServerLoad = async (event) => {
