@@ -45,6 +45,7 @@ export const actions: Actions = {
 				where: { email: artistEmail },
 				data: form.data
 			});
+			console.log('Update Result:', result);
 			if (result) {
 				return message(form, 'Success');
 			}

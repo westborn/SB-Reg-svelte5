@@ -5,10 +5,11 @@
 	import { getRegisterState } from '$lib/state.svelte.js';
 	import { ArtistUpdateForm } from '$lib/components';
 
-	let state = getRegisterState();
+	let myState = getRegisterState();
 </script>
 
-<Dialog.Root bind:open={state.dialogOpen}>
+<Dialog.Root bind:open={myState.dialogOpen}>
+	<p>{myState.submission.firstName}</p>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update Your Details?</Dialog.Trigger>
 	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
 		<Dialog.Header>

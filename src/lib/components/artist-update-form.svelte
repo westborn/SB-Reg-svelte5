@@ -15,29 +15,29 @@
 	import { untrack } from 'svelte';
 
 	// TODO add an interface type for $props to avoid an error
-	let state = getRegisterState();
+	let myState = getRegisterState();
 
-	const form = superForm(state.updateArtistForm, {
-		id: `updateArtistForm-${state?.submission?.id}`,
+	const form = superForm(myState.updateArtistForm, {
+		id: `updateArtistForm-${myState?.submission?.id}`,
 		validators: zodClient(artistAddOrUpdateSchema),
 		resetForm: false,
 		onUpdated: () => {
 			toast.success('Profile Updated');
-			state.dialogOpen = false;
+			myState.dialogOpen = false;
 		}
 	});
 	const { form: formData, enhance, errors, message } = form;
 
 	// grab the form field values from the submission object
 	$effect(() => {
-		const firstName = untrack(() => state?.submission?.firstName || '');
-		const lastName = untrack(() => state?.submission?.lastName || '');
-		const phone = untrack(() => state?.submission?.phone || '');
-		const postcode = untrack(() => state?.submission?.postcode || '');
-		const firstNations = untrack(() => state?.submission?.firstNations || 'Declined');
-		const bankAccountName = untrack(() => state?.submission?.bankAccountName || '');
-		const bankBSB = untrack(() => state?.submission?.bankBSB || '');
-		const bankAccount = untrack(() => state?.submission?.bankAccount || '');
+		const firstName = untrack(() => myState?.submission?.firstName || '');
+		const lastName = untrack(() => myState?.submission?.lastName || '');
+		const phone = untrack(() => myState?.submission?.phone || '');
+		const postcode = untrack(() => myState?.submission?.postcode || '');
+		const firstNations = untrack(() => myState?.submission?.firstNations || 'Declined');
+		const bankAccountName = untrack(() => myState?.submission?.bankAccountName || '');
+		const bankBSB = untrack(() => myState?.submission?.bankBSB || '');
+		const bankAccount = untrack(() => myState?.submission?.bankAccount || '');
 		$formData.firstName = firstName;
 		$formData.lastName = lastName;
 		$formData.phone = phone;
@@ -49,7 +49,8 @@
 	});
 </script>
 
-<form method="POST" action="?/updateArtist&id={state?.submission?.id}" use:enhance class="w-full space-y-4">
+<form method="POST" action="?/updateArtist&id={myState?.submission?.id}" use:enhance class="w-full space-y-4">
+	<p>{myState.submission.firstName}</p>
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>
@@ -133,7 +134,7 @@
 			<Form.Button>Save?</Form.Button>
 			<span class="text-sm text-muted-foreground"> Just a little note</span>
 		</div>
-		<SuperDebug {state} />
+		<SuperDebug {myState} />
 	{:else}
 		<div class="font-semibold text-red-700">{$message}</div>
 		<Button disabled>
