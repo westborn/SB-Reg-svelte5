@@ -1,4 +1,8 @@
 <script lang="ts">
+	import type { Entry, Image } from '$lib/zod-schemas.ts';
+	type EntryItem = Entry & { images?: Image[] };
+	type EntryArray = EntryItem[];
+
 	import { setRegisterState, getRegisterState } from '$lib/state.svelte.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -77,5 +81,5 @@
 		</Card.Content>
 	</Card.Root>
 </div>
-<SuperDebug data={myState} />
+<!-- <SuperDebug data={myState} /> -->
 <!-- <pre>{JSON.stringify(data.submission, null, 2)}</pre> -->

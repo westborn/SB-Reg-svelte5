@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Entry, Image } from '$lib/zod-schemas.ts';
-	type EntryItem = (Entry & { active?: boolean }) & { images?: Image[] };
+	type EntryItem = Entry & { images?: Image[] };
 	type EntryArray = EntryItem[];
 
 	type Props = {

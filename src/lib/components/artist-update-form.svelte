@@ -21,8 +21,11 @@
 		id: `updateArtistForm-${myState?.submission?.id}`,
 		validators: zodClient(artistAddOrUpdateSchema),
 		resetForm: false,
-		onUpdated: () => {
+		onUpdated: (e) => {
 			toast.success('Profile Updated');
+			if (myState.submission) {
+				myState.submission = { ...myState.submission, ...e.form.data };
+			}
 			myState.dialogOpen = false;
 		}
 	});
@@ -50,7 +53,6 @@
 </script>
 
 <form method="POST" action="?/updateArtist&id={myState?.submission?.id}" use:enhance class="w-full space-y-4">
-	<p>{myState.submission.firstName}</p>
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>
@@ -134,7 +136,6 @@
 			<Form.Button>Save?</Form.Button>
 			<span class="text-sm text-muted-foreground"> Just a little note</span>
 		</div>
-		<SuperDebug {myState} />
 	{:else}
 		<div class="font-semibold text-red-700">{$message}</div>
 		<Button disabled>
