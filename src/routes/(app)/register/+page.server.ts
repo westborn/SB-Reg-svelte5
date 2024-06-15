@@ -4,15 +4,16 @@ import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/components/server/prisma';
 import { getSubmission } from '$lib/components/server/registrationDB';
 
-import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+import { artistAddOrUpdateSchema, entryCreateSchema } from '$lib/zod-schemas';
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.safeGetSession();
 	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	console.log('Register +page.server.ts LOAD - START');
 
-	const [createArtistForm, updateArtistForm] = await Promise.all([
+	const [createArtistForm, updateArtistForm, createEntryForm] = await Promise.all([
 		superValidate(zod(artistAddOrUpdateSchema)),
-		superValidate(zod(artistAddOrUpdateSchema))
+		superValidate(zod(artistAddOrUpdateSchema)),
+		superValidate(zod(entryCreateSchema))
 	]);
 
 	const artistEmail = 'full@example.com'; //TODO: replace with user.email
@@ -25,7 +26,8 @@ export const load: PageServerLoad = async (event) => {
 		submission,
 		form,
 		createArtistForm,
-		updateArtistForm
+		updateArtistForm,
+		createEntryForm
 	};
 };
 
@@ -68,10 +70,10 @@ export const actions: Actions = {
 		}
 		let result;
 		const artistEmail = 'full@example.com';
-		let newRegister = { ...form.data, email: artistEmail };
+		let newArtist = { ...form.data, email: artistEmail };
 		try {
 			result = await prisma.artistTable.create({
-				data: newRegister
+				data: newArtist
 			});
 			if (result) {
 				return message(form, 'Success');

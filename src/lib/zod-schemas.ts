@@ -152,6 +152,9 @@ export const entrySchema = z.object({
 });
 export type Entry = z.infer<typeof entrySchema>;
 
+export const entryCreateSchema = entrySchema.omit({ id: true, artistId: true, registrationId: true, accepted: true });
+export type EntryCreate = z.infer<typeof entryCreateSchema>;
+
 export const imageSchema = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),

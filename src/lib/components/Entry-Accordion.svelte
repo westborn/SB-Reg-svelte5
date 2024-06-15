@@ -13,6 +13,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import { EntryCreateForm } from '$lib/components';
 
 	let { showButtons, doUpdate, doDelete, submissionEntries }: Props = $props();
 
@@ -68,3 +69,5 @@
 		</Accordion.Item>
 	{/each}
 </Accordion.Root>
+
+<EntryCreateForm />

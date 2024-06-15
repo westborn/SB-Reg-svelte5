@@ -17,7 +17,8 @@
 	setRegisterState({
 		submission: data.submission,
 		createArtistForm: data.createArtistForm,
-		updateArtistForm: data.updateArtistForm
+		updateArtistForm: data.updateArtistForm,
+		createEntryForm: data.createEntryForm
 	});
 	let myState = getRegisterState();
 	myState.artistExists = data.submission ? true : false;
