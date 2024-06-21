@@ -6,7 +6,7 @@ import { artistAddOrUpdateSchema, entryCreateSchema } from '$lib/zod-schemas';
 import type { Actions, PageServerLoad } from '../../$types';
 import { getSubmission } from '$lib/components/server/registrationDB';
 export const load: PageServerLoad = async (event) => {
-	const { session, user } = await event.locals.safeGetSession();
+	const { session, user } = await event.locals.V1safeGetSession();
 	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	console.log('Register +page.server.ts LOAD - START');
 

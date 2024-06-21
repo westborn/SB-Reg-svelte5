@@ -22,7 +22,7 @@
 <svelte:head>
 	<title>Registration</title>
 </svelte:head>
-{data.user.email}<br />
+
 <ModeWatcher />
 <Toaster
 	toastOptions={{

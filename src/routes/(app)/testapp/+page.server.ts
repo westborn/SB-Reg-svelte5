@@ -22,7 +22,7 @@ const fileSchema = z.object({
 });
 
 export const load: PageServerLoad = async (event) => {
-	const { session, user } = await event.locals.safeGetSession();
+	const { session, user } = await event.locals.V1safeGetSession();
 	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	return {
 		session,

@@ -5,7 +5,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	const { session, user } = await event.locals.safeGetSession();
+	const { session, user } = await event.locals.V1safeGetSession();
 	if (user) redirect(302, '/'); //already logged in so we have a valid email address in user
 	return {
 		session,
@@ -16,8 +16,8 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
 	default: async (event) => {
-		const { supabase, safeGetSession } = event.locals;
-		const { user } = await safeGetSession();
+		const { supabase, V1safeGetSession } = event.locals;
+		const { user } = await V1safeGetSession();
 		if (user) redirect(302, '/');
 
 		const form = await superValidate(event, zod(signupSchema));

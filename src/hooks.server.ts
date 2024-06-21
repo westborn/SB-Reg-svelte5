@@ -28,7 +28,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	 * doesn't validate the JWT, this function validates the JWT by first calling
 	 * `getUser` and aborts early if the JWT signature is invalid.
 	 */
-	event.locals.safeGetSession = async () => {
+	event.locals.V1safeGetSession = async () => {
 		const {
 			data: { user },
 			error
