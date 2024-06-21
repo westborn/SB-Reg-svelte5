@@ -7,7 +7,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 
 	let { children, data } = $props();
-	let { supabase, session } = data;
+	let { supabase, session, user } = data;
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
@@ -22,7 +22,7 @@
 <svelte:head>
 	<title>Registration</title>
 </svelte:head>
-
+{data.user.email}<br />
 <ModeWatcher />
 <Toaster
 	toastOptions={{

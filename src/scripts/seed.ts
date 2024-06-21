@@ -110,6 +110,22 @@ try {
 	process.exit(1);
 }
 
+//and for my email address
+try {
+	const artist = await createArtist('george@westborn.com.au');
+	for (let i = 0; i < 2; i++) {
+		const year = (2024 + i).toString();
+		const registration = await createRegistration(artist.id, year);
+		for (let i = 0; i < 3; i++) {
+			const entry = await createEntry(artist.id, registration.id);
+			const image = await createImage(artist.id, registration.id, entry.id);
+		}
+	}
+} catch (e) {
+	console.error(e);
+	process.exit(1);
+}
+
 // create an Artist record only
 try {
 	const artist = await createArtist('artist@example.com');

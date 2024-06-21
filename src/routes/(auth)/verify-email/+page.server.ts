@@ -27,10 +27,11 @@ export const actions = {
 			});
 		}
 		const { data, error } = await supabase.auth.verifyOtp({
-			email: 'george@westborn.com.au',
+			email: form.data.email,
 			token: form.data.token,
 			type: 'email'
 		});
+		redirect(302, '/register');
 
 		if (error) {
 			console.log('verify-email:', error);

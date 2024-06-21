@@ -20,6 +20,13 @@
 		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<form method="POST" use:enhance class="w-full space-y-4">
+		<Form.Field {form} name="email">
+			<Form.Control let:attrs>
+				<Form.Label>Email Address</Form.Label>
+				<Input type="text" {...attrs} bind:value={$formData.email} />
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
 		<Form.Field {form} name="token">
 			<Form.Control let:attrs>
 				<Form.Label
