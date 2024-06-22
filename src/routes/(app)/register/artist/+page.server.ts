@@ -2,12 +2,14 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
+import { redirect } from '@sveltejs/kit';
 import { artistAddOrUpdateSchema, entryCreateSchema } from '$lib/zod-schemas';
 import type { Actions, PageServerLoad } from '../../$types';
 import { getSubmission } from '$lib/components/server/registrationDB';
+
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
-	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
+	if (!user || !session) redirect(302, '/login');
 	console.log('Register +page.server.ts LOAD - START');
 
 	const [createArtistForm, updateArtistForm, createEntryForm] = await Promise.all([
@@ -16,7 +18,7 @@ export const load: PageServerLoad = async (event) => {
 		superValidate(zod(entryCreateSchema))
 	]);
 
-	const artistEmail = 'full@example.com'; //TODO: replace with user.email
+	const artistEmail = user.email; //TODO: SB email?
 
 	const submission = await getSubmission(artistEmail);
 	!submission ? console.log('No Submission Found') : console.log('Submission Found', submission.id);
@@ -33,7 +35,8 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	updateArtist: async (event) => {
-		const submissionId = event.url.searchParams.get('id');
+		const { session, user } = await event.locals.V1safeGetSession();
+		if (!user || !session) redirect(302, '/login');
 		const form = await superValidate(event, zod(artistAddOrUpdateSchema));
 		if (!form.valid) {
 			return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -42,7 +45,7 @@ export const actions: Actions = {
 		}
 		let result;
 		try {
-			const artistEmail = 'full@example.com'; //TODO: replace with user.email
+			const artistEmail = user.email; //TODO: SB email?
 			result = await prisma.artistTable.update({
 				where: { email: artistEmail },
 				data: form.data
@@ -68,8 +71,10 @@ export const actions: Actions = {
 				status: 400
 			});
 		}
+		const { session, user } = await event.locals.V1safeGetSession();
+		if (!user || !session) redirect(302, '/login');
 		let result;
-		const artistEmail = 'full@example.com';
+		const artistEmail = user.email; //TODO: SB email?
 		const newArtist = { ...form.data, email: artistEmail };
 		try {
 			result = await prisma.artistTable.create({

@@ -31,7 +31,6 @@ export const actions = {
 			token: form.data.token,
 			type: 'email'
 		});
-		redirect(302, '/register');
 
 		if (error) {
 			console.log('verify-email:', error);
@@ -41,6 +40,6 @@ export const actions = {
 			});
 		}
 		console.log('verify-email:', data);
-		redirect(302, '/signup');
+		redirect(302, '/');
 	}
 };

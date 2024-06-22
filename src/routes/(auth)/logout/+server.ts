@@ -10,5 +10,5 @@ export const GET: RequestHandler = async (event) => {
 			console.log('logout:', error);
 		}
 	}
-	redirect(302, '/');
+	redirect(302, '/login');
 };

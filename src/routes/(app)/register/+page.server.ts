@@ -6,7 +6,7 @@ export const load: PageServerLoad = async (event) => {
 	console.log('(app)/register/+page.server.ts LOAD - DONE');
 	console.log('user', user ? 'yes' : 'no');
 	console.log('session', session ? 'yes' : 'no');
-	if (!user) redirect(302, '/login'); //no user so ask for login
+	if (!user || !session) redirect(302, '/login'); //no user so ask for login
 	return {
 		session,
 		user
