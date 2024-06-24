@@ -43,10 +43,7 @@ export function setRegisterState(init: SetRegisterState) {
 }
 
 export function getRegisterState() {
-	const xyzzy = getContext<RegisterState>(REGISTER_CTX);
-	console.log('getRegisterState');
-	console.log(xyzzy?.submission?.id);
-	return xyzzy;
+	return getContext<RegisterState>(REGISTER_CTX);
 }
 
 export function updateSubmission({

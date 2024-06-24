@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
 //This is a phantom load, it doesn't have a +page.svelte to go with it.
 //It just validates the user and redirects to the correct page.

@@ -26,6 +26,7 @@ export const actions: Actions = {
 		let result;
 		try {
 			const artistEmail = user.email; //TODO: SB email?
+			console.log('updateArtist', artistEmail);
 			result = await prisma.artistTable.update({
 				where: { email: artistEmail },
 				data: form.data
@@ -53,6 +54,7 @@ export const actions: Actions = {
 		if (!user || !session) redirect(302, '/login');
 		let result;
 		const artistEmail = user.email; //TODO: SB email?
+		console.log('createArtist', artistEmail);
 		const newArtist = { ...form.data, email: artistEmail };
 		try {
 			result = await prisma.artistTable.create({
@@ -62,10 +64,10 @@ export const actions: Actions = {
 				return message(form, 'Success');
 			}
 		} catch (reason) {
-			console.log('Prisma Error? (app)/register/artist +page.server.ts', reason);
+			console.log('Prisma Error? (app)/register/artist +page.server.ts - create', reason);
 			return message(form, "Something went wrong. Sorry, we're broken!");
 		}
-		console.log('Generic Error? (app)/register/artist +page.server.ts', result);
+		console.log('Generic Error? (app)/register/artist +page.server.ts - create', result);
 		return message(form, 'Something went wrong. Please try again later.');
 	}
 };
