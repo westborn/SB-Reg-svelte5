@@ -1,27 +1,18 @@
 <script lang="ts">
-	import { setRegisterState, getRegisterState } from '$lib/state.svelte.js';
+	import { getRegisterState } from '$lib/state.svelte.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card/index.js';
 
 	import { ArtistCreateDialog, ArtistUpdateDialog } from '$lib/components';
 	import { ExhibitionYear } from '$lib/constants.js';
-	import SuperDebug from 'sveltekit-superforms';
 
-	let { data } = $props();
-
-	//Set initial State with the submisison fro the email we have been given
-	const myState = setRegisterState({
-		currentUserEmail: 'george@westborn.com.au',
-		submission: data.submission,
-		createArtistForm: data.createArtistForm,
-		updateArtistForm: data.updateArtistForm,
-		createEntryForm: data.createEntryForm
-	});
+	let myState = getRegisterState();
 </script>
 
 {#if !myState}
 	<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 		<p>Loading...</p>
+		<p>State: {JSON.stringify(myState)}</p>
 	</div>
 {:else}
 	<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
@@ -64,5 +55,4 @@
 			</Card.Content>
 		</Card.Root>
 	</div>
-	<SuperDebug data={myState} />
 {/if}

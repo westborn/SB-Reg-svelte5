@@ -3,34 +3,14 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
 import { redirect } from '@sveltejs/kit';
-import { artistAddOrUpdateSchema, entryCreateSchema } from '$lib/zod-schemas';
-import type { Actions, PageServerLoad } from '../../$types';
-import { getSubmission } from '$lib/components/server/registrationDB';
+import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+import type { Actions, PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
-	console.log('Register +page.server.ts LOAD - START');
-
-	const [createArtistForm, updateArtistForm, createEntryForm] = await Promise.all([
-		superValidate(zod(artistAddOrUpdateSchema)),
-		superValidate(zod(artistAddOrUpdateSchema)),
-		superValidate(zod(entryCreateSchema))
-	]);
-
-	const artistEmail = user.email; //TODO: SB email?
-
-	const submission = await getSubmission(artistEmail);
-	!submission ? console.log('No Submission Found') : console.log('Submission Found', submission.id);
-
-	const form = await superValidate(submission, zod(artistAddOrUpdateSchema));
-	return {
-		submission,
-		form,
-		createArtistForm,
-		updateArtistForm,
-		createEntryForm
-	};
+	console.log('register/artist +page.server.ts LOAD - START');
+	return;
 };
 
 export const actions: Actions = {
@@ -50,21 +30,19 @@ export const actions: Actions = {
 				where: { email: artistEmail },
 				data: form.data
 			});
-			console.log('Update Result:', result);
 			if (result) {
 				return message(form, 'Success');
 			}
 		} catch (reason) {
-			console.log('Prisma Error? (app)/register +page.server.ts', reason);
+			console.log('Prisma Error? (app)/register/artist +page.server.ts', reason);
 			return message(form, "Something went wrong. Sorry, we're broken!");
 		}
-		console.log('Generic Error? (app)/register +page.server.ts', result);
+		console.log('Generic Error? (app)/register/artist +page.server.ts', result);
 		return message(form, 'Something went wrong. Please try again later.');
 	},
 
 	createArtist: async (event) => {
 		const form = await superValidate(event, zod(artistAddOrUpdateSchema));
-		console.log('Create Form:', form.data);
 		if (!form.valid) {
 			console.log('Registration is Invalid', form.data);
 			return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -84,10 +62,10 @@ export const actions: Actions = {
 				return message(form, 'Success');
 			}
 		} catch (reason) {
-			console.log('Prisma Error? (app)/register +page.server.ts', reason);
+			console.log('Prisma Error? (app)/register/artist +page.server.ts', reason);
 			return message(form, "Something went wrong. Sorry, we're broken!");
 		}
-		console.log('Generic Error? (app)/register +page.server.ts', result);
+		console.log('Generic Error? (app)/register/artist +page.server.ts', result);
 		return message(form, 'Something went wrong. Please try again later.');
 	}
 };

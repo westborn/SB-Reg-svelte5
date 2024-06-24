@@ -34,7 +34,7 @@ export class RegisterState {
 	}
 }
 
-const REGISTER_CTX = Symbol('register_ctx');
+export const REGISTER_CTX = Symbol('register_ctx');
 
 export function setRegisterState(init: SetRegisterState) {
 	const registerState = new RegisterState(init);
@@ -43,5 +43,28 @@ export function setRegisterState(init: SetRegisterState) {
 }
 
 export function getRegisterState() {
-	return getContext<RegisterState>(REGISTER_CTX);
+	const xyzzy = getContext<RegisterState>(REGISTER_CTX);
+	console.log('getRegisterState');
+	console.log(xyzzy?.submission?.id);
+	return xyzzy;
+}
+
+export function updateSubmission({
+	currentUserEmail,
+	submission,
+	createArtistForm,
+	updateArtistForm,
+	createEntryForm
+}) {
+	const currentState = getRegisterState();
+	currentState.currentUserEmail = currentUserEmail;
+	currentState.submission = submission;
+	currentState.artistExists = submission ? true : false;
+	currentState.registrationExists = submission?.registrations?.length ?? 0 > 0 ? true : false;
+	currentState.entriesExist = submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
+	currentState.createArtistForm = createArtistForm;
+	currentState.updateArtistForm = updateArtistForm;
+	currentState.createEntryForm = createEntryForm;
+	setContext(REGISTER_CTX, currentState);
+	return currentState;
 }

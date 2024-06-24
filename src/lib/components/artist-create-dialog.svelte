@@ -4,10 +4,10 @@
 	import { getRegisterState } from '$lib/state.svelte.js';
 	import { ArtistCreateForm } from '$lib/components';
 
-	let state = getRegisterState();
+	let myState = getRegisterState();
 </script>
 
-<Dialog.Root bind:open={state.dialogOpen}>
+<Dialog.Root bind:open={myState.dialogOpen}>
 	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
 		<Dialog.Header>
 			<Dialog.Title>Create a New Registration</Dialog.Title>

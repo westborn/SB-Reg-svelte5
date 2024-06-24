@@ -14,16 +14,16 @@
 	import { getRegisterState } from '$lib/state.svelte.js';
 	import { entryCreateSchema } from '$lib/zod-schemas';
 
-	let state = getRegisterState();
+	let myState = getRegisterState();
 
-	const form = superForm(state.createEntryForm, {
+	const form = superForm(myState.createEntryForm, {
 		id: `createEntryForm`,
 		validators: zodClient(entryCreateSchema),
 		onUpdated: () => {
 			if ($message === 'Success') {
 				toast.success('Entry Added');
 				$message = null;
-				state.dialogOpen = false;
+				myState.dialogOpen = false;
 			} else {
 				toast.error('Entry Create Failed!');
 			}

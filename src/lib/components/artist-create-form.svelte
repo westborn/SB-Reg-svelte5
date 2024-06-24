@@ -13,23 +13,22 @@
 	import { getRegisterState } from '$lib/state.svelte.js';
 	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
 
-	let state = getRegisterState();
-
-	const form = superForm(state.createArtistForm, {
+	let myState = getRegisterState();
+	let form = superForm(myState.createArtistForm, {
 		id: `createArtistForm`,
 		validators: zodClient(artistAddOrUpdateSchema),
 		onUpdated: () => {
 			if ($message === 'Success') {
-				toast.success('Profile Added');
+				toast.success('Artist Profile Added');
 				$message = null;
-				state.dialogOpen = false;
+				myState.dialogOpen = false;
 			} else {
-				toast.error('Profile Create Failed!');
+				toast.error('Artist Profile Create Failed!');
 			}
 		}
 	});
 
-	const { form: formData, enhance, message, errors } = form;
+	const { form: formData, enhance, errors, message } = form;
 </script>
 
 <form method="POST" action="?/createArtist" use:enhance class="w-full space-y-4">
@@ -113,7 +112,7 @@
 	<Form.Errors errors={$errors._errors} />
 	{#if !$message}
 		<div>
-			<Form.Button>Update?</Form.Button>
+			<Form.Button>Create Registration?</Form.Button>
 			<span class="text-sm text-muted-foreground"> Just a little note</span>
 		</div>
 	{:else}

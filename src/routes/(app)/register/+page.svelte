@@ -1,27 +1,24 @@
 <script lang="ts">
-	import { setRegisterState, getRegisterState } from '$lib/state.svelte.js';
+	import { updateSubmission } from '$lib/state.svelte.js';
 	import SuperDebug from 'sveltekit-superforms';
 	import { Button } from '$lib/components/ui/button';
 
-	import { page } from '$app/stores';
-
 	let { data } = $props();
-	// setRegisterState({
-	// 	submission: data.submission,
-	// 	createArtistForm: data.createArtistForm,
-	// 	updateArtistForm: data.updateArtistForm,
-	// 	createEntryForm: data.createEntryForm
-	// });
-	// let myState = getRegisterState();
-	// myState.artistExists = data.submission ? true : false;
-	// myState.registrationExists = data.submission?.registrations?.length ?? 0 > 0 ? true : false;
-	// myState.entriesExist = data.submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
+	let { submission, createArtistForm, updateArtistForm, createEntryForm } = data;
+	//Set initial State with the submisison for the email we have been given
+	const myState = updateSubmission({
+		currentUserEmail: data.user.email,
+		submission,
+		createArtistForm,
+		updateArtistForm,
+		createEntryForm
+	});
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<h1>Register Page</h1>
 	<p>
-		{data.user.email}<br />
+		{myState.currentUserEmail}<br />
 	</p>
 	<Button href="/register/artist">Do ARTIST</Button>
 </div>
@@ -35,5 +32,5 @@
 <li>If none - create artist<br /></li>
 <li></li>
 
-<!-- <SuperDebug data={data.session} /> -->
-<SuperDebug data={$page} />
+<!-- <SuperDebug data={myState.submission} /> -->
+<SuperDebug data={myState.submission} />
