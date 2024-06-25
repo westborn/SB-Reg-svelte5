@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import type { SuperValidated } from 'sveltekit-superforms';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -11,13 +12,13 @@
 	import { toast } from 'svelte-sonner';
 
 	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
-	import { getRegisterState } from '$lib/state.svelte';
+	import { getRegisterState } from '$lib/state.svelte.js';
 	import { untrack } from 'svelte';
 
-	// TODO add an interface type for $props to avoid an error
+	let { artistForm }: { artistForm: SuperValidated<Record<string, unknown>> } = $props();
 	let myState = getRegisterState();
 
-	const form = superForm(myState.updateArtistForm, {
+	let form = superForm(artistForm, {
 		id: `updateArtistForm-${myState?.submission?.id}`,
 		validators: zodClient(artistAddOrUpdateSchema),
 		resetForm: false,

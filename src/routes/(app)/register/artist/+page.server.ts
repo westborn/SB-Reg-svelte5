@@ -1,16 +1,17 @@
 import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
+import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
 
 import { redirect } from '@sveltejs/kit';
-import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
 import type { Actions, PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log('register/artist +page.server.ts LOAD - START');
-	return;
+	const form = await superValidate(zod(artistAddOrUpdateSchema));
+	return { form };
 };
 
 export const actions: Actions = {

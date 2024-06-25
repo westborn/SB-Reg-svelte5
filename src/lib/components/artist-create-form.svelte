@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import type { SuperValidated } from 'sveltekit-superforms';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -10,11 +12,13 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	import { getRegisterState } from '$lib/state.svelte.js';
 	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+	import { getRegisterState } from '$lib/state.svelte.js';
 
 	let myState = getRegisterState();
-	let form = superForm(myState.createArtistForm, {
+	let { artistForm }: { artistForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>> } = $props();
+
+	let form = superForm(artistForm, {
 		id: `createArtistForm`,
 		validators: zodClient(artistAddOrUpdateSchema),
 		onUpdated: () => {
@@ -22,6 +26,7 @@
 				toast.success('Artist Profile Added');
 				$message = null;
 				myState.dialogOpen = false;
+				goto('/register');
 			} else {
 				toast.error('Artist Profile Create Failed!');
 			}

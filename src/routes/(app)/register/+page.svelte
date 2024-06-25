@@ -4,22 +4,13 @@
 	import { Button } from '$lib/components/ui/button';
 
 	let { data } = $props();
-	let { submission, createArtistForm, updateArtistForm, createEntryForm } = data;
+	let { submission } = data;
 	//Set initial State with the submisison for the email we have been given
-	const myState = updateSubmission({
-		currentUserEmail: data.user.email,
-		submission,
-		createArtistForm,
-		updateArtistForm,
-		createEntryForm
-	});
+	const myState = updateSubmission(submission);
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<h1>Register Page</h1>
-	<p>
-		{myState.currentUserEmail}<br />
-	</p>
 	<Button href="/register/artist">Do ARTIST</Button>
 </div>
 

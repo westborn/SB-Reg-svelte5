@@ -5,6 +5,7 @@
 	import { getRegisterState } from '$lib/state.svelte.js';
 	import { ArtistUpdateForm } from '$lib/components';
 
+	let { artistForm } = $props();
 	let myState = getRegisterState();
 </script>
 
@@ -16,7 +17,7 @@
 			<Dialog.Description>Make changes to your profile here.<br />Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<ArtistUpdateForm />
+			<ArtistUpdateForm {artistForm} />
 		</div>
 	</Dialog.Content>
 </Dialog.Root>
