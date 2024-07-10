@@ -5,6 +5,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
+	import { page } from '$app/stores';
 
 	let { data } = $props();
 	let { session, user } = data;
@@ -12,6 +13,9 @@
 		validators: zodClient(tokenSchema)
 	});
 	const { form: formData, enhance, errors } = form;
+	const url = $page.url;
+	const validatingEmail = url.searchParams.get('email');
+	$formData.email = validatingEmail || '';
 </script>
 
 <AuthPage type="verify-email" {session} {user}>

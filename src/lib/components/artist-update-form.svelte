@@ -12,7 +12,7 @@
 	import { toast } from 'svelte-sonner';
 
 	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
-	import { getRegisterState } from '$lib/state.svelte.js';
+	import { getRegisterState } from '$lib/context.svelte.js';
 	import { untrack } from 'svelte';
 
 	let { artistForm }: { artistForm: SuperValidated<Record<string, unknown>> } = $props();

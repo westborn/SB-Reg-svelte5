@@ -3,7 +3,7 @@
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
 
-	import { setRegisterState } from '$lib/state.svelte.js';
+	import { setRegisterState } from '$lib/context.svelte.js';
 
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';

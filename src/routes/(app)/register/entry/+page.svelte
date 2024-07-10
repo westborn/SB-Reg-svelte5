@@ -7,7 +7,7 @@
 
 {#if myState.submission}
 	<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
-		<h1>Register Page</h1>
+		<h1>Entry Page</h1>
 		<h2>User: {data.user.email}</h2>
 	</div>
 {/if}

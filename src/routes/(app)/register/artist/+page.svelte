@@ -1,15 +1,11 @@
 <script lang="ts">
-	import { getRegisterState } from '$lib/state.svelte.js';
-	import { Button } from '$lib/components/ui/button';
+	import { getRegisterState } from '$lib/context.svelte.js';
 	import * as Card from '$lib/components/ui/card/index.js';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
 
 	import { ArtistCreateForm, ArtistUpdateDialog } from '$lib/components';
-	import { ExhibitionYear } from '$lib/constants.js';
 	let { data } = $props();
 
-	const artistForm = data.form;
+	const { artistForm } = data;
 	let myState = getRegisterState();
 </script>
 

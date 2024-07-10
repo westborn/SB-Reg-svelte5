@@ -2,7 +2,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
-	import { getRegisterState } from '$lib/state.svelte.js';
+	import { getRegisterState } from '$lib/context.svelte.js';
 	import { ArtistCreateForm } from '$lib/components';
 
 	let myState = getRegisterState();

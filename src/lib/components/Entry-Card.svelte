@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getRegisterState } from '$lib/state.svelte';
+	import { getRegisterState } from '$lib/context.svelte';
 
 	const myState = getRegisterState();
 
