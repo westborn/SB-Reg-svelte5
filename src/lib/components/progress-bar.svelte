@@ -1,33 +1,30 @@
 <script lang="ts">
-	let { steps, currentStep }: { steps: []; currentStep: { value: number } } = $props();
+	import { getStep } from '$lib/state.svelte';
+	import SuperDebug from 'sveltekit-superforms';
+	let current = getStep();
 
-	let stepsState: Array<{ description: string; completed: boolean; highlighted: boolean; selected: boolean }> = $state(
-		[]
-	);
-	let displaySteps = updateStep(currentStep.value);
+	let { steps }: { steps: string[] } = $props();
 
-	function updateStep(stepNumber: number) {
-		// first time through - setup the steps
-		if (stepsState.length === 0) {
-			stepsState = steps.map((step, index) => {
-				return {
-					description: step,
-					completed: false,
-					highlighted: index === 0 ? true : false,
-					selected: index === 0 ? true : false
-				};
-			});
-		}
-		return stepsState.map((step, index) => {
-			if (index === stepNumber) {
+	let stepsStateArray = steps.map((step) => {
+		return {
+			description: step,
+			completed: false,
+			highlighted: false,
+			selected: false
+		};
+	});
+
+	let displaySteps = $derived(
+		stepsStateArray.map((step, index) => {
+			if (index === current.step) {
 				return { ...step, highlighted: true, selected: true, completed: false }; // Current step
-			} else if (index < stepNumber) {
+			} else if (index < current.step) {
 				return { ...step, highlighted: false, selected: true, completed: true }; // Past step
 			} else {
 				return { ...step, highlighted: false, selected: false, completed: false }; // Future steps
 			}
-		});
-	}
+		})
+	);
 </script>
 
 <div class="flex items-center justify-between p-4">
@@ -57,7 +54,7 @@
 			<!-- Line between circles-->
 			<div
 				class="flex-auto border-t-4 transition duration-500 ease-in-out
-        {index < currentStep.value ? 'border-primary-400' : 'border-gray-300'}"
+        {index < current.step ? 'border-primary-400' : 'border-gray-300'}"
 			></div>
 		</div>
 	{/each}

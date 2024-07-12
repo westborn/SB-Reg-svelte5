@@ -39,7 +39,9 @@
 				</div>
 				<ArtistUpdateDialog {artistForm} />
 			{:else}
-				<p class="text-sm text-muted-foreground">Some basic information we use to contact you:</p>
+				<p class="text-sm text-muted-foreground">
+					First you need to register for the exhibition,<br /> and provide some basic details so we can contact you.
+				</p>
 				<ArtistCreateForm {artistForm} />
 			{/if}
 		</Card.Content>
