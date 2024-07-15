@@ -11,6 +11,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"db:migrate": "prisma migrate dev",
+		"db:reset": "prisma migrate reset --force",
 		"db:seed": "tsx src/scripts/seed.ts",
 		"studio": "prisma studio"
 	},

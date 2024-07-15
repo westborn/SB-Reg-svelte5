@@ -6,16 +6,15 @@ import { Indigenous, EntryType } from '$lib/constants';
 const prisma = new PrismaClient();
 
 function makeArtist(email: string) {
-	const firstName = faker.person.firstName();
-	// const firstNations = faker.helpers.enumValue(Indigenous);
 	return {
-		firstName,
+		firstName: faker.person.firstName(),
 		lastName: faker.person.lastName(),
 		email,
 		firstNations: faker.helpers.enumValue(Indigenous),
 		phone: '04' + faker.string.numeric(8),
 		postcode: faker.string.numeric(4),
-		bankAccountName: faker.finance.accountName(),
+		// bankAccountName: faker.finance.accountName(),
+		bankAccountName: email,
 		bankBSB: faker.string.numeric(6),
 		bankAccount: faker.finance.accountNumber()
 	};
