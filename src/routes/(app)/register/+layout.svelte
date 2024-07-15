@@ -5,6 +5,8 @@
 	import { ProgressBar } from '$lib/components/index.js';
 
 	import { getStep } from '$lib/state.svelte';
+	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	let { children, data } = $props();
 	let { submission } = data;
@@ -21,14 +23,28 @@
 		if (myState.entriesExist && myState?.submission?.registrations[0]?.closed) return 3; // 'Complete' step
 		return nextStepIndex;
 	}
+	const handleProgress = (stepIncrement: number) => {
+		console.log('handleProgress', current.step, stepIncrement);
+		const nextStep = current.step + stepIncrement;
+		const allowedStep = calcAllowableNextStep(current.step + stepIncrement);
+		if (nextStep < allowedStep) {
+			current.step = nextStep;
+		} else {
+			current.step = allowedStep;
+		}
+		if (current.step === 0 && browser) {
+			goto('/register/artist');
+		}
+		if (current.step === 1 && browser) {
+			goto('/register/entry');
+		}
+	};
+
 	//setup the current step state
 	let current = getStep();
 	// check what is allowable - assume all steps completed
 	current.step = calcAllowableNextStep(3);
-
-	const handleProgress = (stepIncrement: number) => {
-		current.step = calcAllowableNextStep(current.step + stepIncrement);
-	};
+	handleProgress(0);
 
 	// let showButtons = true;
 
@@ -66,4 +82,4 @@
 {:else}
 	{@render children()}
 {/if}
-<SuperDebug data={current.step} />
+<SuperDebug data={submission} />

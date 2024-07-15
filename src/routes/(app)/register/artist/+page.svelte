@@ -12,7 +12,7 @@
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<Card.Root>
 		<Card.Header class="p-2 sm:px-6">
-			<Card.Title class="text-xl">Registration Management</Card.Title>
+			<Card.Title class="text-xl">Artist Registration</Card.Title>
 		</Card.Header>
 		<Card.Content class="p-2 sm:px-6">
 			{#if myState?.artistExists && myState?.submission}
