@@ -40,7 +40,7 @@
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>
 			<Form.Label>Title for this Exhibit</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.title} />
+			<Input autofocus type="text" {...attrs} bind:value={$formData.title} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>

@@ -37,7 +37,7 @@
 					>6 Digit Token
 					<span class="py-4 text-xs text-muted-foreground">(that we sent to your email address)</span>
 				</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.token} />
+				<Input autofocus type="text" {...attrs} bind:value={$formData.token} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>

@@ -25,7 +25,7 @@
 		<Form.Field {form} name="email">
 			<Form.Control let:attrs>
 				<Form.Label>Email Address</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.email} />
+				<Input autofocus type="text" {...attrs} bind:value={$formData.email} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>

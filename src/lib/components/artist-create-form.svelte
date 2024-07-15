@@ -40,7 +40,7 @@
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.firstName} />
+			<Input autofocus type="text" {...attrs} bind:value={$formData.firstName} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
