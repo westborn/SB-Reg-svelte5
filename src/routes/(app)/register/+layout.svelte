@@ -38,6 +38,12 @@
 		if (current.step === 1 && browser) {
 			goto('/register/entry');
 		}
+		if (current.step === 2 && browser) {
+			goto('/register/confirm');
+		}
+		if (current.step === 3 && browser) {
+			goto('/register/complete');
+		}
 	};
 
 	//setup the current step state
@@ -48,13 +54,13 @@
 
 	// let showButtons = true;
 
-	// function doUpdate(id: number) {
-	// 	console.log('doUpdate for ', id);
-	// }
+	function doUpdate(id: number) {
+		console.log('doUpdate for ', id);
+	}
 
-	// function doDelete(id: number) {
-	// 	console.log('doDelete for ', id);
-	// }
+	function doDelete(id: number) {
+		console.log('doDelete for ', id);
+	}
 </script>
 
 {#if myState.submission}
