@@ -13,7 +13,6 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
-	import { EntryCreateForm } from '$lib/components';
 
 	let { showButtons, doUpdate, doDelete, submissionEntries }: Props = $props();
 
@@ -27,9 +26,9 @@
 </script>
 
 <Accordion.Root class="w-full">
-	{#each submissionEntries as entryDisplayed}
+	{#each submissionEntries as entryDisplayed, entryKey}
 		<Accordion.Item value={entryDisplayed.id.toString()}>
-			<Accordion.Trigger>{entryDisplayed.title}</Accordion.Trigger>
+			<Accordion.Trigger>Entry {entryKey + 1} - {entryDisplayed.title}</Accordion.Trigger>
 			<Accordion.Content>
 				<Card.Root>
 					<Card.Content class="p-2 text-sm sm:p-6">
@@ -69,5 +68,3 @@
 		</Accordion.Item>
 	{/each}
 </Accordion.Root>
-
-<EntryCreateForm />

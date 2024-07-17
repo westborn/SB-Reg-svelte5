@@ -48,8 +48,8 @@
 
 	//setup the current step state
 	let current = getStep();
-	// check what is allowable - assume all steps completed
-	current.step = calcAllowableNextStep(3);
+	// check what is allowable - assume the user wants to see entries
+	current.step = calcAllowableNextStep(1);
 	handleProgress(0);
 
 	// let showButtons = true;

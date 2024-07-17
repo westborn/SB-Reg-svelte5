@@ -1,11 +1,16 @@
 <script lang="ts">
+	import type { SuperValidated } from 'sveltekit-superforms';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { ArtistUpdateForm } from '$lib/components';
 
-	let { artistForm } = $props();
+	type Props = {
+		artistForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+	};
+
+	let { artistForm }: Props = $props();
 	let myState = getRegisterState();
 </script>
 
