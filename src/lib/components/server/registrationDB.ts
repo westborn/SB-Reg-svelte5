@@ -1,8 +1,23 @@
 import { prisma } from '$lib/components/server/prisma';
 import { ExhibitionYear } from '$lib/constants';
 
-import type { Image } from '$lib/zod-schemas';
+import type { Entry, Image } from '$lib/zod-schemas';
+import { EntryType } from '$lib/constants';
 
+// Two different ways to add types from a prisma query
+
+// // https://www.prisma.io/docs/orm/prisma-client/type-safety/operating-against-partial-structures-of-model-types
+// // Extract Type `Submission` from result of the "getSubmission" function
+// type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+// export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
+// // OR
+// import { Prisma } from '@prisma/client';
+// type Submisssion_alt = Prisma.PromiseReturnType<typeof getSubmission>;
+
+//I choose ths way!
+type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+
+export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
 export const getSubmission = async (artistEmail: string) => {
 	const submission = await prisma.artistTable.findFirst({
 		where: {
@@ -64,13 +79,78 @@ export const getSubmission = async (artistEmail: string) => {
 	});
 	return submission;
 };
-// https://www.prisma.io/docs/orm/prisma-client/type-safety/operating-against-partial-structures-of-model-types
-// Extract Type `Submission` from result of the "getSubmission" function
-type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
-export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
-// OR
-import { Prisma } from '@prisma/client';
-type Submisssion_alt = Prisma.PromiseReturnType<typeof getSubmission>;
+
+export type entriesList = ThenArg<ReturnType<typeof getEntries>>;
+export const getEntries = async (artistEmail: string) => {
+	const entries = await prisma.artistTable.findFirst({
+		where: { email: artistEmail },
+		select: {
+			registrations: {
+				where: { registrationYear: ExhibitionYear.toString() },
+				select: {
+					entries: {
+						select: {
+							id: true,
+							artistId: true,
+							registrationId: true,
+							accepted: true,
+							inOrOut: true,
+							title: true,
+							material: true,
+							dimensions: true,
+							description: true,
+							specialRequirements: true,
+							enterMajorPrize: true,
+							price: true,
+							images: {
+								select: {
+									id: true,
+									originalFileName: true,
+									cloudId: true,
+									cloudURL: true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+	return entries;
+};
+
+export const createEntry = async (workingEntry: Entry) => {
+	const {
+		artistId,
+		registrationId,
+		accepted,
+		inOrOut,
+		title,
+		material,
+		dimensions,
+		description,
+		specialRequirements,
+		enterMajorPrize,
+		price
+	} = workingEntry as Entry;
+
+	const entry = await prisma.entryTable.create({
+		data: {
+			artistId,
+			registrationId,
+			accepted,
+			inOrOut: EntryType[inOrOut as keyof typeof EntryType],
+			title: title || '',
+			material,
+			dimensions,
+			description,
+			specialRequirements,
+			enterMajorPrize,
+			price
+		}
+	});
+	return entry;
+};
 
 export const createImage = async (workingImage: Image) => {
 	const { artistId, registrationId = null, entryId = null, cloudId, cloudURL, originalFileName } = workingImage;

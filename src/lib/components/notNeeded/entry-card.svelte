@@ -20,7 +20,7 @@
 					currency: 'AUD'
 				})}
 			</p>
-			<p>{entry?.enterMajorPrize ? 'Entered in Major Prize' : ''}</p>
+			<p>{entry?.enterMajorPrize === 'Yes' ? 'Entered in Major Prize' : ''}</p>
 			<p>({entry.dimensions})</p>
 		</div>
 

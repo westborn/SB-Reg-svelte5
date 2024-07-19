@@ -26,11 +26,11 @@ function makeRegistration(artistId: number, year: string = '2025') {
 		registrationYear: year,
 		bumpIn: faker.date.future().toString(),
 		bumpOut: faker.date.future().toString(),
-		crane: faker.datatype.boolean(),
+		crane: faker.helpers.arrayElement(['Yes', 'No']),
 		displayRequirements: faker.lorem.words(),
-		transport: faker.datatype.boolean(),
-		accommodation: faker.datatype.boolean(),
-		closed: false
+		transport: faker.helpers.arrayElement(['Yes', 'No']),
+		accommodation: faker.helpers.arrayElement(['Yes', 'No']),
+		closed: 'No'
 	};
 }
 
@@ -38,8 +38,8 @@ function makeEntry(artistId: number, registrationId: number) {
 	return {
 		artistId,
 		registrationId,
-		accepted: false,
-		enterMajorPrize: faker.datatype.boolean(),
+		accepted: 'No',
+		enterMajorPrize: faker.helpers.arrayElement(['Yes', 'No']),
 		inOrOut: faker.helpers.enumValue(EntryType),
 		title: faker.lorem.words(3),
 		material: faker.lorem.words(3),

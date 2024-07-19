@@ -12,7 +12,7 @@
 	});
 
 	let { data } = $props();
-	let { form: formData, session, user } = data;
+	let { form: formData, session, user, record } = data;
 
 	const { form, enhance, errors } = superForm(formData, {
 		validators: zodClient(fileSchema)
@@ -63,5 +63,9 @@ Here I am
 
 	<!-- <img src={form.image} class="max-w-sm rounded-lg shadow-2xl" alt="uploaded" /> -->
 </div>
+
+<pre>
+{JSON.stringify(record, null, 2)}
+</pre>
 
 <SuperDebug data={form} />

@@ -4,17 +4,11 @@
 
 	import { ArtistCreateForm, ArtistUpdateDialog } from '$lib/components';
 	let { data } = $props();
-
 	const { artistForm } = data;
-	let myState = getRegisterState();
 
-	import { page } from '$app/stores';
+	let myState = getRegisterState();
 </script>
 
-<pre>
-
-Page: {$page.route.id}
-</pre>
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<Card.Root>
 		<Card.Header class="p-2 sm:px-6">

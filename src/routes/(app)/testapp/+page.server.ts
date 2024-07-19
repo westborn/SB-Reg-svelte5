@@ -6,7 +6,7 @@ import type { PageServerLoad } from '../$types';
 import { v2 as cloudinary, type UploadApiErrorResponse, type UploadApiResponse } from 'cloudinary';
 import { CLOUDINARY_API_SECRET, CLOUDINARY_API_KEY } from '$env/static/private';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
-import { createImage } from '$lib/components/server/registrationDB';
+import { createImage, getEntries } from '$lib/components/server/registrationDB';
 
 cloudinary.config({
 	cloud_name: PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -24,10 +24,14 @@ const fileSchema = z.object({
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
+
+	const record = await getEntries(user.email);
+
 	return {
 		session,
 		user,
-		form: await superValidate(zod(fileSchema))
+		form: await superValidate(zod(fileSchema)),
+		record
 	};
 };
 

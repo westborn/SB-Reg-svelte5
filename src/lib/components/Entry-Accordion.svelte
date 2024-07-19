@@ -37,7 +37,7 @@
 
 						<div class="mx-auto flex items-center justify-between">
 							<p class="text-lg">{convertToDollars(entryDisplayed.price)}</p>
-							<p class="text-xs">{entryDisplayed?.enterMajorPrize ? 'Major Prize Entry' : ''}</p>
+							<p class="text-xs">{entryDisplayed?.enterMajorPrize === 'Yes' ? 'Major Prize Entry' : ''}</p>
 							<p>({entryDisplayed.dimensions})</p>
 						</div>
 

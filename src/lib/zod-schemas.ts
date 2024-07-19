@@ -14,10 +14,8 @@ export const loginSchema = z.object({
 });
 
 export const IndigenousSchema = z.enum(['Yes', 'No', 'Declined']);
-export type IndigenousType = `${z.infer<typeof IndigenousSchema>}`;
-
 export const EntryTypeSchema = z.enum(['Indoor', 'Outdoor']);
-export type EntryTypeType = `${z.infer<typeof EntryTypeSchema>}`;
+export const YesOrNoSchema = z.enum(['Yes', 'No']);
 
 /////////////////////////////////////////
 // ARTIST TABLE SCHEMA
@@ -45,13 +43,13 @@ export const registrationTableSchema = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),
 	registrationYear: z.string(),
-	closed: z.boolean(),
+	closed: YesOrNoSchema,
 	bumpIn: z.string().nullable(),
 	bumpOut: z.string().nullable(),
 	displayRequirements: z.string().nullable(),
-	accommodation: z.boolean().nullable(),
-	crane: z.boolean().nullable(),
-	transport: z.boolean().nullable(),
+	accommodation: YesOrNoSchema,
+	crane: YesOrNoSchema,
+	transport: YesOrNoSchema,
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date()
 });
@@ -65,10 +63,10 @@ export const entryTableSchema = z.object({
 	accepted: z.boolean(),
 	artistId: z.number().int(),
 	registrationId: z.number().int(),
-	inOrOut: EntryTypeSchema.nullable(),
+	inOrOut: EntryTypeSchema,
 	description: z.string().nullable(),
 	dimensions: z.string().nullable(),
-	enterMajorPrize: z.boolean(),
+	enterMajorPrize: YesOrNoSchema,
 	material: z.string().nullable(),
 	price: z.number().int().nullable(),
 	specialRequirements: z.string().nullable(),
@@ -117,22 +115,17 @@ export const artistSchema = z.object({
 });
 export type Artist = z.infer<typeof artistSchema>;
 
-export const artistAddOrUpdateSchema = artistSchema.omit({ id: true, email: true });
-export type ArtistUpdate = z.infer<typeof artistAddOrUpdateSchema>;
-
 export const registrationSchema = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),
 	registrationYear: z.string().nullish(),
-	closed: z.boolean({ required_error: 'closed response is required' }),
+	closed: YesOrNoSchema.default('No'),
 	bumpIn: z.string().nullish(),
 	bumpOut: z.string().nullish(),
 	displayRequirements: z.string().nullish(),
-	accomodation: z.boolean({
-		required_error: 'accomodation response is required'
-	}),
-	crane: z.boolean({ required_error: 'transport response is required' }),
-	transport: z.boolean({ required_error: 'transport response is required' })
+	accomodation: YesOrNoSchema.default('No'),
+	crane: YesOrNoSchema.default('No'),
+	transport: YesOrNoSchema.default('No')
 });
 export type Registration = z.infer<typeof registrationSchema>;
 
@@ -140,20 +133,17 @@ export const entrySchema = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),
 	registrationId: z.number().int(),
-	accepted: z.boolean(),
-	inOrOut: z.string().nullish(),
+	accepted: YesOrNoSchema.default('No'),
+	inOrOut: z.lazy(() => EntryTypeSchema).default('Outdoor'),
 	title: z.string({ required_error: 'Title is required' }).nullish(),
 	material: z.string().nullish(),
 	dimensions: z.string().nullish(),
 	description: z.string().nullish(),
 	specialRequirements: z.string().nullish(),
-	enterMajorPrize: z.boolean(),
-	price: z.number({ required_error: 'Price is required' }).nullish()
+	enterMajorPrize: YesOrNoSchema.default('No'),
+	price: z.string({ required_error: 'Price is required' }).nullish()
 });
 export type Entry = z.infer<typeof entrySchema>;
-
-export const entryCreateSchema = entrySchema.omit({ id: true, artistId: true, registrationId: true, accepted: true });
-export type EntryCreate = z.infer<typeof entryCreateSchema>;
 
 export const imageSchema = z.object({
 	id: z.number().int(),
@@ -166,13 +156,15 @@ export const imageSchema = z.object({
 });
 export type Image = z.infer<typeof imageSchema>;
 
-/////////////////////////////////////////
-// WORKING SCHEMA for APIs, state, validators
-/////////////////////////////////////////
-// export const submissionSchema = z.object({
-// 	...artistSchema.shape,
-// 	registration: registrationSchema.optional(),
-// 	entries: z.array(entrySchema).optional(),
-// 	images: z.array(imageSchema).optional()
-// });
-// export type Submission = z.infer<typeof submissionSchema>;
+// Schemas for forms to add/update tables
+export const artistAddOrUpdateSchema = artistSchema.omit({ id: true, email: true });
+export type ArtistUpdate = z.infer<typeof artistAddOrUpdateSchema>;
+
+export const entryAddOrUpdateSchema = entrySchema.omit({
+	id: true,
+	artistId: true,
+	registrationId: true,
+	accepted: true
+});
+export type EntryUpdate = z.infer<typeof entryAddOrUpdateSchema>;
+export type EntryCreate = z.infer<typeof entryAddOrUpdateSchema>;

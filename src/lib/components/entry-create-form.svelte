@@ -13,14 +13,15 @@
 	import { Textarea } from './ui/textarea';
 
 	import { getRegisterState } from '$lib/context.svelte.js';
-	import { entryCreateSchema } from '$lib/zod-schemas';
+	import { entryAddOrUpdateSchema } from '$lib/zod-schemas';
 
 	let myState = getRegisterState();
+
 	let { entryForm }: { entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>> } = $props();
 
 	const form = superForm(entryForm, {
 		id: `createEntryForm`,
-		validators: zodClient(entryCreateSchema),
+		validators: zodClient(entryAddOrUpdateSchema),
 		onUpdated: () => {
 			if ($message === 'Success') {
 				toast.success('Entry Added');
