@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -13,7 +13,7 @@
 	import { Textarea } from './ui/textarea';
 
 	import { getRegisterState } from '$lib/context.svelte.js';
-	import { entryAddOrUpdateSchema } from '$lib/zod-schemas';
+	import { entrySchemaUI } from '$lib/zod-schemas';
 
 	let myState = getRegisterState();
 
@@ -21,13 +21,13 @@
 
 	const form = superForm(entryForm, {
 		id: `createEntryForm`,
-		validators: zodClient(entryAddOrUpdateSchema),
+		validators: zodClient(entrySchemaUI),
 		onUpdated: () => {
 			if ($message === 'Success') {
 				toast.success('Entry Added');
 				$message = null;
 				myState.dialogOpen = false;
-				goto('/register');
+				invalidateAll();
 			} else {
 				toast.error('Entry Creation Failed!');
 			}

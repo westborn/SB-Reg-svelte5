@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import type { SuperValidated } from 'sveltekit-superforms';
@@ -12,7 +11,7 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+	import { artistSchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte.js';
 
 	let myState = getRegisterState();
@@ -20,16 +19,30 @@
 
 	let form = superForm(artistForm, {
 		id: `createArtistForm`,
-		validators: zodClient(artistAddOrUpdateSchema),
+		validators: zodClient(artistSchemaUI),
+		applyAction: true,
 		onUpdated: () => {
+			console.log('onUpdated');
 			if ($message === 'Success') {
 				toast.success('Artist Profile Added');
+				console.log('Artist Profile Added');
 				$message = null;
 				myState.dialogOpen = false;
-				goto('/register');
 			} else {
 				toast.error('Artist Profile Create Failed!');
+				console.log('Artist Profile Create Failed!');
 			}
+		},
+		onResult: ({ result, formElement }) => {
+			console.log('onResult', JSON.stringify(result, null, 2), JSON.stringify(formElement, null, 2));
+			if (result.type) {
+				$message = 'Success1';
+			} else {
+				$message = 'Failed1';
+			}
+		},
+		onUpdate: () => {
+			console.log('onUpdated');
 		}
 	});
 

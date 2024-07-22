@@ -1,8 +1,8 @@
 import { prisma } from '$lib/components/server/prisma';
 import { ExhibitionYear } from '$lib/constants';
 
-import type { Entry, Image } from '$lib/zod-schemas';
 import { EntryType } from '$lib/constants';
+import type { EntryTable, ImageTable } from '../../zod-schemas';
 
 // Two different ways to add types from a prisma query
 
@@ -80,7 +80,36 @@ export const getSubmission = async (artistEmail: string) => {
 	return submission;
 };
 
-export type entriesList = ThenArg<ReturnType<typeof getEntries>>;
+type xyzzy = {
+	entries: {
+		id: number;
+		artistId: number;
+		registrationId: number;
+		accepted: boolean;
+		inOrOut: string;
+		title: string;
+		material: string;
+		dimensions: string;
+		description: string;
+		specialRequirements: string;
+		enterMajorPrize: boolean;
+		price: number;
+		images: {
+			id: number;
+			originalFileName: string;
+			cloudId: string;
+			cloudURL: string;
+		}[];
+	}[];
+};
+
+type ReturnedEntriesEntry = Omit<EntryTable, 'createdAt' | 'updatedAt'>;
+type ReturnedEntriesImage = Pick<ImageTable, 'id' | 'originalFileName' | 'cloudId' | 'cloudURL'>;
+export type ReturnedEntry = ReturnedEntriesEntry & { images: ReturnedEntriesImage[] };
+export type ReturnedEntries = ReturnedEntry[];
+
+export type CurrentRegistration = ThenArg<ReturnType<typeof getEntries>>;
+
 export const getEntries = async (artistEmail: string) => {
 	const entries = await prisma.artistTable.findFirst({
 		where: { email: artistEmail },
@@ -119,7 +148,7 @@ export const getEntries = async (artistEmail: string) => {
 	return entries;
 };
 
-export const createEntry = async (workingEntry: Entry) => {
+export const createEntry = async (workingEntry: EntryTable) => {
 	const {
 		artistId,
 		registrationId,
@@ -132,7 +161,7 @@ export const createEntry = async (workingEntry: Entry) => {
 		specialRequirements,
 		enterMajorPrize,
 		price
-	} = workingEntry as Entry;
+	} = workingEntry;
 
 	const entry = await prisma.entryTable.create({
 		data: {
@@ -146,13 +175,13 @@ export const createEntry = async (workingEntry: Entry) => {
 			description,
 			specialRequirements,
 			enterMajorPrize,
-			price
+			price: price || 0
 		}
 	});
 	return entry;
 };
 
-export const createImage = async (workingImage: Image) => {
+export const createImage = async (workingImage: ImageTable) => {
 	const { artistId, registrationId = null, entryId = null, cloudId, cloudURL, originalFileName } = workingImage;
 	const image = await prisma.imageTable.create({
 		data: {

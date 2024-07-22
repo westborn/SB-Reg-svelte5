@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { boolean, z } from 'zod';
 
 export const signupSchema = z.object({
 	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
@@ -15,7 +15,6 @@ export const loginSchema = z.object({
 
 export const IndigenousSchema = z.enum(['Yes', 'No', 'Declined']);
 export const EntryTypeSchema = z.enum(['Indoor', 'Outdoor']);
-export const YesOrNoSchema = z.enum(['Yes', 'No']);
 
 /////////////////////////////////////////
 // ARTIST TABLE SCHEMA
@@ -43,13 +42,13 @@ export const registrationTableSchema = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),
 	registrationYear: z.string(),
-	closed: YesOrNoSchema,
+	closed: boolean(),
 	bumpIn: z.string().nullable(),
 	bumpOut: z.string().nullable(),
 	displayRequirements: z.string().nullable(),
-	accommodation: YesOrNoSchema,
-	crane: YesOrNoSchema,
-	transport: YesOrNoSchema,
+	accommodation: boolean(),
+	crane: boolean(),
+	transport: boolean(),
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date()
 });
@@ -66,7 +65,7 @@ export const entryTableSchema = z.object({
 	inOrOut: EntryTypeSchema,
 	description: z.string().nullable(),
 	dimensions: z.string().nullable(),
-	enterMajorPrize: YesOrNoSchema,
+	enterMajorPrize: boolean(),
 	material: z.string().nullable(),
 	price: z.number().int().nullable(),
 	specialRequirements: z.string().nullable(),
@@ -93,9 +92,9 @@ export const imageTableSchema = z.object({
 export type ImageTable = z.infer<typeof imageTableSchema>;
 
 /////////////////////////////////////////
-// ARTIST SCHEMA - just the columns that are editable or used for lookup
+// ARTIST SCHEMA UI - just the columns that are editable or used in forms
 /////////////////////////////////////////
-export const artistSchema = z.object({
+export const artistSchemaUI = z.object({
 	id: z.number().int(),
 	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
 	firstName: z
@@ -113,58 +112,41 @@ export const artistSchema = z.object({
 	bankBSB: z.coerce.string().nullish(),
 	bankAccount: z.coerce.string().nullish()
 });
-export type Artist = z.infer<typeof artistSchema>;
+export type ArtistUI = z.infer<typeof artistSchemaUI>;
 
-export const registrationSchema = z.object({
+export const registrationSchemaUI = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),
 	registrationYear: z.string().nullish(),
-	closed: YesOrNoSchema.default('No'),
+	closed: z.string().default('No'),
 	bumpIn: z.string().nullish(),
 	bumpOut: z.string().nullish(),
 	displayRequirements: z.string().nullish(),
-	accomodation: YesOrNoSchema.default('No'),
-	crane: YesOrNoSchema.default('No'),
-	transport: YesOrNoSchema.default('No')
+	accomodation: z.string().default('No'),
+	crane: z.string().default('No'),
+	transport: z.string().default('No')
 });
-export type Registration = z.infer<typeof registrationSchema>;
+export type RegistrationUI = z.infer<typeof registrationSchemaUI>;
 
-export const entrySchema = z.object({
+export const entrySchemaUI = z.object({
 	id: z.number().int(),
-	artistId: z.number().int(),
-	registrationId: z.number().int(),
-	accepted: YesOrNoSchema.default('No'),
-	inOrOut: z.lazy(() => EntryTypeSchema).default('Outdoor'),
 	title: z.string({ required_error: 'Title is required' }).nullish(),
+	inOrOut: z.lazy(() => EntryTypeSchema).default('Outdoor'),
+	price: z.string({ required_error: 'Price is required' }).nullish(),
 	material: z.string().nullish(),
-	dimensions: z.string().nullish(),
-	description: z.string().nullish(),
+	dimLength: z.string().nullish(),
+	dimWidth: z.string().nullish(),
+	dimHeight: z.string().nullish(),
 	specialRequirements: z.string().nullish(),
-	enterMajorPrize: YesOrNoSchema.default('No'),
-	price: z.string({ required_error: 'Price is required' }).nullish()
+	enterMajorPrize: z.string().default('No'),
+	description: z.string().nullish()
 });
-export type Entry = z.infer<typeof entrySchema>;
+export type EntryUI = z.infer<typeof entrySchemaUI>;
 
-export const imageSchema = z.object({
+export const imageSchemaUI = z.object({
 	id: z.number().int(),
-	artistId: z.number().int(),
-	entryId: z.number().int().nullish(),
-	registrationId: z.number().int().nullish(),
 	cloudId: z.string(),
 	cloudURL: z.string(),
 	originalFileName: z.string()
 });
-export type Image = z.infer<typeof imageSchema>;
-
-// Schemas for forms to add/update tables
-export const artistAddOrUpdateSchema = artistSchema.omit({ id: true, email: true });
-export type ArtistUpdate = z.infer<typeof artistAddOrUpdateSchema>;
-
-export const entryAddOrUpdateSchema = entrySchema.omit({
-	id: true,
-	artistId: true,
-	registrationId: true,
-	accepted: true
-});
-export type EntryUpdate = z.infer<typeof entryAddOrUpdateSchema>;
-export type EntryCreate = z.infer<typeof entryAddOrUpdateSchema>;
+export type ImageUI = z.infer<typeof imageSchemaUI>;

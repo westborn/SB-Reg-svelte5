@@ -8,18 +8,18 @@ import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
 
-import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+import { artistSchemaUI } from '$lib/zod-schemas';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
-	const artistForm = await superValidate(zod(artistAddOrUpdateSchema));
+	const artistForm = await superValidate(zod(artistSchemaUI));
 	return { artistForm };
 };
 
 const updateArtist = async (event: RequestEvent) => {
-	const form = await superValidate(event, zod(artistAddOrUpdateSchema));
+	const form = await superValidate(event, zod(artistSchemaUI));
 	if (!form.valid) {
 		return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', { status: 400 });
 	}
@@ -47,7 +47,7 @@ const updateArtist = async (event: RequestEvent) => {
 };
 
 const createArtist = async (event: RequestEvent) => {
-	const form = await superValidate(event, zod(artistAddOrUpdateSchema));
+	const form = await superValidate(event, zod(artistSchemaUI));
 	if (!form.valid) {
 		return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', { status: 400 });
 	}

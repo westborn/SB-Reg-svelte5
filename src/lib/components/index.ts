@@ -2,6 +2,7 @@
 export { default as ArtistCreateForm } from './artist-create-form.svelte';
 export { default as ArtistUpdateDialog } from './artist-update-dialog.svelte';
 export { default as ArtistUpdateForm } from './artist-update-form.svelte';
+export { default as EntryCreateDialog } from './entry-create-dialog.svelte';
 export { default as EntryCreateForm } from './entry-create-form.svelte';
 export { default as EntryAccordion } from './entry-accordion.svelte';
 export { default as OptimisedImage } from './optimised-image.svelte';

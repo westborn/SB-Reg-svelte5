@@ -34,15 +34,19 @@
 		}
 		if (current.step === 0 && browser) {
 			goto('/register/artist');
+			return;
 		}
 		if (current.step === 1 && browser) {
 			goto('/register/entry');
+			return;
 		}
 		if (current.step === 2 && browser) {
 			goto('/register/confirm');
+			return;
 		}
 		if (current.step === 3 && browser) {
 			goto('/register/complete');
+			return;
 		}
 	};
 
@@ -88,4 +92,4 @@
 {:else}
 	{@render children()}
 {/if}
-<SuperDebug data={submission} />
+<!-- <SuperDebug data={submission} /> -->

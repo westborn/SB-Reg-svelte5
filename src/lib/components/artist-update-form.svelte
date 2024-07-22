@@ -11,7 +11,7 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	import { artistAddOrUpdateSchema } from '$lib/zod-schemas';
+	import { artistSchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { untrack } from 'svelte';
 
@@ -20,7 +20,7 @@
 
 	let form = superForm(artistForm, {
 		id: `updateArtistForm-${myState?.submission?.id}`,
-		validators: zodClient(artistAddOrUpdateSchema),
+		validators: zodClient(artistSchemaUI),
 		resetForm: false,
 		onUpdated: (e) => {
 			toast.success('Profile Updated');

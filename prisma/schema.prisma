@@ -36,13 +36,13 @@ model registrationTable {
   id                  Int          @id @default(autoincrement())
   artistId            Int          @map("artist_id")
   registrationYear    String       @map("registration_year")
-  closed              String       @default("No")
+  closed              Boolean      @default(false)
   bumpIn              String?      @map("bump_in")
   bumpOut             String?      @map("bump_out")
   displayRequirements String?      @map("display_requirements")
-  accommodation       String       @default("No")
-  crane               String       @default("No")
-  transport           String       @default("No")
+  accommodation       Boolean      @default(false)
+  crane               Boolean      @default(false)
+  transport           Boolean      @default(false)
   createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime     @updatedAt @map("updated_at")
   artist              artistTable  @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -55,11 +55,11 @@ model registrationTable {
 model entryTable {
   id                  Int               @id @default(autoincrement())
   artistId            Int               @map("artist_id")
-  accepted            String?
+  accepted            Boolean           @default(false)
   registrationId      Int               @map("registration_id")
   description         String?
   dimensions          String?
-  enterMajorPrize     String            @default("No") @map("enter_major_prize")
+  enterMajorPrize     Boolean           @default(false) @map("enter_major_prize")
   inOrOut             EntryType?        @map("in_or_out")
   material            String?
   price               Int               @map("price_in_cents")

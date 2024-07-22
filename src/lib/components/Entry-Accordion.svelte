@@ -1,20 +1,18 @@
 <script lang="ts">
-	import type { Entry, Image } from '$lib/zod-schemas.ts';
-	type EntryItem = Entry & { images?: Image[] };
-	type EntryArray = EntryItem[];
+	import type { ReturnedEntries } from '$lib/components/server/registrationDB.ts';
 
 	type Props = {
 		showButtons: boolean;
 		doUpdate: (id: number) => void;
 		doDelete: (id: number) => void;
-		submissionEntries: EntryArray;
+		entryArray: ReturnedEntries;
 	};
 
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 
-	let { showButtons, doUpdate, doDelete, submissionEntries }: Props = $props();
+	let { showButtons, doUpdate, doDelete, entryArray }: Props = $props();
 
 	const convertToDollars = (price: number | null | undefined) => {
 		if (!price) return '';
@@ -26,7 +24,7 @@
 </script>
 
 <Accordion.Root class="w-full">
-	{#each submissionEntries as entryDisplayed, entryKey}
+	{#each entryArray as entryDisplayed, entryKey}
 		<Accordion.Item value={entryDisplayed.id.toString()}>
 			<Accordion.Trigger>Entry {entryKey + 1} - {entryDisplayed.title}</Accordion.Trigger>
 			<Accordion.Content>
@@ -37,7 +35,7 @@
 
 						<div class="mx-auto flex items-center justify-between">
 							<p class="text-lg">{convertToDollars(entryDisplayed.price)}</p>
-							<p class="text-xs">{entryDisplayed?.enterMajorPrize === 'Yes' ? 'Major Prize Entry' : ''}</p>
+							<p class="text-xs">{entryDisplayed?.enterMajorPrize ? 'Major Prize Entry' : ''}</p>
 							<p>({entryDisplayed.dimensions})</p>
 						</div>
 
