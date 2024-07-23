@@ -7,7 +7,7 @@
 		class: string;
 	};
 
-	let { path, alt, width, height, class: className } = $props<Props>();
+	let { path, alt, width, height, class: className }: Props = $props();
 </script>
 
 <picture>

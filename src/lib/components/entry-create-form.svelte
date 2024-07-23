@@ -48,7 +48,7 @@
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>
-		<RadioGroup.Root class="flex flex-row" bind:value={$formData.inOrOut}>
+		<RadioGroup.Root class="flex flex-row" bind:value={$formData.inOrOut as string}>
 			<div class="flex items-center space-x-2">
 				<RadioGroup.Item value="Outdoor" id="r1" />
 				<Label for="r1">Outdoor</Label>
@@ -131,7 +131,7 @@
 
 	<Form.Field class="px-2" {form} name="enterMajorPrize">
 		<Form.Legend class="mb-2">Submit this entry to the Major Prize program?</Form.Legend>
-		<RadioGroup.Root class="flex flex-row" bind:value={$formData.enterMajorPrize}>
+		<RadioGroup.Root class="flex flex-row" bind:value={$formData.enterMajorPrize as string}>
 			<div class="flex items-center space-x-2">
 				<RadioGroup.Item value="Yes" id="r1" />
 				<Label for="r1">Yes</Label>
@@ -147,7 +147,7 @@
 	<Form.Field {form} name="description">
 		<Form.Control let:attrs>
 			<Form.Label>Description for the catalogue (25 words)</Form.Label>
-			<Textarea {...attrs} class="resize-none" bind:value={$formData.description} />
+			<Textarea {...attrs} class="resize-none" bind:value={$formData.description as string} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>

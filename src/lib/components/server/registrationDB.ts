@@ -80,29 +80,6 @@ export const getSubmission = async (artistEmail: string) => {
 	return submission;
 };
 
-type xyzzy = {
-	entries: {
-		id: number;
-		artistId: number;
-		registrationId: number;
-		accepted: boolean;
-		inOrOut: string;
-		title: string;
-		material: string;
-		dimensions: string;
-		description: string;
-		specialRequirements: string;
-		enterMajorPrize: boolean;
-		price: number;
-		images: {
-			id: number;
-			originalFileName: string;
-			cloudId: string;
-			cloudURL: string;
-		}[];
-	}[];
-};
-
 type ReturnedEntriesEntry = Omit<EntryTable, 'createdAt' | 'updatedAt'>;
 type ReturnedEntriesImage = Pick<ImageTable, 'id' | 'originalFileName' | 'cloudId' | 'cloudURL'>;
 export type ReturnedEntry = ReturnedEntriesEntry & { images: ReturnedEntriesImage[] };
@@ -148,6 +125,7 @@ export const getEntries = async (artistEmail: string) => {
 	return entries;
 };
 
+
 export const createEntry = async (workingEntry: EntryTable) => {
 	const {
 		artistId,
@@ -161,10 +139,10 @@ export const createEntry = async (workingEntry: EntryTable) => {
 		specialRequirements,
 		enterMajorPrize,
 		price
-	} = workingEntry;
+		} = workingEntry;
 
-	const entry = await prisma.entryTable.create({
-		data: {
+		const entry = await prisma.entryTable.create({
+			data: {
 			artistId,
 			registrationId,
 			accepted,
@@ -176,7 +154,7 @@ export const createEntry = async (workingEntry: EntryTable) => {
 			specialRequirements,
 			enterMajorPrize,
 			price: price || 0
-		}
+			}
 	});
 	return entry;
 };

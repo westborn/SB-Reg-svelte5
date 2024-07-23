@@ -84,7 +84,7 @@
 
 	<Form.Field class="px-2" {form} name="firstNations">
 		<Form.Legend class="mb-2">Do you identify as Indigenous?</Form.Legend>
-		<RadioGroup.Root class="flex flex-row" bind:value={$formData.firstNations}>
+		<RadioGroup.Root class="flex flex-row" bind:value={$formData.firstNations as string}>
 			<div class="flex items-center space-x-2">
 				<RadioGroup.Item value="Yes" id="r1" />
 				<Label for="r1">Yes</Label>

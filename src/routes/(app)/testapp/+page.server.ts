@@ -7,6 +7,7 @@ import { v2 as cloudinary, type UploadApiErrorResponse, type UploadApiResponse }
 import { CLOUDINARY_API_SECRET, CLOUDINARY_API_KEY } from '$env/static/private';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
 import { createImage, getEntries } from '$lib/components/server/registrationDB';
+import type { ImageTable } from '$lib/zod-schemas';
 
 cloudinary.config({
 	cloud_name: PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -46,7 +47,7 @@ const insertImage = async (cloudId: string, cloudURL: string, originalFileName: 
 		cloudId,
 		cloudURL,
 		originalFileName
-	};
+	} as ImageTable;
 	return await createImage(workingImage);
 };
 
