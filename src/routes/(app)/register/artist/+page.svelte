@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getRegisterState } from '$lib/context.svelte.js';
+	import { getStep } from '$lib/regState.svelte.ts';
 	import * as Card from '$lib/components/ui/card/index.js';
 
 	import { ArtistCreateForm, ArtistUpdateDialog } from '$lib/components';
@@ -7,6 +8,8 @@
 	const { artistForm } = data;
 
 	let myState = getRegisterState();
+	let currentStep = getStep();
+	currentStep.step = 0;
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">

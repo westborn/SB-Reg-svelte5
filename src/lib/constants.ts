@@ -30,3 +30,33 @@ export const ExhibitionYear = getNextExhibitionYear();
 export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again later.';
 export const GENERIC_ERROR_UNEXPECTED = "Something went wrong. Sorry, we're broken!";
 export const SUCCESS_MESSAGE = 'Success';
+
+export enum REGISTER_ROUTES {
+	REGISTER = '/register/artist',
+	ENTRY = '/register/entry',
+	CONFIRM = '/register/confirm',
+	COMPLETE = '/register/complete'
+}
+
+export const STEPS = [
+	{
+		title: 'Register',
+		route: 'artist',
+		link: REGISTER_ROUTES.REGISTER
+	},
+	{
+		title: 'Entries',
+		route: 'entry',
+		link: REGISTER_ROUTES.ENTRY
+	},
+	{
+		title: 'Confirm',
+		route: 'confirm',
+		link: REGISTER_ROUTES.CONFIRM
+	},
+	{
+		title: 'Complete',
+		route: 'complete',
+		link: REGISTER_ROUTES.COMPLETE
+	}
+];

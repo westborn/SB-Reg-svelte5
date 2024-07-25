@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
+	import { getStep } from '$lib/regState.svelte.ts';
+
 	import SuperDebug from 'sveltekit-superforms';
 	import type { ReturnedEntries } from '$lib/components/server/registrationDB.ts';
 	// TODO fix this type!
@@ -7,6 +9,8 @@
 	let { data } = $props();
 	let { currentEntries, entryForm } = data;
 
+	let currentStep = getStep();
+	currentStep.step = 1;
 	// console.log('currentEntries', JSON.stringify(currentEntries, null, 2));
 
 	let entryArray = (

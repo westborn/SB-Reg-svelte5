@@ -1,6 +1,11 @@
 <script lang="ts">
-	let { data } = $props();
 	import { getRegisterState } from '$lib/context.svelte.js';
+	import { getStep } from '$lib/regState.svelte.ts';
+
+	let { data } = $props();
+
+	let currentStep = getStep();
+	currentStep.step = 3;
 
 	const myState = getRegisterState();
 </script>
