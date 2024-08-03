@@ -22,27 +22,14 @@
 		validators: zodClient(artistSchemaUI),
 		applyAction: true,
 		onUpdated: () => {
-			console.log('onUpdated');
 			if ($message === 'Success') {
 				toast.success('Artist Profile Added');
-				console.log('Artist Profile Added');
 				$message = null;
 				myState.dialogOpen = false;
+				// todo update return value from load function
 			} else {
 				toast.error('Artist Profile Create Failed!');
-				console.log('Artist Profile Create Failed!');
 			}
-		},
-		onResult: ({ result, formElement }) => {
-			console.log('onResult', JSON.stringify(result, null, 2), JSON.stringify(formElement, null, 2));
-			if (result.type) {
-				$message = 'Success1';
-			} else {
-				$message = 'Failed1';
-			}
-		},
-		onUpdate: () => {
-			console.log('onUpdated');
 		}
 	});
 

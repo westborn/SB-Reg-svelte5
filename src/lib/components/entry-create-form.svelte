@@ -30,7 +30,6 @@
 
 		validators: zodClient(entrySchemaUI),
 		onUpdated: () => {
-			console.log('onUpdated', $message);
 			if ($message === 'Success') {
 				currentEntries = $page.data.entries;
 				$message = null;

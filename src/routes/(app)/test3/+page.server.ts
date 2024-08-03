@@ -83,7 +83,6 @@ export const actions: Actions = {
 			console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(form, GENERIC_ERROR_MESSAGE);
 		}
-		console.log('registration', registration);
 		const {
 			title,
 			price,
@@ -113,7 +112,6 @@ export const actions: Actions = {
 					price: price * 100
 				}
 			});
-			console.log('result', result);
 			if (!result) {
 				console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 				return message(form, GENERIC_ERROR_MESSAGE);

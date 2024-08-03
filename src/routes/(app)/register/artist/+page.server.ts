@@ -55,7 +55,7 @@ const createArtist = async (event: RequestEvent) => {
 	if (!user || !session) return redirect(302, '/login');
 
 	const artistEmail = user.email; // TODO Ensure email is correctly identified
-	console.log('createArtist', artistEmail);
+	// console.log('createArtist', artistEmail);
 	const newArtist = { ...form.data, email: artistEmail };
 
 	try {

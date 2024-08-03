@@ -62,7 +62,6 @@ const updateEntry = async (event: RequestEvent) => {
 
 const createEntry = async (event: RequestEvent) => {
 	const form = await superValidate(event, zod(entrySchemaUI));
-	console.log('createEntry', form);
 	if (!form.valid) {
 		return message(form, 'Entry is Invalid - please reload and try again, or, call us!!', { status: 400 });
 	}
@@ -91,7 +90,6 @@ const createEntry = async (event: RequestEvent) => {
 		console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 		return message(form, GENERIC_ERROR_MESSAGE);
 	}
-	console.log('registration', registration);
 	const {
 		title,
 		price,
@@ -121,7 +119,6 @@ const createEntry = async (event: RequestEvent) => {
 				price: price * 100
 			}
 		});
-		console.log('result', result);
 		if (!result) {
 			console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(form, GENERIC_ERROR_MESSAGE);

@@ -20,8 +20,6 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	createEntry: async ({ request, locals, route }) => {
 		const form = await request.formData();
-		console.log('createEntry', form);
-
 		const { session, user } = await locals.V1safeGetSession();
 		if (!user || !session) return redirect(302, '/login');
 
@@ -47,8 +45,6 @@ export const actions: Actions = {
 			console.log(`${route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return fail(400, { form, missing: true });
 		}
-		console.log('registration', registration);
-
 		const title = form.get('title');
 		const price = form.get('price');
 		const inOrOut = form.get('inOrOut');
@@ -76,7 +72,6 @@ export const actions: Actions = {
 					price: price * 100
 				}
 			});
-			console.log('result', result);
 			if (!result) {
 				console.log(`${route.id} - ${GENERIC_ERROR_MESSAGE}`);
 				return fail(400, { form, missing: true });

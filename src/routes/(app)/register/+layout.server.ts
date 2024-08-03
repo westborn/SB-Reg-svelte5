@@ -8,7 +8,6 @@ export const load: LayoutServerLoad = async (event) => {
 	console.log('register +layout.server.ts LOAD - START');
 
 	const submission = await getSubmission(user.email);
-	console.log('submission', submission);
 	if (!submission) {
 		console.log('No Submission Found');
 	} else {
