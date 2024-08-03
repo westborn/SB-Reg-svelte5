@@ -5,12 +5,13 @@
 
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { EntryCreateForm } from '$lib/components';
+	import type { ReturnedEntries } from '$lib/components/server/registrationDB';
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 	};
-
 	let { entryForm }: Props = $props();
+
 	let myState = getRegisterState();
 </script>
 

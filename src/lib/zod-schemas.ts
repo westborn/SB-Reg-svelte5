@@ -130,9 +130,12 @@ export type RegistrationUI = z.infer<typeof registrationSchemaUI>;
 
 export const entrySchemaUI = z.object({
 	id: z.number().int(),
-	title: z.string({ required_error: 'Title is required' }).nullish(),
+	title: z.string({ required_error: 'Title is required' }),
 	inOrOut: z.lazy(() => EntryTypeSchema).default('Outdoor'),
-	price: z.string({ required_error: 'Price is required' }).nullish(),
+	price: z.coerce
+		.number()
+		.int()
+		.refine((val) => val > 0, { message: 'Number is required.' }),
 	material: z.string().nullish(),
 	dimLength: z.string().nullish(),
 	dimWidth: z.string().nullish(),

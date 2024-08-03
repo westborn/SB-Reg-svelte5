@@ -86,7 +86,6 @@ export type ReturnedEntry = ReturnedEntriesEntry & { images: ReturnedEntriesImag
 export type ReturnedEntries = ReturnedEntry[];
 
 export type CurrentRegistration = ThenArg<ReturnType<typeof getEntries>>;
-
 export const getEntries = async (artistEmail: string) => {
 	const entries = await prisma.artistTable.findFirst({
 		where: { email: artistEmail },
@@ -125,7 +124,6 @@ export const getEntries = async (artistEmail: string) => {
 	return entries;
 };
 
-
 export const createEntry = async (workingEntry: EntryTable) => {
 	const {
 		artistId,
@@ -139,10 +137,10 @@ export const createEntry = async (workingEntry: EntryTable) => {
 		specialRequirements,
 		enterMajorPrize,
 		price
-		} = workingEntry;
+	} = workingEntry;
 
-		const entry = await prisma.entryTable.create({
-			data: {
+	const entry = await prisma.entryTable.create({
+		data: {
 			artistId,
 			registrationId,
 			accepted,
@@ -154,7 +152,7 @@ export const createEntry = async (workingEntry: EntryTable) => {
 			specialRequirements,
 			enterMajorPrize,
 			price: price || 0
-			}
+		}
 	});
 	return entry;
 };

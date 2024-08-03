@@ -2,27 +2,26 @@
 	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
 	import { getStep } from '$lib/regState.svelte.ts';
 
-	import SuperDebug from 'sveltekit-superforms';
-	import type { ReturnedEntries } from '$lib/components/server/registrationDB.ts';
-	// TODO fix this type!
+	import SuperDebug, { type SuperValidated } from 'sveltekit-superforms';
+	import type { ReturnedEntries } from '$lib/components/server/registrationDB.js';
+
+	type Props = {
+		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+		currentEntries: ReturnedEntries;
+	};
 
 	let { data } = $props();
-	let { currentEntries, entryForm } = data;
+	let { currentEntries: fromServer, entryForm } = data;
+	let currentEntries = $state(fromServer);
+
+	let entriesExist = $derived(currentEntries.length > 0);
+	let costOfRegistration = $derived(currentEntries ? 20 + currentEntries.length * 20 : 20);
+	let numberOfEntries = $derived(
+		currentEntries ? (currentEntries.length === 1 ? `1 entry` : `${currentEntries.length} entries`) : 'wtf'
+	);
 
 	let currentStep = getStep();
 	currentStep.step = 1;
-	// console.log('currentEntries', JSON.stringify(currentEntries, null, 2));
-
-	let entryArray = (
-		currentEntries && currentEntries.registrations.length > 0 ? currentEntries.registrations[0].entries : []
-	) as ReturnedEntries;
-
-	let entriesExist = entryArray.length > 0;
-
-	let showButtons = true;
-
-	let costOfRegistration = entryArray ? 20 + entryArray.length * 20 : 20;
-	let numberOfEntries = entryArray ? (entryArray.length === 1 ? `1 entry` : `${entryArray.length} entries`) : 'wtf';
 
 	function doUpdate(id: number) {
 		console.log('doUpdate for ', id);
@@ -33,6 +32,7 @@
 	}
 </script>
 
+<!-- <SuperDebug data={currentEntries} /> -->
 <section class="mx-auto mt-10 max-w-prose px-3">
 	{#if !entriesExist}
 		<div>
@@ -44,12 +44,10 @@
 			Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
 		</p>
 		<div class="mt-6">
-			<EntryAccordion {showButtons} {doDelete} {doUpdate} {entryArray} />
+			<EntryAccordion {currentEntries} {doUpdate} {doDelete} />
 			<div class="mt-6">
 				<EntryCreateDialog {entryForm} />
 			</div>
-			<!-- <Button class="mt-6" onclick={() => (showAdd = true)}>or - Add a New Entry?</Button> -->
 		</div>
 	{/if}
 </section>
-<!-- <SuperDebug data={currentEntries} /> -->

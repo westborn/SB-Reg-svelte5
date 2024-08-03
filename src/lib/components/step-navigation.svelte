@@ -1,21 +1,20 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-
 	import { getStep } from '$lib/regState.svelte.ts';
-	import SuperDebug from 'sveltekit-superforms';
 
-	import { REGISTER_ROUTES, STEPS } from '$lib/constants';
+	import { STEPS } from '$lib/constants';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { getRegisterState } from '$lib/context.svelte.js';
+
+	let myState = getRegisterState();
 
 	let currentStep = getStep();
 
-	if (browser) {
-		goto(REGISTER_ROUTES.REGISTER);
+	if (currentStep.calcAllowableNextStep(myState, currentStep.step) < currentStep.step) {
+		currentStep.step = currentStep.calcAllowableNextStep(myState, currentStep.step);
 	}
 </script>
 
-<SuperDebug data={{ currentStep }} />
+<!-- <SuperDebug data={{ currentStep }} /> -->
 <!-- list of form STEPS -->
 <div class="flex items-center justify-between p-4">
 	{#each STEPS as step, index}

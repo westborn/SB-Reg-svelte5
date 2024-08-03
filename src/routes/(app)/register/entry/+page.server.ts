@@ -17,7 +17,18 @@ export const load: PageServerLoad = async (event) => {
 
 	const entryForm = await superValidate(zod(entrySchemaUI));
 	const artistEmail = user.email; // TODO Ensure email is correctly identified
-	const currentEntries = await getEntries(artistEmail);
+	const result = await getEntries(artistEmail);
+	if (!result) {
+		console.log('No Artist Found');
+	} else if (result && !result.registrations) {
+		console.log('No Registration Found');
+	} else if (result && result.registrations.length === 0) {
+		console.log('No Entries Found');
+	} else {
+		console.log(`Entries Found - ${result.registrations[0].entries.length}`);
+	}
+
+	const currentEntries = result?.registrations.length ? result.registrations[0].entries : [];
 	return { currentEntries, entryForm };
 };
 
@@ -80,6 +91,7 @@ const createEntry = async (event: RequestEvent) => {
 		console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 		return message(form, GENERIC_ERROR_MESSAGE);
 	}
+	console.log('registration', registration);
 	const {
 		title,
 		price,
@@ -106,7 +118,7 @@ const createEntry = async (event: RequestEvent) => {
 				specialRequirements: specialRequirements || '',
 				enterMajorPrize: enterMajorPrize === 'Yes' ? true : false,
 				dimensions: `${dimLength || '0'}x${dimWidth || '0'}x${dimHeight || '0'}`,
-				price: parseInt(price || '0') * 100
+				price: price * 100
 			}
 		});
 		console.log('result', result);

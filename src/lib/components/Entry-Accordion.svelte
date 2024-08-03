@@ -1,18 +1,16 @@
 <script lang="ts">
 	import type { ReturnedEntries } from '$lib/components/server/registrationDB.ts';
 
-	type Props = {
-		showButtons: boolean;
-		doUpdate: (id: number) => void;
-		doDelete: (id: number) => void;
-		entryArray: ReturnedEntries;
-	};
-
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 
-	let { showButtons, doUpdate, doDelete, entryArray }: Props = $props();
+	type Props = {
+		doUpdate: (id: number) => void;
+		doDelete: (id: number) => void;
+		currentEntries: ReturnedEntries;
+	};
+	let { doUpdate, doDelete, currentEntries }: Props = $props();
 
 	const convertToDollars = (price: number | null | undefined) => {
 		if (!price) return '';
@@ -21,41 +19,42 @@
 			currency: 'AUD'
 		});
 	};
+	const showButtons = true;
 </script>
 
 <Accordion.Root class="w-full">
-	{#each entryArray as entryDisplayed, entryKey}
-		<Accordion.Item value={entryDisplayed.id.toString()}>
-			<Accordion.Trigger>Entry {entryKey + 1} - {entryDisplayed.title}</Accordion.Trigger>
+	{#each currentEntries as entryItem, entryKey}
+		<Accordion.Item value={entryItem.id.toString()}>
+			<Accordion.Trigger>Entry {entryKey + 1} - {entryItem.title}</Accordion.Trigger>
 			<Accordion.Content>
 				<Card.Root>
 					<Card.Content class="p-2 text-sm sm:p-6">
-						<p class="text-xs">({entryDisplayed.inOrOut})</p>
-						<p>{entryDisplayed.description}</p>
+						<p class="text-xs">({entryItem.inOrOut})</p>
+						<p>{entryItem.description}</p>
 
 						<div class="mx-auto flex items-center justify-between">
-							<p class="text-lg">{convertToDollars(entryDisplayed.price)}</p>
-							<p class="text-xs">{entryDisplayed?.enterMajorPrize ? 'Major Prize Entry' : ''}</p>
-							<p>({entryDisplayed.dimensions})</p>
+							<p class="text-lg">{convertToDollars(entryItem.price)}</p>
+							<p class="text-xs">{entryItem?.enterMajorPrize ? 'Major Prize Entry' : ''}</p>
+							<p>({entryItem.dimensions})</p>
 						</div>
 
-						<p>{entryDisplayed.material}</p>
-						<p>{entryDisplayed?.specialRequirements}</p>
+						<p>{entryItem.material}</p>
+						<p>{entryItem?.specialRequirements}</p>
 
 						<div class="mx-auto flex h-48 w-48 flex-col items-center justify-center">
-							{#if entryDisplayed?.images?.[0]?.cloudURL}
-								<img class="h-48 w-48 object-scale-down p-1" src={entryDisplayed?.images[0]?.cloudURL} alt="Preview" />
+							{#if entryItem?.images?.[0]?.cloudURL}
+								<img class="h-48 w-48 object-scale-down p-1" src={entryItem?.images[0]?.cloudURL} alt="Preview" />
 							{:else}
 								<span>Image Preview</span>
 							{/if}
 						</div>
-						<!-- <pre>{JSON.stringify(entryDisplayed, null, 2)}</pre> -->
+						<!-- <pre>{JSON.stringify(entryItem, null, 2)}</pre> -->
 						{#if showButtons}
 							<div class="flex justify-between py-2">
-								<Button variant="outline" size="sm" class=" text-sm" onclick={() => doUpdate(entryDisplayed.id)}>
+								<Button variant="outline" size="sm" class=" text-sm" onclick={() => doUpdate(entryItem.id)}>
 									<span class="text-xs"> Edit </span></Button
 								>
-								<Button class="bg-red-700" size="sm" onclick={() => doDelete(entryDisplayed.id)}
+								<Button class="bg-red-700" size="sm" onclick={() => doDelete(entryItem.id)}
 									><span class="text-xs"> Delete </span>
 								</Button>
 							</div>

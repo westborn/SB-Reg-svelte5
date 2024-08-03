@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
-	import { superForm, type SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
@@ -8,40 +7,51 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
-	import { Textarea } from './ui/textarea';
 
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { entrySchemaUI } from '$lib/zod-schemas';
 
-	let myState = getRegisterState();
+	type Props = {
+		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+	};
 
-	let { entryForm }: { entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>> } = $props();
+	let { entryForm }: Props = $props();
+	let myState = getRegisterState();
 
 	const form = superForm(entryForm, {
 		id: `createEntryForm`,
+
 		validators: zodClient(entrySchemaUI),
 		onUpdated: () => {
+			console.log('onUpdated', $message);
 			if ($message === 'Success') {
 				toast.success('Entry Added');
 				$message = null;
-				myState.dialogOpen = false;
-				invalidateAll();
 			} else {
 				toast.error('Entry Creation Failed!');
 			}
+		},
+		onResult({ result }) {
+			console.log('onResult', result);
+		},
+		onUpdate({ result, cancel }) {
+			console.log('onUpdate', result);
+			cancel();
+			myState.dialogOpen = false;
 		}
 	});
 
 	const { form: formData, enhance, message, errors } = form;
 </script>
 
-<form method="POST" action="?/createEntry" use:enhance class="w-full space-y-4">
+<form method="POST" action="?/createEntry" class="w-full space-y-4">
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>
 			<Form.Label>Title for this Exhibit</Form.Label>
-			<Input autofocus type="text" {...attrs} bind:value={$formData.title} />
+			<Input autofocus type="text" {...attrs} bind:value={$formData.title} required />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>

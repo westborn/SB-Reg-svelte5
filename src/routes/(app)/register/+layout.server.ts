@@ -8,7 +8,16 @@ export const load: LayoutServerLoad = async (event) => {
 	console.log('register +layout.server.ts LOAD - START');
 
 	const submission = await getSubmission(user.email);
-	!submission ? console.log('No Submission Found') : console.log('Submission Found', submission.id);
+	console.log('submission', submission);
+	if (!submission) {
+		console.log('No Submission Found');
+	} else {
+		if (submission && submission.registrations.length === 0) {
+			console.log('No Registrations Found');
+		} else {
+			console.log(`Submission Found ${submission.id} with ${submission?.registrations[0]?.entries?.length}`);
+		}
+	}
 
 	return { submission };
 };

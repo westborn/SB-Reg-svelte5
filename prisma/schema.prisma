@@ -60,7 +60,7 @@ model entryTable {
   description         String?
   dimensions          String?
   enterMajorPrize     Boolean           @default(false) @map("enter_major_prize")
-  inOrOut             EntryType?        @map("in_or_out")
+  inOrOut             EntryType         @map("in_or_out")
   material            String?
   price               Int               @map("price_in_cents")
   specialRequirements String?           @map("special_requirements")
