@@ -29,11 +29,14 @@
 
 <ModeWatcher />
 <Toaster
+	position="top-left"
+	duration={4000}
+	offset={60}
 	toastOptions={{
 		unstyled: true,
 		classes: {
 			error: 'bg-red-400',
-			success: 'text-green-400',
+			success: 'text-green-600',
 			warning: 'text-yellow-400',
 			info: 'bg-blue-400'
 		}
