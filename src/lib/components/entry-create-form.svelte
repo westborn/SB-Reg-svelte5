@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { page } from '$app/stores';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -11,15 +12,18 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	import { getRegisterState } from '$lib/context.svelte.js';
 	import { entrySchemaUI } from '$lib/zod-schemas';
+	import type { ReturnedEntries } from './server/registrationDB';
+	import { getRegisterState } from '../context.svelte';
+
+	let myState = getRegisterState();
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+		currentEntries: ReturnedEntries;
 	};
 
-	let { entryForm }: Props = $props();
-	let myState = getRegisterState();
+	let { currentEntries = $bindable(), entryForm }: Props = $props();
 
 	const form = superForm(entryForm, {
 		id: `createEntryForm`,
@@ -28,26 +32,20 @@
 		onUpdated: () => {
 			console.log('onUpdated', $message);
 			if ($message === 'Success') {
-				toast.success('Entry Added');
+				currentEntries = $page.data.entries;
 				$message = null;
+				toast.success('Entry Added');
+				myState.dialogOpen = false;
 			} else {
 				toast.error('Entry Creation Failed!');
 			}
-		},
-		onResult({ result }) {
-			console.log('onResult', result);
-		},
-		onUpdate({ result, cancel }) {
-			console.log('onUpdate', result);
-			cancel();
-			myState.dialogOpen = false;
 		}
 	});
 
 	const { form: formData, enhance, message, errors } = form;
 </script>
 
-<form method="POST" action="?/createEntry" class="w-full space-y-4">
+<form method="POST" action="?/createEntry" class=" w-full space-y-4" use:enhance>
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>
 			<Form.Label>Title for this Exhibit</Form.Label>

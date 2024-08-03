@@ -28,8 +28,8 @@ export const load: PageServerLoad = async (event) => {
 		console.log(`Entries Found - ${result.registrations[0].entries.length}`);
 	}
 
-	const currentEntries = result?.registrations.length ? result.registrations[0].entries : [];
-	return { currentEntries, entryForm };
+	const entries = result?.registrations.length ? result.registrations[0].entries : [];
+	return { entries, entryForm };
 };
 
 const updateEntry = async (event: RequestEvent) => {

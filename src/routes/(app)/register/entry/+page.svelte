@@ -7,12 +7,12 @@
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
-		currentEntries: ReturnedEntries;
+		entries: ReturnedEntries;
 	};
 
 	let { data } = $props();
-	let { currentEntries: fromServer, entryForm } = data;
-	let currentEntries = $state(fromServer);
+	let { entries, entryForm } = data;
+	let currentEntries = $state(entries);
 
 	let entriesExist = $derived(currentEntries.length > 0);
 	let costOfRegistration = $derived(currentEntries ? 20 + currentEntries.length * 20 : 20);
@@ -37,16 +37,16 @@
 	{#if !entriesExist}
 		<div>
 			<div class="mb-10 mt-10">Create your first entry</div>
-			<EntryCreateForm {entryForm} />
+			<EntryCreateForm bind:currentEntries {entryForm} />
 		</div>
 	{:else}
 		<p class="mt-2 text-base font-bold text-primary-400">
 			Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
 		</p>
 		<div class="mt-6">
-			<EntryAccordion {currentEntries} {doUpdate} {doDelete} />
+			<EntryAccordion bind:currentEntries {doUpdate} {doDelete} />
 			<div class="mt-6">
-				<EntryCreateDialog {entryForm} />
+				<EntryCreateDialog bind:currentEntries {entryForm} />
 			</div>
 		</div>
 	{/if}

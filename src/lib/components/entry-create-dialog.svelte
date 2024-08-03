@@ -5,12 +5,13 @@
 
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { EntryCreateForm } from '$lib/components';
-	import type { ReturnedEntries } from '$lib/components/server/registrationDB';
+	import type { ReturnedEntries } from './server/registrationDB';
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+		currentEntries: ReturnedEntries;
 	};
-	let { entryForm }: Props = $props();
+	let { currentEntries = $bindable(), entryForm }: Props = $props();
 
 	let myState = getRegisterState();
 </script>
@@ -23,7 +24,7 @@
 			<Dialog.Description>Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<EntryCreateForm {entryForm} />
+			<EntryCreateForm bind:currentEntries {entryForm} />
 		</div>
 	</Dialog.Content>
 </Dialog.Root>

@@ -10,7 +10,7 @@
 		doDelete: (id: number) => void;
 		currentEntries: ReturnedEntries;
 	};
-	let { doUpdate, doDelete, currentEntries }: Props = $props();
+	let { doUpdate, doDelete, currentEntries = $bindable() }: Props = $props();
 
 	const convertToDollars = (price: number | null | undefined) => {
 		if (!price) return '';

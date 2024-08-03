@@ -16,6 +16,7 @@
 
 	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
 	import { getStep } from '$lib/regState.svelte.ts';
+	import { page } from '$app/stores';
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
@@ -50,6 +51,7 @@
 			if ($message === 'Success') {
 				toast.success('Entry Added');
 				$message = null;
+				currentEntries = $page.data.currentEntries;
 			} else {
 				toast.error('Entry Creation Failed!');
 			}
@@ -66,7 +68,7 @@
 	</p>
 	<EntryAccordion {currentEntries} {doUpdate} {doDelete} />
 	<div class="mt-10">
-		<form method="POST" action="?/createEntry" class="w-full space-y-4">
+		<form method="POST" action="?/createEntry" class="w-full space-y-4" use:enhance>
 			<Form.Field {form} name="title">
 				<Form.Control let:attrs>
 					<Form.Label>Title for this Exhibit</Form.Label>
