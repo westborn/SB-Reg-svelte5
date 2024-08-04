@@ -20,8 +20,8 @@
 		<h1 class="text-2xl font-semibold tracking-tight">Create an account</h1>
 		<p class="text-sm text-muted-foreground">Start building your digital community today.</p>
 	</div>
-
-	<form method="POST" use:enhance class="w-full space-y-4">
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<form method="POST" use:enhance class="w-full space-y-4" onkeydown={(event) => event.key != 'Enter'}>
 		<Form.Field {form} name="email">
 			<Form.Control let:attrs>
 				<Form.Label>Email Address</Form.Label>

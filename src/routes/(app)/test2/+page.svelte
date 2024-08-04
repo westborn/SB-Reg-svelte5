@@ -20,7 +20,8 @@
 <section class="mx-auto mt-10 max-w-prose px-3">
 	<h2 class="text-2xl">Create Entry</h2>
 	<p class="text-sm">Fill out the form below to create an entry</p>
-	<form method="POST" action="?/createEntry" class="w-full space-y-4">
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<form method="POST" action="?/createEntry" class="w-full space-y-4" onkeydown={(event) => event.key != 'Enter'}>
 		<div class="mt-4 grid gap-3">
 			<input type="text" name="title" value="the title" />
 			<input type="text" name="price" value="10" />

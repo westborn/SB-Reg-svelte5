@@ -36,7 +36,14 @@
 	const { form: formData, enhance, errors, message } = form;
 </script>
 
-<form method="POST" action="?/createArtist" use:enhance class="w-full space-y-4">
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<form
+	method="POST"
+	action="?/createArtist"
+	use:enhance
+	class="w-full space-y-4"
+	onkeydown={(event) => event.key != 'Enter'}
+>
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>

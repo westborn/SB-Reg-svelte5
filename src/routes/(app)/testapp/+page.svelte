@@ -46,7 +46,8 @@ Here I am
 <div class="container">
 	<h1 class="title">SvelteKit &amp; Cloudinary Upload Widget</h1>
 
-	<form method="POST" enctype="multipart/form-data" use:enhance>
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<form method="POST" enctype="multipart/form-data" use:enhance onkeydown={(event) => event.key != 'Enter'}>
 		<label for="image" class="text-lg">Upload Image</label>
 		<span class="text-xs">(Max 5 Mb)</span>
 		<div class="space-between flex gap-4">
