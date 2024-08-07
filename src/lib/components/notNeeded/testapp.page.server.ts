@@ -1,12 +1,14 @@
 import type { PageServerLoad, RequestEvent } from './$types';
 
-import { superValidate, fail, withFiles } from 'sveltekit-superforms';
+import { superValidate, fail, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { v2 as cloudinary, type UploadApiErrorResponse, type UploadApiResponse } from 'cloudinary';
 import { fileUploadSchema } from '$lib/zod-schemas';
 import { createImage, getImage, type CurrentImage } from '$lib/components/server/registrationDB';
 import { redirect } from '@sveltejs/kit';
 
-import { getCloudinaryURL, uploadImageToCloudinary } from '$lib/components/server/cloudinary.ts';
+import { cloudinaryConfig } from '$lib/components/server/cloudinary.ts';
+cloudinary.config(cloudinaryConfig);
 
 export const load: PageServerLoad = async (event) => {
 	console.log(`${event.route.id} - LOAD - START`);
@@ -28,25 +30,33 @@ export const actions = {
 		console.log(`${event.route.id} - default - ACTION`);
 		const form = await superValidate(event, zod(fileUploadSchema));
 		if (!form.valid) {
-			return fail(400, withFiles({ form }));
+			return fail(400, { form });
 		}
-		// Upload the inmage to cloudinary as an unattached image
-		const result = await uploadImageToCloudinary(form.data.image, 'UnAttachedImages');
-		if (!result.success) {
-			console.log('Error uploading image to cloudinary');
-			console.error(result);
-			return fail(500, withFiles({ form }));
-		}
-		const cloudId = result.result.public_id;
-		const cloudURL = getCloudinaryURL(cloudId);
 
-		console.log(result);
+		// https://dev.to/emmabase/image-upload-to-cloudinary-using-nodejs-typescript-4oje
+		const arrayBuffer = await form.data.image.arrayBuffer();
+		const buffer = new Uint8Array(arrayBuffer);
+		const uploadStream = await new Promise((resolve, reject) => {
+			cloudinary.uploader
+				.upload_stream(
+					{ upload_preset: 'UnAttachedImages' },
+					function (err: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) {
+						if (err) {
+							console.error(err);
+							return reject(err);
+						}
+						return resolve(result);
+					}
+				)
+				.end(buffer);
+		});
+		const { public_id: cloudId } = uploadStream as UploadApiResponse;
+		const cloudURL = cloudinary.url(cloudId, { secure: true });
+
 		console.log('cloudId:', cloudId);
 		console.log('cloudURL:', cloudURL);
 		console.log('originalFileName:', form.data.image.name);
 
-		// Save the image to the database without using a registrationId or an entryId
-		// This will allow the image to be attached when the entry is created
 		const workingImage = {
 			id: 0,
 			artistId: 1,
@@ -58,7 +68,8 @@ export const actions = {
 
 		//TODO update tag when image is attached to an entry
 		// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
+
 		console.log('image:', image);
-		return withFiles({ form, image });
+		return message(form, 'You have uploaded a valid file!');
 	}
 };

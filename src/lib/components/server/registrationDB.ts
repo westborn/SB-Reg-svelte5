@@ -16,6 +16,8 @@ import type { EntryTable, ImageTable } from '../../zod-schemas';
 
 //I choose ths way!
 type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+// also this for unpacking an array Element
+type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
 export const getSubmission = async (artistEmail: string) => {
@@ -157,8 +159,42 @@ export const createEntry = async (workingEntry: EntryTable) => {
 	return entry;
 };
 
-export const createImage = async (workingImage: ImageTable) => {
-	const { artistId, registrationId = null, entryId = null, cloudId, cloudURL, originalFileName } = workingImage;
+export type CurrentImage = ThenArg<ReturnType<typeof getImage>>;
+export const getImage = async (id: number) => {
+	const image = await prisma.imageTable.findFirst({
+		where: { id: id },
+		select: {
+			id: true,
+			artistId: true,
+			registrationId: true,
+			entryId: true,
+			originalFileName: true,
+			cloudId: true,
+			cloudURL: true
+		}
+	});
+	return image;
+};
+
+export type CurrentEntryImages = ThenArg<ReturnType<typeof getEntryImages>>;
+export const getEntryImages = async (entryId: number) => {
+	const images = await prisma.imageTable.findMany({
+		where: { entryId: entryId },
+		select: {
+			id: true,
+			artistId: true,
+			registrationId: true,
+			entryId: true,
+			originalFileName: true,
+			cloudId: true,
+			cloudURL: true
+		}
+	});
+	return images;
+};
+
+export const createImage = async (workingImage: CurrentImage) => {
+	const { artistId, registrationId = null, entryId = null, cloudId, cloudURL, originalFileName } = Object(workingImage);
 	const image = await prisma.imageTable.create({
 		data: {
 			artistId,
@@ -167,6 +203,15 @@ export const createImage = async (workingImage: ImageTable) => {
 			cloudId,
 			cloudURL,
 			originalFileName
+		},
+		select: {
+			id: true,
+			artistId: true,
+			registrationId: true,
+			entryId: true,
+			cloudId: true,
+			cloudURL: true,
+			originalFileName: true
 		}
 	});
 	return image;

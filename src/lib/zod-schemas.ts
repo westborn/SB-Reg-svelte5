@@ -153,3 +153,10 @@ export const imageSchemaUI = z.object({
 	originalFileName: z.string()
 });
 export type ImageUI = z.infer<typeof imageSchemaUI>;
+
+export const fileUploadSchema = z.object({
+	image: z
+		.instanceof(File, { message: 'Please upload a file.' })
+		.refine((f) => f.size < 5 * 1024 * 1024, 'Upload must be less than 5Mb!')
+});
+export type FileUpload = z.infer<typeof fileUploadSchema>;

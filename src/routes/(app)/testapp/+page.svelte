@@ -1,72 +1,107 @@
 <script lang="ts">
 	import type { ChangeEventHandler } from 'svelte/elements';
+
 	import SuperDebug, { superForm, fileProxy } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { z } from 'zod';
 	import { OptimisedImage } from '$lib/components';
-
-	const fileSchema = z.object({
-		image: z
-			.instanceof(File, { message: 'Please upload a file.' })
-			.refine((f) => f.size < 5 * 1024 * 1024, 'Max 5Mb upload size.')
-	});
+	import { Button } from '$lib/components/ui/button';
+	import { fileUploadSchema } from '$lib/zod-schemas.js';
+	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
-	let { form: formData, session, user, record } = data;
+	let { form: formData, session, user, currentImage } = data;
 
-	const { form, enhance, errors } = superForm(formData, {
-		validators: zodClient(fileSchema)
+	let returnedImage = $state({});
+
+	const { form, enhance, errors, message } = superForm(formData, {
+		validators: zodClient(fileUploadSchema),
+		resetForm: true,
+		onUpdated: () => {
+			toast.success($message);
+			$message = null;
+			returnedImage = $form.image;
+		},
+		onResult({ result, cancel }) {
+			if (result.type != 'success') {
+				toast.error('Failed to upload image');
+				cancel();
+				return;
+			}
+			returnedImage = { ...result?.data?.image };
+			console.log('returnedImage', returnedImage);
+		}
 	});
 
 	const file = fileProxy(form, 'image');
 
 	let previewImageContainer: HTMLDivElement;
+	let showUploadButton = $state(false);
+
 	const renderPreview: ChangeEventHandler<HTMLInputElement> = (e) => {
 		if (!e.currentTarget.files || e.currentTarget.files.length === 0) return;
 		const [imageToUpload] = e.currentTarget.files;
 		const previewImage = document.createElement('img');
+		const previewSpan = document.createElement('span');
+		previewSpan.textContent = 'New Image';
+		previewSpan.className = 'font-semibold';
 		previewImage.src = URL.createObjectURL(imageToUpload);
 		previewImage.alt = 'Preview Image';
-		previewImage.className = 'aspect-square h-full w-full';
+		previewImage.className = '';
 		previewImageContainer.innerHTML = '';
+		previewImageContainer.appendChild(previewSpan);
 		previewImageContainer.appendChild(previewImage);
+		showUploadButton = true;
 	};
 </script>
 
-Here I am
-
-<OptimisedImage
-	path="https://res.cloudinary.com/dpkmx9mow/image/upload/v1717244519/cvek2ay95deqt7biuoe6.jpg"
-	alt="Hero Image"
-	width={48}
-	height={48}
-	class="h-24 w-24 overflow-hidden rounded object-contain"
-/>
-
-<div class="container">
-	<h1 class="title">SvelteKit &amp; Cloudinary Upload Widget</h1>
-
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<form method="POST" enctype="multipart/form-data" use:enhance onkeydown={(event) => event.key != 'Enter'}>
-		<label for="image" class="text-lg">Upload Image</label>
-		<span class="text-xs">(Max 5 Mb)</span>
-		<div class="space-between flex gap-4">
-			<input type="file" name="image" accept="image/png, image/jpeg" bind:files={$file} onchange={renderPreview} />
-
-			<div
-				class="relative flex h-24 w-24 overflow-hidden rounded object-contain"
-				bind:this={previewImageContainer}
-			></div>
+<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
+	<form method="POST" enctype="multipart/form-data" use:enhance>
+		<div class="grid grid-cols-[200px_120px_200px]">
+			<div class="self-center">
+				<span class="font-semibold"> Current Image </span>
+				<OptimisedImage
+					path={currentImage?.cloudURL ? currentImage.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
+					alt="Current Image"
+					width={160}
+					height={160}
+					class="h-40 w-40 overflow-hidden rounded object-contain"
+				/>
+			</div>
+			<div class="self-center">
+				<label
+					class=" shadow-l flex cursor-pointer flex-col items-center rounded-lg bg-accent-400 font-semibold text-black hover:bg-accent-500 hover:text-gray-600"
+				>
+					<svg class="h-8 w-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+						<path
+							d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"
+						/>
+					</svg>
+					<span class="mt-2 text-base leading-normal">Change Image?</span>
+					<span class="text-xs">(Max 5 Mb)</span>
+					<input
+						type="file"
+						name="image"
+						accept="image/png, image/jpeg"
+						bind:files={$file}
+						onchange={renderPreview}
+						hidden
+					/>
+				</label>
+			</div>
+			<div class="px-10">
+				<div bind:this={previewImageContainer}></div>
+			</div>
 		</div>
-		{#if $errors.image}<p>{$errors.image}</p>{/if}
-		<button>Submit</button>
+
+		{#if $errors.image}
+			<div class="text-destructive" aria-live="assertive">
+				{$errors.image}
+			</div>
+		{:else if showUploadButton}
+			<div class="ml-40 mt-8">
+				<Button type="submit">Use the New Image?</Button>
+			</div>
+		{/if}
 	</form>
-
-	<!-- <img src={form.image} class="max-w-sm rounded-lg shadow-2xl" alt="uploaded" /> -->
 </div>
-
-<pre>
-{JSON.stringify(record, null, 2)}
-</pre>
-
-<SuperDebug data={form} />
+<!-- <SuperDebug data={form} /> -->
