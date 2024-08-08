@@ -12,39 +12,42 @@
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
 	import { type CurrentImage } from '$lib/components/server/registrationDB';
+	import { getRegisterState } from '$lib/context.svelte';
+	import { cn } from '../utils';
 
 	type Props = {
+		buttonText?: string;
 		currentImage: CurrentImage;
-		returnedImage: CurrentImage;
 		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 	};
 
-	let { currentImage, imageUploadForm, returnedImage }: Props = $props();
-	let imageDialogOpen = $state(false);
+	let { buttonText = 'Update Image?', currentImage, imageUploadForm }: Props = $props();
 
-	const { form, enhance, errors, message } = superForm(imageUploadForm, {
+	let imageDialogOpen = $state(false);
+	let showChangeButton = $state(false);
+
+	let myState = getRegisterState();
+
+	const { form, enhance, errors, message, delayed } = superForm(imageUploadForm, {
 		validators: zodClient(fileUploadSchema),
 		resetForm: true,
-		onUpdated: () => {
-			toast.success($message);
-			$message = null;
-			returnedImage = $form.image as CurrentImage;
-		},
 		onResult({ result, cancel }) {
 			if (result.type != 'success') {
 				toast.error('Failed to upload image');
 				cancel();
 				return;
 			}
-			returnedImage = { ...result?.data?.image };
-			console.log('returnedImage', returnedImage);
+			myState.workingImage = { ...result?.data?.image };
+			console.log('returnedImage', myState.workingImage);
+			toast.success('Image uploaded successfully');
+			showChangeButton = false;
+			imageDialogOpen = false;
 		}
 	});
 
 	const file = fileProxy(form, 'image');
 
 	let previewImageContainer: HTMLDivElement;
-	let showUploadButton = $state(false);
 
 	const renderPreview: ChangeEventHandler<HTMLInputElement> = (e) => {
 		if (!e.currentTarget.files || e.currentTarget.files.length === 0) return;
@@ -59,12 +62,12 @@
 		previewImageContainer.innerHTML = '';
 		previewImageContainer.appendChild(previewSpan);
 		previewImageContainer.appendChild(previewImage);
-		showUploadButton = true;
+		showChangeButton = true;
 	};
 </script>
 
 <Dialog.Root bind:open={imageDialogOpen}>
-	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update an image</Dialog.Trigger>
+	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>{buttonText}</Dialog.Trigger>
 	<Dialog.Content class="max-h-full max-w-[600px] overflow-y-auto bg-card">
 		<Dialog.Header>
 			<Dialog.Title>Change Image</Dialog.Title>
@@ -113,9 +116,27 @@
 					<div class="text-destructive" aria-live="assertive">
 						{$errors.image}
 					</div>
-				{:else if showUploadButton}
+				{/if}
+				{#if showChangeButton}
 					<div class="ml-40 mt-8">
-						<Button type="submit">Use the New Image?</Button>
+						{#if $delayed}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class={cn('animate-spin')}
+							>
+								<path d="M21 12a9 9 0 1 1-6.219-8.56" />
+							</svg>
+						{:else}
+							<Button type="submit">Use the New Image?</Button>
+						{/if}
 					</div>
 				{/if}
 			</form>

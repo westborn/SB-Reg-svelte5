@@ -1,24 +1,25 @@
 <script lang="ts">
-	import type { CurrentImage } from '$lib/components/server/registrationDB';
 	import { ImageUploadForm, OptimisedImage } from '$lib/components';
+	import SuperDebug from 'sveltekit-superforms';
+	import { getRegisterState, updateImage } from '$lib/context.svelte';
 
 	let { data } = $props();
-	let { form: imageUploadForm, session, user, currentImage: providedImage } = data;
+	let { form: imageUploadForm, session, user, currentImage } = data;
 
-	let currentImage = $state(providedImage);
-	let returnedImage = $state({}) as CurrentImage;
+	let myState = getRegisterState();
+	updateImage(null);
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<p class="my-6">This is an image upload page</p>
-	<ImageUploadForm {currentImage} {imageUploadForm} {returnedImage} />
+	<ImageUploadForm buttonText={'Change Image'} {currentImage} {imageUploadForm} />
 </div>
 
-{#if returnedImage?.id}
+{#if myState.workingImage?.id}
 	<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 		<p class="my-6">Returned Image</p>
 		<OptimisedImage
-			path={returnedImage?.cloudURL ? returnedImage.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
+			path={myState.workingImage?.cloudURL ? myState.workingImage?.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
 			alt="Current Image"
 			width={600}
 			height={600}
@@ -26,4 +27,4 @@
 		/>
 	</div>
 {/if}
-<!-- <SuperDebug data={form} /> -->
+<SuperDebug data={myState.workingImage} />

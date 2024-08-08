@@ -1,9 +1,10 @@
 import { getContext, setContext } from 'svelte';
 
-import type { Submission } from '$lib/components/server/registrationDB';
+import type { CurrentImage, Submission } from '$lib/components/server/registrationDB';
 
 export class RegisterState {
 	submission = $state() as Submission;
+	workingImage = $state() as CurrentImage;
 	artistExists = $state() as boolean;
 	registrationExists = $state() as boolean;
 	entriesExist = $state() as boolean;
@@ -29,6 +30,13 @@ export function updateSubmission(submission: Submission) {
 	currentState.artistExists = submission ? true : false;
 	currentState.registrationExists = submission?.registrations?.length ?? 0 > 0 ? true : false;
 	currentState.entriesExist = submission?.registrations?.[0]?.entries?.length ?? 0 > 0 ? true : false;
+	setContext(REGISTER_CTX, currentState);
+	return currentState;
+}
+
+export function updateImage(image: CurrentImage) {
+	const currentState = getRegisterState();
+	currentState.workingImage = image;
 	setContext(REGISTER_CTX, currentState);
 	return currentState;
 }

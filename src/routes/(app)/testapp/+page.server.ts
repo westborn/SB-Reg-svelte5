@@ -45,16 +45,13 @@ export const actions = {
 		console.log('cloudURL:', cloudURL);
 		console.log('originalFileName:', form.data.image.name);
 
-		// Save the image to the database without using a registrationId or an entryId
-		// This will allow the image to be attached when the entry is created
-		const workingImage = {
+		const image = await createImage({
 			id: 0,
 			artistId: 1,
 			cloudId,
 			cloudURL,
 			originalFileName: form.data.image.name
-		} as CurrentImage;
-		const image = await createImage(workingImage);
+		} as CurrentImage);
 
 		//TODO update tag when image is attached to an entry
 		// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
