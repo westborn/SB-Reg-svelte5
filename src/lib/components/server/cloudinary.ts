@@ -1,6 +1,5 @@
 import { CLOUDINARY_API_SECRET, CLOUDINARY_API_KEY } from '$env/static/private';
 import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
-
 import cloudinary, { type UploadApiErrorResponse, type UploadApiResponse } from 'cloudinary';
 
 const cloudinaryConfig = {
@@ -9,12 +8,11 @@ const cloudinaryConfig = {
 	api_secret: CLOUDINARY_API_SECRET,
 	secure: true
 };
-cloudinary.v2.config({ cloudinaryConfig });
+cloudinary.v2.config(cloudinaryConfig);
 
 export function fetchImagePath(imagePath: string) {
 	return cloudinary.v2.url(imagePath, { secure: true });
 }
-
 export interface CloudinaryUploadResponse {
 	success: boolean;
 	result: {
@@ -34,6 +32,7 @@ export interface CloudinaryUploadResponse {
 		signature: string;
 	};
 }
+
 // takes in an Image and a Preset and returns a promise that resolves to a CloudinaryUploadResponse
 export async function uploadImageToCloudinary(
 	image: File | undefined,
