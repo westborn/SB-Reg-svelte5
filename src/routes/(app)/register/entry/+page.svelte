@@ -7,11 +7,12 @@
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 		entries: ReturnedEntries;
 	};
 
 	let { data } = $props();
-	let { entries, entryForm } = data;
+	let { entries, entryForm, imageUploadForm } = data;
 	let currentEntries = $state(entries);
 
 	let entriesExist = $derived(currentEntries.length > 0);
@@ -33,11 +34,11 @@
 </script>
 
 <!-- <SuperDebug data={currentEntries} /> -->
-<section class="mx-auto mt-10 max-w-prose px-3">
+<section class="mx-auto mt-10 px-3">
 	{#if !entriesExist}
 		<div>
 			<div class="mb-10 mt-10">Create your first entry</div>
-			<EntryCreateForm bind:currentEntries {entryForm} />
+			<EntryCreateForm bind:currentEntries {entryForm} {imageUploadForm} />
 		</div>
 	{:else}
 		<p class="mt-2 text-base font-bold text-primary-400">
@@ -46,7 +47,7 @@
 		<div class="mt-6">
 			<EntryAccordion bind:currentEntries {doUpdate} {doDelete} />
 			<div class="mt-6">
-				<EntryCreateDialog bind:currentEntries {entryForm} />
+				<EntryCreateDialog bind:currentEntries {entryForm} {imageUploadForm} />
 			</div>
 		</div>
 	{/if}

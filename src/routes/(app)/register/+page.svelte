@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	// import { goto } from '$app/navigation';
 
-	goto('/register/artist');
+	// goto('/register/artist');
 </script>
 
 <!-- No DOM content here - just a placeholder for \register -->

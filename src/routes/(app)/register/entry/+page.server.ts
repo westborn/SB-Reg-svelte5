@@ -3,12 +3,13 @@ import type { RequestEvent } from './$types';
 
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
-import { message, superValidate } from 'sveltekit-superforms';
+import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
 import { ExhibitionYear, GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
-import { entrySchemaUI } from '$lib/zod-schemas';
-import { getEntries } from '$lib/components/server/registrationDB';
+import { entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
+import { createImage, getEntries, type CurrentImage } from '$lib/components/server/registrationDB';
+import { getCloudinaryURL, uploadImageToCloudinary } from '$lib/components/server/cloudinary';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
@@ -16,6 +17,8 @@ export const load: PageServerLoad = async (event) => {
 	console.log(`${event.route.id} - LOAD - START`);
 
 	const entryForm = await superValidate(zod(entrySchemaUI));
+	const imageUploadForm = await superValidate(zod(fileUploadSchema));
+
 	const artistEmail = user.email; // TODO Ensure email is correctly identified
 	const result = await getEntries(artistEmail);
 	if (!result) {
@@ -29,7 +32,7 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	const entries = result?.registrations.length ? result.registrations[0].entries : [];
-	return { entries, entryForm };
+	return { entries, entryForm, imageUploadForm };
 };
 
 const updateEntry = async (event: RequestEvent) => {
@@ -131,4 +134,39 @@ const createEntry = async (event: RequestEvent) => {
 	return message(form, SUCCESS_MESSAGE);
 };
 
-export const actions: Actions = { updateEntry, createEntry };
+const uploadImage = async (event: RequestEvent) => {
+	console.log(`${event.route.id} - default - ACTION`);
+	const form = await superValidate(event, zod(fileUploadSchema));
+	if (!form.valid) {
+		return fail(400, withFiles({ form }));
+	}
+	// Upload the inmage to cloudinary as an unattached image
+	const result = await uploadImageToCloudinary(form.data.image, 'UnAttachedImages');
+	if (!result.success) {
+		console.log('Error uploading image to cloudinary');
+		console.error(result);
+		return fail(500, withFiles({ form }));
+	}
+	const cloudId = result.result.public_id;
+	const cloudURL = getCloudinaryURL(cloudId);
+
+	console.log(result);
+	console.log('cloudId:', cloudId);
+	console.log('cloudURL:', cloudURL);
+	console.log('originalFileName:', form.data.image.name);
+
+	const image = await createImage({
+		id: 0,
+		artistId: 1,
+		cloudId,
+		cloudURL,
+		originalFileName: form.data.image.name
+	} as CurrentImage);
+
+	//TODO update tag when image is attached to an entry
+	// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
+	console.log('image:', image);
+	return withFiles({ form, image });
+};
+
+export const actions: Actions = { updateEntry, createEntry, uploadImage };

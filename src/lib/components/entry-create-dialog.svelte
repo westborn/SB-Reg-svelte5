@@ -9,22 +9,23 @@
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 		currentEntries: ReturnedEntries;
 	};
-	let { currentEntries = $bindable(), entryForm }: Props = $props();
+	let { currentEntries = $bindable(), entryForm, imageUploadForm }: Props = $props();
 
 	let myState = getRegisterState();
 </script>
 
 <Dialog.Root bind:open={myState.dialogOpen}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Add a New Entry?</Dialog.Trigger>
-	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
+	<Dialog.Content class="max-h-full max-w-[600px] overflow-y-auto bg-card">
 		<Dialog.Header>
 			<Dialog.Title>Create a NEW entry</Dialog.Title>
 			<Dialog.Description>Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<EntryCreateForm bind:currentEntries {entryForm} />
+			<EntryCreateForm bind:currentEntries {entryForm} {imageUploadForm} />
 		</div>
 	</Dialog.Content>
 </Dialog.Root>

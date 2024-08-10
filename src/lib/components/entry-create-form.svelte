@@ -13,21 +13,24 @@
 	import { toast } from 'svelte-sonner';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
-	import type { ReturnedEntries } from './server/registrationDB';
-	import { getRegisterState } from '../context.svelte';
+	import type { CurrentImage, ReturnedEntries } from '$lib/components/server/registrationDB';
+	import { getRegisterState, updateImage } from '$lib/context.svelte';
+	import { ImageUploadForm, OptimisedImage } from '$lib/components';
 
 	let myState = getRegisterState();
+	updateImage(null);
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
+		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 		currentEntries: ReturnedEntries;
 	};
 
-	let { currentEntries = $bindable(), entryForm }: Props = $props();
+	let { currentEntries = $bindable(), entryForm, imageUploadForm }: Props = $props();
 
+	let currentImage = $state(null) as CurrentImage;
 	const form = superForm(entryForm, {
 		id: `createEntryForm`,
-
 		validators: zodClient(entrySchemaUI),
 		onUpdated: () => {
 			if ($message === 'Success') {
@@ -59,6 +62,19 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
+
+	{#if myState.workingImage?.cloudURL}
+		<div class="self-center">
+			<OptimisedImage
+				path={myState.workingImage?.cloudURL ? myState.workingImage?.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
+				alt="Current Image"
+				width={128}
+				height={128}
+				class="h-32 w-32 overflow-hidden rounded object-contain"
+			/>
+		</div>
+	{/if}
+	<ImageUploadForm buttonText={'Upload Image'} {currentImage} {imageUploadForm} />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>
@@ -169,8 +185,7 @@
 	<Form.Errors errors={$errors._errors} />
 	{#if !$message}
 		<div>
-			<Form.Button>Add New Entry?</Form.Button>
-			<span class="text-sm text-muted-foreground"> Just a little note</span>
+			<Form.Button>Save New Entry?</Form.Button>
 		</div>
 	{:else}
 		<div class="font-semibold text-red-700">{$message}</div>
