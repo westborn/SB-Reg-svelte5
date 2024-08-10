@@ -150,11 +150,6 @@ const uploadImage = async (event: RequestEvent) => {
 	const cloudId = result.result.public_id;
 	const cloudURL = getCloudinaryURL(cloudId);
 
-	console.log(result);
-	console.log('cloudId:', cloudId);
-	console.log('cloudURL:', cloudURL);
-	console.log('originalFileName:', form.data.image.name);
-
 	const image = await createImage({
 		id: 0,
 		artistId: 1,
@@ -165,7 +160,6 @@ const uploadImage = async (event: RequestEvent) => {
 
 	//TODO update tag when image is attached to an entry
 	// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
-	console.log('image:', image);
 	return withFiles({ form, image });
 };
 

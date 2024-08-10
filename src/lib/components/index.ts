@@ -9,3 +9,4 @@ export { default as OptimisedImage } from './optimised-image.svelte';
 export { default as ThemeToggle } from './theme-toggle.svelte';
 export { default as StepNavigation } from './step-navigation.svelte';
 export { default as ImageUploadForm } from './image-upload-form.svelte';
+export { default as AdminMenu } from './admin-menu.svelte';

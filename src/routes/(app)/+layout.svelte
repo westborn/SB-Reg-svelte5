@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { ThemeToggle } from '$lib/components';
+	import { AdminMenu, ThemeToggle } from '$lib/components';
 	let { children, data } = $props();
 	const { session, user } = data;
 	const loggedInEmail = user ? user.email : 'full@example.com';
@@ -11,6 +11,7 @@
 
 <section class="flex flex-row items-center justify-between sm:container">
 	<div>
+		<AdminMenu />
 		<a href="/" class="text-2xl font-bold leading-tight tracking-tighter text-primary md:text-3xl">
 			SB Exhibit Registration
 		</a>
@@ -33,7 +34,7 @@
 	</div>
 </section>
 <section class="sm:container">
-	<main class="h-screen">
+	<main class="h-auto">
 		{@render children()}
 	</main>
 </section>
