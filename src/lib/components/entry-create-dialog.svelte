@@ -24,8 +24,6 @@
 			<Dialog.Title>Create a NEW entry</Dialog.Title>
 			<Dialog.Description>Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
-		<div class="grid gap-4 py-4">
-			<EntryCreateForm bind:currentEntries {entryForm} {imageUploadForm} />
-		</div>
+		<EntryCreateForm bind:currentEntries {entryForm} {imageUploadForm} />
 	</Dialog.Content>
 </Dialog.Root>

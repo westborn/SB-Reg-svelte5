@@ -51,7 +51,7 @@
 <form
 	method="POST"
 	action="?/createEntry"
-	class=" w-full space-y-4"
+	class="w-full space-y-4"
 	use:enhance
 	onkeydown={(event) => event.key != 'Enter'}
 >
