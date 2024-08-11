@@ -74,6 +74,7 @@
 			/>
 		</div>
 	{/if}
+
 	<ImageUploadForm buttonText={'Upload Image'} {currentImage} {imageUploadForm} />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
@@ -107,13 +108,13 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<p class="mb-4 mt-8 text-gray-600">
+	<p class="text-gray-600">
 		Size of this piece <span class="font-semibold">in centimetres</span> (L x W x H)
 	</p>
 	<div class="grid grid-cols-3 gap-4">
 		<Form.Field {form} name="dimLength">
 			<Form.Control let:attrs>
-				<Form.Label class="mb-4 mt-8 text-gray-600">Length</Form.Label>
+				<Form.Label>Length</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.dimLength} />
 			</Form.Control>
 			<Form.FieldErrors />
@@ -121,7 +122,7 @@
 
 		<Form.Field {form} name="dimWidth">
 			<Form.Control let:attrs>
-				<Form.Label class="mb-4 mt-8 text-gray-600">Width</Form.Label>
+				<Form.Label>Width</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.dimWidth} />
 			</Form.Control>
 			<Form.FieldErrors />
@@ -129,7 +130,7 @@
 
 		<Form.Field {form} name="dimHeight">
 			<Form.Control let:attrs>
-				<Form.Label class="mb-4 mt-8 text-gray-600">Height</Form.Label>
+				<Form.Label>Height</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.dimHeight} />
 			</Form.Control>
 			<Form.FieldErrors />
