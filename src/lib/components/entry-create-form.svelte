@@ -32,6 +32,12 @@
 	const form = superForm(entryForm, {
 		id: `createEntryForm`,
 		validators: zodClient(entrySchemaUI),
+		dataType: 'json',
+		onSubmit({ jsonData }) {
+			// pass the image that we accepted, into this form's data when they save the new entry
+			console.log('onSubmit - myState.workingImage', myState.workingImage);
+			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage) });
+		},
 		onUpdated: () => {
 			if ($message === 'Success') {
 				currentEntries = $page.data.entries;
@@ -54,6 +60,7 @@
 	class="w-full space-y-4"
 	use:enhance
 	onkeydown={(event) => event.key != 'Enter'}
+	id="createEntryForm"
 >
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>

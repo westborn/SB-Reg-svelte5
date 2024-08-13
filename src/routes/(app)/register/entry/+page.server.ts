@@ -112,13 +112,13 @@ const createEntry = async (event: RequestEvent) => {
 				artistId: registration.registrations[0].artistId,
 				registrationId: registration.registrations[0].id,
 				accepted: false,
-				title: title || '',
+				title: title ?? '',
 				inOrOut: inOrOut === 'Outdoor' ? 'Outdoor' : 'Indoor',
-				material: material || '',
-				description: description || '',
-				specialRequirements: specialRequirements || '',
+				material: material ?? '',
+				description: description ?? '',
+				specialRequirements: specialRequirements ?? '',
 				enterMajorPrize: enterMajorPrize === 'Yes' ? true : false,
-				dimensions: `${dimLength || '0'}x${dimWidth || '0'}x${dimHeight || '0'}`,
+				dimensions: `${dimLength ?? '0'}x${dimWidth ?? '0'}x${dimHeight ?? '0'}`,
 				price: price * 100
 			}
 		});

@@ -147,13 +147,13 @@ export const createEntry = async (workingEntry: EntryTable) => {
 			registrationId,
 			accepted,
 			inOrOut: EntryType[inOrOut as keyof typeof EntryType],
-			title: title || '',
+			title: title ?? '',
 			material,
 			dimensions,
 			description,
 			specialRequirements,
 			enterMajorPrize,
-			price: price || 0
+			price: price ?? 0
 		}
 	});
 	return entry;

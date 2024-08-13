@@ -45,7 +45,7 @@
 	<!-- back button -->
 	<div class="min-w-10">
 		{#if currentStep.step > 0}
-			<a href={STEPS[currentStep.step - 1]?.link || STEPS[0].link}>
+			<a href={STEPS[currentStep.step - 1]?.link ?? STEPS[0].link}>
 				<Button variant="ghost" class="bg-primary-50 text-white">Back</Button>
 			</a>
 		{/if}

@@ -74,7 +74,7 @@
 			<Dialog.Description>Upload a new image or replace an existing one</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<form method="POST" enctype="multipart/form-data" use:enhance action="?/uploadImage">
+			<form method="POST" enctype="multipart/form-data" use:enhance action="?/uploadImage" id="imageUploadForm">
 				<div class="grid grid-cols-[200px_120px_200px]">
 					<div class="self-center">
 						<span class="font-semibold"> Current Image </span>

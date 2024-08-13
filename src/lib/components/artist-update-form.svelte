@@ -34,14 +34,14 @@
 
 	// grab the form field values from the submission object
 	$effect(() => {
-		const firstName = untrack(() => myState?.submission?.firstName || '');
-		const lastName = untrack(() => myState?.submission?.lastName || '');
-		const phone = untrack(() => myState?.submission?.phone || '');
-		const postcode = untrack(() => myState?.submission?.postcode || '');
-		const firstNations = untrack(() => myState?.submission?.firstNations || 'Declined');
-		const bankAccountName = untrack(() => myState?.submission?.bankAccountName || '');
-		const bankBSB = untrack(() => myState?.submission?.bankBSB || '');
-		const bankAccount = untrack(() => myState?.submission?.bankAccount || '');
+		const firstName = untrack(() => myState?.submission?.firstName ?? '');
+		const lastName = untrack(() => myState?.submission?.lastName ?? '');
+		const phone = untrack(() => myState?.submission?.phone ?? '');
+		const postcode = untrack(() => myState?.submission?.postcode ?? '');
+		const firstNations = untrack(() => myState?.submission?.firstNations ?? 'Declined');
+		const bankAccountName = untrack(() => myState?.submission?.bankAccountName ?? '');
+		const bankBSB = untrack(() => myState?.submission?.bankBSB ?? '');
+		const bankAccount = untrack(() => myState?.submission?.bankAccount ?? '');
 		$formData.firstName = firstName;
 		$formData.lastName = lastName;
 		$formData.phone = phone;
