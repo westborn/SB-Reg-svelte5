@@ -47,6 +47,17 @@
 	const form = superForm(entryForm, {
 		id: `createEntryForm`,
 		validators: zodClient(entrySchemaUI),
+		dataType: 'json',
+		onSubmit({ jsonData }) {
+			const jsonImage = {
+				id: 34,
+				originalFileName: 'the filename',
+				cloudId: 'the cloud id',
+				cloudURL: 'the cloud url'
+			};
+			jsonData({ ...$formData });
+			// jsonData({ ...$formData, image: JSON.stringify(jsonImage) });
+		},
 		onUpdated: () => {
 			if ($message === 'Success') {
 				toast.success('Entry Added');

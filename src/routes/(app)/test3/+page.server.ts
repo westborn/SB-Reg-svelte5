@@ -9,6 +9,7 @@ import { prisma } from '$lib/components/server/prisma';
 import { ExhibitionYear, GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
 import { entrySchemaUI } from '$lib/zod-schemas';
 import { getEntries } from '$lib/components/server/registrationDB';
+import { z } from 'zod';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
@@ -53,8 +54,13 @@ export const actions: Actions = {
 	},
 
 	createEntry: async (event: RequestEvent) => {
-		const form = await superValidate(event, zod(entrySchemaUI));
-		console.log('createEntry', form);
+		// console.log(await event.request.formData());
+		const newschema = entrySchemaUI.extend({ image: z.string().nullable() });
+		const form = await superValidate(event, zod(newschema));
+		if (form.data.image) {
+			console.log('image', JSON.parse(form.data.image));
+		}
+		console.log('createEntry', form.data);
 		if (!form.valid) {
 			return message(form, 'Entry is Invalid - please reload and try again, or, call us!!', { status: 400 });
 		}
