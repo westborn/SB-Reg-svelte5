@@ -2,6 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import type { RequestEvent } from './$types';
 
 import { zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
 import { redirect } from '@sveltejs/kit';
 import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
@@ -62,9 +63,24 @@ const updateEntry = async (event: RequestEvent) => {
 
 	return message(form, SUCCESS_MESSAGE);
 };
-
 const createEntry = async (event: RequestEvent) => {
-	const form = await superValidate(event, zod(entrySchemaUI));
+	const newImageSchema = entrySchemaUI.extend({ image: z.string().nullable() });
+	const form = await superValidate(event, zod(newImageSchema));
+
+	console.log('createEntry', form);
+	const workingImage = form.data.image ? JSON.parse(form.data.image) : null;
+	console.log('workingImage', workingImage);
+
+	// workingImage {
+	// 	id: 58,
+	// 	artistId: 1,
+	// 	registrationId: null,
+	// 	entryId: null,
+	// 	cloudId: 'wciz3du4iowgrudhwden',
+	// 	cloudURL: 'https://res.cloudinary.com/dpkmx9mow/image/upload/wciz3du4iowgrudhwden?_a=BAMADKRg0',
+	// 	originalFileName: 'Arena Carpark.JPG'
+	// }
+
 	if (!form.valid) {
 		return message(form, 'Entry is Invalid - please reload and try again, or, call us!!', { status: 400 });
 	}

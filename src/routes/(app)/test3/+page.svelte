@@ -2,13 +2,9 @@
 	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
 	import { getStep } from '$lib/regState.svelte.ts';
 
-	import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
+	import { type SuperValidated } from 'sveltekit-superforms';
 	import type { ReturnedEntries } from '$lib/components/server/registrationDB.js';
-	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { entrySchemaUI } from '../../../lib/zod-schemas.js';
-	import { toast } from 'svelte-sonner';
-	import { page } from '$app/stores';
-	import { getRegisterState, updateSubmission } from '../../../lib/context.svelte.js';
+	import { getRegisterState, updateSubmission } from '$lib/context.svelte.js';
 
 	type Props = {
 		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;

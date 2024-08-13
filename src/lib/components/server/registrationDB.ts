@@ -2,7 +2,7 @@ import { prisma } from '$lib/components/server/prisma';
 import { ExhibitionYear } from '$lib/constants';
 
 import { EntryType } from '$lib/constants';
-import type { EntryTable, ImageTable } from '../../zod-schemas';
+import type { EntryTable, ImageTable } from '$lib/zod-schemas';
 
 // Two different ways to add types from a prisma query
 
