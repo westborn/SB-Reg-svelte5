@@ -10,7 +10,25 @@ import { prisma } from '$lib/components/server/prisma';
 import { ExhibitionYear, GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
 import { entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
 import { createImage, getEntries, type CurrentImage } from '$lib/components/server/registrationDB';
-import { getCloudinaryURL, uploadImageToCloudinary } from '$lib/components/server/cloudinary';
+import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
+
+async function fetchEntries(userEmail: string) {
+	const result = await getEntries(userEmail);
+	if (!result) {
+		console.log('No Artist Found');
+		return [];
+	}
+	if (!result.registrations) {
+		console.log('No Registration Found');
+		return [];
+	}
+	if (result.registrations.length === 0) {
+		console.log('No Entries Found');
+		return [];
+	}
+	console.log(`Entries Found - ${result.registrations[0].entries.length}`);
+	return result.registrations[0].entries;
+}
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
@@ -19,20 +37,7 @@ export const load: PageServerLoad = async (event) => {
 
 	const entryForm = await superValidate(zod(entrySchemaUI));
 	const imageUploadForm = await superValidate(zod(fileUploadSchema));
-
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
-	const result = await getEntries(artistEmail);
-	if (!result) {
-		console.log('No Artist Found');
-	} else if (result && !result.registrations) {
-		console.log('No Registration Found');
-	} else if (result && result.registrations.length === 0) {
-		console.log('No Entries Found');
-	} else {
-		console.log(`Entries Found - ${result.registrations[0].entries.length}`);
-	}
-
-	const entries = result?.registrations.length ? result.registrations[0].entries : [];
+	const entries = await fetchEntries(user.email);
 	return { entries, entryForm, imageUploadForm };
 };
 
@@ -53,11 +58,11 @@ const updateEntry = async (event: RequestEvent) => {
 		});
 
 		if (!result) {
-			console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(form, GENERIC_ERROR_MESSAGE);
 		}
 	} catch (error) {
-		console.log(`${event.route.id}`, error);
+		console.error(`${event.route.id}`, error);
 		return message(form, GENERIC_ERROR_MESSAGE);
 	}
 
@@ -68,9 +73,22 @@ const createEntry = async (event: RequestEvent) => {
 	const form = await superValidate(event, zod(newImageSchema));
 
 	console.log('createEntry', form);
-	const workingImage = form.data.image ? JSON.parse(form.data.image) : null;
-	console.log('workingImage', workingImage);
-
+	if (!form.valid) {
+		return message(form, 'Entry is Invalid - please reload and try again, or, call us!!', { status: 400 });
+	}
+	const { session, user } = await event.locals.V1safeGetSession();
+	if (!user || !session) return redirect(302, '/login');
+	// Process image data if available
+	let workingImage = null;
+	try {
+		if (form.data.image) {
+			workingImage = JSON.parse(form.data.image);
+			console.log('workingImage', workingImage);
+		}
+	} catch (error) {
+		console.error('Error parsing image data:', error);
+		return message(form, 'Error processing image data.', { status: 400 });
+	}
 	// workingImage {
 	// 	id: 58,
 	// 	artistId: 1,
@@ -80,12 +98,6 @@ const createEntry = async (event: RequestEvent) => {
 	// 	cloudURL: 'https://res.cloudinary.com/dpkmx9mow/image/upload/wciz3du4iowgrudhwden?_a=BAMADKRg0',
 	// 	originalFileName: 'Arena Carpark.JPG'
 	// }
-
-	if (!form.valid) {
-		return message(form, 'Entry is Invalid - please reload and try again, or, call us!!', { status: 400 });
-	}
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
 
 	// get the registration id and the artist id from the registration table by using the artist email
 
@@ -139,44 +151,47 @@ const createEntry = async (event: RequestEvent) => {
 			}
 		});
 		if (!result) {
-			console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(form, GENERIC_ERROR_MESSAGE);
 		}
 	} catch (error) {
-		console.log(`${event.route.id} - `, error);
+		console.error(`${event.route.id} - `, error);
 		return message(form, GENERIC_ERROR_UNEXPECTED);
 	}
-
 	return message(form, SUCCESS_MESSAGE);
 };
 
 const uploadImage = async (event: RequestEvent) => {
-	console.log(`${event.route.id} - default - ACTION`);
-	const form = await superValidate(event, zod(fileUploadSchema));
-	if (!form.valid) {
-		return fail(400, withFiles({ form }));
+	console.log(`${event.route.id} - uploadImage - ACTION`);
+	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
+	if (!formValidationResult.valid) {
+		return fail(400, withFiles({ formValidationResult }));
 	}
-	// Upload the inmage to cloudinary as an unattached image
-	const result = await uploadImageToCloudinary(form.data.image, 'UnAttachedImages');
-	if (!result.success) {
-		console.log('Error uploading image to cloudinary');
-		console.error(result);
-		return fail(500, withFiles({ form }));
+	try {
+		// Attempt to upload the image to Cloudinary
+		const uploadResult = await uploadImageToCloudinary(formValidationResult.data.image, 'UnAttachedImages');
+		if (!uploadResult.success) {
+			console.error('Error uploading image to Cloudinary:', uploadResult);
+			return fail(500, withFiles({ formValidationResult }));
+		}
+		// Extract Cloudinary URL and ID from the successful upload result
+		const { public_id: cloudId, secure_url: cloudURL } = uploadResult.result;
+		console.log(`Image uploaded successfully to Cloudinary. ID: ${cloudId}, URL: ${cloudURL}`);
+		// save to database, return success response with image URL, etc.
+		const image = await createImage({
+			id: 0,
+			artistId: 1,
+			cloudId,
+			cloudURL,
+			originalFileName: formValidationResult.data.image.name
+		} as CurrentImage);
+		//TODO update tag when image is attached to an entry
+		// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
+		return withFiles({ formValidationResult, image });
+	} catch (error) {
+		console.error(`${event.route.id} - Error during image upload:`, error);
+		return fail(500, withFiles({ formValidationResult }));
 	}
-	const cloudId = result.result.public_id;
-	const cloudURL = getCloudinaryURL(cloudId);
-
-	const image = await createImage({
-		id: 0,
-		artistId: 1,
-		cloudId,
-		cloudURL,
-		originalFileName: form.data.image.name
-	} as CurrentImage);
-
-	//TODO update tag when image is attached to an entry
-	// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
-	return withFiles({ form, image });
 };
 
 export const actions: Actions = { updateEntry, createEntry, uploadImage };
