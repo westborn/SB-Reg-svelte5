@@ -34,11 +34,8 @@ export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
-
-	const entryForm = await superValidate(zod(entrySchemaUI));
-	const imageUploadForm = await superValidate(zod(fileUploadSchema));
 	const entries = await fetchEntries(user.email);
-	return { entries, entryForm, imageUploadForm };
+	return { entries };
 };
 
 const updateEntry = async (event: RequestEvent) => {

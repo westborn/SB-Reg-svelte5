@@ -14,10 +14,8 @@ export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
-	const artistForm = await superValidate(zod(artistSchemaUI));
-	return { artistForm };
+	return;
 };
-
 const updateArtist = async (event: RequestEvent) => {
 	const form = await superValidate(event, zod(artistSchemaUI));
 	if (!form.valid) {

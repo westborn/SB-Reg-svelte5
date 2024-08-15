@@ -6,11 +6,6 @@
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { ArtistUpdateForm } from '$lib/components';
 
-	type Props = {
-		artistForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
-	};
-
-	let { artistForm }: Props = $props();
 	let myState = getRegisterState();
 </script>
 
@@ -22,7 +17,7 @@
 			<Dialog.Description>Make changes to your profile here.<br />Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<ArtistUpdateForm {artistForm} />
+			<ArtistUpdateForm />
 		</div>
 	</Dialog.Content>
 </Dialog.Root>

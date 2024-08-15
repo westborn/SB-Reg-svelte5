@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ChangeEventHandler } from 'svelte/elements';
 
-	import SuperDebug, { superForm, fileProxy, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm, fileProxy } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { OptimisedImage } from '$lib/components';
 	import { Button } from '$lib/components/ui/button';
@@ -18,17 +18,14 @@
 	type Props = {
 		buttonText?: string;
 		currentImage: CurrentImage;
-		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 	};
-
-	let { buttonText = 'Update Image?', currentImage, imageUploadForm }: Props = $props();
+	let { buttonText = 'Update Image?', currentImage }: Props = $props();
+	let myState = getRegisterState();
 
 	let imageDialogOpen = $state(false);
 	let showChangeButton = $state(false);
 
-	let myState = getRegisterState();
-
-	const { form, enhance, errors, message, delayed } = superForm(imageUploadForm, {
+	const { form, enhance, errors, delayed } = superForm(myState.imageUploadForm, {
 		validators: zodClient(fileUploadSchema),
 		resetForm: true,
 		onResult({ result, cancel }) {

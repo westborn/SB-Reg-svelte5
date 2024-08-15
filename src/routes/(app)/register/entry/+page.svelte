@@ -1,18 +1,14 @@
 <script lang="ts">
 	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
 	import { getStep } from '$lib/regState.svelte.ts';
-
-	import SuperDebug, { type SuperValidated } from 'sveltekit-superforms';
 	import type { ReturnedEntries } from '$lib/components/server/registrationDB.js';
 
 	type Props = {
-		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
-		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 		entries: ReturnedEntries;
 	};
 
 	let { data } = $props();
-	let { entries, entryForm, imageUploadForm } = data;
+	let { entries } = data;
 	let currentEntries = $state(entries);
 
 	let entriesExist = $derived(currentEntries.length > 0);
@@ -38,7 +34,7 @@
 	{#if !entriesExist}
 		<div>
 			<div class="mb-10 mt-10">Create your first entry</div>
-			<EntryCreateForm bind:currentEntries {entryForm} {imageUploadForm} />
+			<EntryCreateForm bind:currentEntries />
 		</div>
 	{:else}
 		<p class="mt-2 text-base font-bold text-primary-400">
@@ -47,7 +43,7 @@
 		<div class="mt-6">
 			<EntryAccordion bind:currentEntries {doUpdate} {doDelete} />
 			<div class="mt-6">
-				<EntryCreateDialog bind:currentEntries {entryForm} {imageUploadForm} />
+				<EntryCreateDialog bind:currentEntries />
 			</div>
 		</div>
 	{/if}

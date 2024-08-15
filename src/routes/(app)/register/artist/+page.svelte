@@ -4,8 +4,6 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 
 	import { ArtistCreateForm, ArtistUpdateDialog } from '$lib/components';
-	let { data } = $props();
-	const { artistForm } = data;
 
 	let myState = getRegisterState();
 	let currentStep = getStep();
@@ -40,12 +38,12 @@
 					<p class="text-sm">Account Name:</p>
 					<p class="">{myState.submission.bankAccountName}</p>
 				</div>
-				<ArtistUpdateDialog {artistForm} />
+				<ArtistUpdateDialog />
 			{:else}
 				<p class="text-sm text-muted-foreground">
 					First you need to register for the exhibition,<br /> and provide some basic details so we can contact you.
 				</p>
-				<ArtistCreateForm {artistForm} />
+				<ArtistCreateForm />
 			{/if}
 		</Card.Content>
 	</Card.Root>

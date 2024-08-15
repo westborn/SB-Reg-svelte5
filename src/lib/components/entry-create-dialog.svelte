@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { SuperValidated } from 'sveltekit-superforms';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
@@ -8,12 +7,9 @@
 	import type { ReturnedEntries } from './server/registrationDB';
 
 	type Props = {
-		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
-		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
 		currentEntries: ReturnedEntries;
 	};
-	let { currentEntries = $bindable(), entryForm, imageUploadForm }: Props = $props();
-
+	let { currentEntries = $bindable() }: Props = $props();
 	let myState = getRegisterState();
 </script>
 
@@ -24,6 +20,6 @@
 			<Dialog.Title>Create a NEW entry</Dialog.Title>
 			<Dialog.Description>Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
-		<EntryCreateForm bind:currentEntries {entryForm} {imageUploadForm} />
+		<EntryCreateForm bind:currentEntries />
 	</Dialog.Content>
 </Dialog.Root>

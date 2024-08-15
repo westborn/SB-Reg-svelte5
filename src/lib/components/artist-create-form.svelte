@@ -15,9 +15,8 @@
 	import { getRegisterState } from '$lib/context.svelte.js';
 
 	let myState = getRegisterState();
-	let { artistForm }: { artistForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>> } = $props();
 
-	let form = superForm(artistForm, {
+	let form = superForm(myState.artistForm, {
 		id: `createArtistForm`,
 		validators: zodClient(artistSchemaUI),
 		applyAction: true,

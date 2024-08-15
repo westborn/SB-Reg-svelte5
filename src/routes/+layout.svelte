@@ -10,6 +10,7 @@
 
 	let { children, data } = $props();
 	let { supabase, session, user } = data;
+	let { artistForm, entryForm, imageUploadForm } = data.universal;
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
@@ -20,7 +21,11 @@
 		return () => data.subscription.unsubscribe();
 	});
 
-	setRegisterState();
+	setRegisterState({
+		artistForm,
+		entryForm,
+		imageUploadForm
+	});
 </script>
 
 <svelte:head>
