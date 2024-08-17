@@ -1,4 +1,5 @@
 import { boolean, z } from 'zod';
+import { MAX_IMAGE_SIZE } from '$lib/constants';
 
 export const signupSchema = z.object({
 	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
@@ -157,6 +158,6 @@ export type ImageUI = z.infer<typeof imageSchemaUI>;
 export const fileUploadSchema = z.object({
 	image: z
 		.instanceof(File, { message: 'Please upload a file.' })
-		.refine((f) => f.size < 5 * 1024 * 1024, 'Upload must be less than 5Mb!')
+		.refine((f) => f.size < MAX_IMAGE_SIZE, 'Upload must be less than 5Mb!')
 });
 export type FileUpload = z.infer<typeof fileUploadSchema>;
