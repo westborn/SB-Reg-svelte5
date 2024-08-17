@@ -27,7 +27,7 @@
 	const { form, enhance, errors, delayed } = superForm(myState.imageUploadForm, {
 		validators: zodClient(fileUploadSchema),
 		resetForm: true,
-		onResult({ result, cancel }) {
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
 			if (result.type != 'success') {
 				toast.error('Failed to upload image');
 				cancel();
@@ -36,6 +36,7 @@
 			myState.workingImage = { ...result?.data?.image };
 			toast.success('Image uploaded successfully');
 			cancel();
+			imageDialogOpen = false;
 		}
 	});
 
@@ -44,6 +45,7 @@
 	let previewImageContainer: HTMLDivElement;
 
 	const renderPreview: ChangeEventHandler<HTMLInputElement> = (e) => {
+		console.log('file', $file);
 		if (!e.currentTarget.files || e.currentTarget.files.length === 0) return;
 		const [imageToUpload] = e.currentTarget.files;
 		const previewImage = document.createElement('img');
@@ -85,50 +87,47 @@
 							{$errors.image}
 						</div>
 					{/if}
-					{#if showButton}
-						<div class="mt-8">
-							{#if $delayed}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class={cn('animate-spin')}
-								>
-									<path d="M21 12a9 9 0 1 1-6.219-8.56" />
-								</svg>
-							{:else}
-								<Button type="submit">Use this Image?</Button>
-							{/if}
-						</div>
-					{:else}
-						<div class="max-w-[300px] self-center">
-							<label
-								class=" shadow-l flex cursor-pointer flex-col items-center rounded-lg bg-accent-400 font-semibold text-black hover:bg-accent-500 hover:text-gray-600"
+					<div class="mt-8" hidden={!showButton}>
+						{#if $delayed}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class={cn('animate-spin')}
 							>
-								<svg class="h-8 w-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-									<path
-										d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"
-									/>
-								</svg>
-								<span class="mt-2">Upload</span>
-								<span class="text-xs">(Max 5 Mb)</span>
-								<input
-									type="file"
-									name="image"
-									accept="image/png, image/jpeg"
-									bind:files={$file}
-									onchange={renderPreview}
-									hidden
+								<path d="M21 12a9 9 0 1 1-6.219-8.56" />
+							</svg>
+						{:else}
+							<Button type="submit">Use this Image?</Button>
+						{/if}
+					</div>
+					<div class="max-w-[300px] self-center" hidden={showButton}>
+						<label
+							class=" shadow-l flex cursor-pointer flex-col items-center rounded-lg bg-accent-400 font-semibold text-black hover:bg-accent-500 hover:text-gray-600"
+						>
+							<svg class="h-8 w-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+								<path
+									d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"
 								/>
-							</label>
-						</div>
-					{/if}
+							</svg>
+							<span class="mt-2">Upload</span>
+							<span class="text-xs">(Max 5 Mb)</span>
+							<input
+								type="file"
+								name="image"
+								accept="image/png, image/jpeg"
+								bind:files={$file}
+								onchange={renderPreview}
+								hidden
+							/>
+						</label>
+					</div>
 				</div>
 			</form>
 		</div>

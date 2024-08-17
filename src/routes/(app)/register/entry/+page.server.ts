@@ -161,6 +161,7 @@ const createEntry = async (event: RequestEvent) => {
 const uploadImage = async (event: RequestEvent) => {
 	console.log(`${event.route.id} - uploadImage - ACTION`);
 	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
+	console.log(`${event.route.id} ${JSON.stringify(formValidationResult, null, 2)}`);
 	if (!formValidationResult.valid) {
 		return fail(400, withFiles({ formValidationResult }));
 	}
@@ -184,7 +185,8 @@ const uploadImage = async (event: RequestEvent) => {
 		} as CurrentImage);
 		//TODO update tag when image is attached to an entry
 		// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
-		return withFiles({ formValidationResult, image });
+		const returnData = { formValidationResult, image };
+		return withFiles(returnData);
 	} catch (error) {
 		console.error(`${event.route.id} - Error during image upload:`, error);
 		return fail(500, withFiles({ formValidationResult }));
