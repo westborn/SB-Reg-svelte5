@@ -159,6 +159,28 @@ export const createEntry = async (workingEntry: EntryTable) => {
 	return entry;
 };
 
+export type CurrentEntry = ThenArg<ReturnType<typeof getEntry>>;
+export const getEntry = async (id: number) => {
+	const entry = await prisma.entryTable.findFirst({
+		where: { id: id },
+		select: {
+			id: true,
+			artistId: true,
+			registrationId: true,
+			accepted: true,
+			inOrOut: true,
+			title: true,
+			material: true,
+			dimensions: true,
+			description: true,
+			specialRequirements: true,
+			enterMajorPrize: true,
+			price: true
+		}
+	});
+	return entry;
+};
+
 export type CurrentImage = ThenArg<ReturnType<typeof getImage>>;
 export const getImage = async (id: number) => {
 	const image = await prisma.imageTable.findFirst({

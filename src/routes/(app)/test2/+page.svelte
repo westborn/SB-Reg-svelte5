@@ -1,39 +1,36 @@
 <script lang="ts">
-	let { data } = $props();
-	let { currentEntries: fromServer } = data;
-	let currentEntries = $state(fromServer);
+	import { page } from '$app/stores';
+	import { getRegisterState, updateSubmission } from '$lib/context.svelte';
+	import { onMount } from 'svelte';
+	import Level1 from './level1.svelte';
 
-	let costOfRegistration = $derived(currentEntries ? 20 + currentEntries.length * 20 : 20);
-	let numberOfEntries = $derived(
-		currentEntries ? (currentEntries.length === 1 ? `1 entry` : `${currentEntries.length} entries`) : 'wtf'
-	);
+	let { data } = $props();
+	let submission = data.submission;
+
+	onMount(() => {
+		myState = updateSubmission(submission);
+	});
+
+	let myState = getRegisterState();
+	let firstName = $state('');
 </script>
 
 <section class="mx-auto mt-10 max-w-prose px-3">
-	<p>Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}</p>
-	{#each currentEntries as entry}
-		<p>
-			{entry.title}
-		</p>
-	{/each}
-</section>
-<section class="mx-auto mt-10 max-w-prose px-3">
-	<h2 class="text-2xl">Create Entry</h2>
-	<p class="text-sm">Fill out the form below to create an entry</p>
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<form method="POST" action="?/createEntry" class="w-full space-y-4" onkeydown={(event) => event.key != 'Enter'}>
-		<div class="mt-4 grid gap-3">
-			<input type="text" name="title" value="the title" />
-			<input type="text" name="price" value="10" />
-			<input type="text" name="inOrOut" value="Outdoor" />
-			<input type="text" name="material" value="the material" />
-			<input type="text" name="specialRequirements" value="the specials" />
-			<input type="text" name="enterMajorPrize" value="Yes" />
-			<input type="text" name="description" value="lots of words" />
-			<input type="text" name="dimHeight" value="12" />
-			<input type="text" name="dimLength" value="23" />
-			<input type="text" name="dimWidth" value="24" />
-			<button type="submit">Submit</button>
-		</div>
-	</form>
+	<div class="mt-6 border-spacing-2 border p-4">
+		<p>Submission: {submission?.email}</p>
+		<p>Page: {$page.data.submission.email}</p>
+		<p>MyState: {myState?.submission?.email}</p>
+
+		<input
+			class="w-48 rounded-md border border-input bg-background px-3 py-2 text-sm"
+			type="text"
+			name="firstName"
+			id="2wH3Y"
+			bind:value={firstName}
+			aria-required="true"
+			data-fs-control=""
+		/>
+		<p>{firstName}</p>
+	</div>
+	<Level1 bind:firstName />
 </section>

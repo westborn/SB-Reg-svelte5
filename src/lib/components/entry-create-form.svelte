@@ -14,11 +14,11 @@
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
 	import type { CurrentImage, ReturnedEntries } from '$lib/components/server/registrationDB';
-	import { getRegisterState, updateImage } from '$lib/context.svelte';
+	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
 	import { ImageUploadForm, OptimisedImage } from '$lib/components';
 
 	let myState = getRegisterState();
-	updateImage(null);
+	updateWorkingImage(null);
 
 	type Props = {
 		currentEntries: ReturnedEntries;

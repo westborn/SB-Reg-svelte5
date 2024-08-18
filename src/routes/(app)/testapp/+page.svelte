@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { ImageUploadForm, OptimisedImage } from '$lib/components';
 	import SuperDebug from 'sveltekit-superforms';
-	import { getRegisterState, updateImage } from '$lib/context.svelte';
+	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
 
 	let { data } = $props();
 	let { form: imageUploadForm, session, user, currentImage } = data;
 
 	let myState = getRegisterState();
-	updateImage(null);
+	updateWorkingImage(null);
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
