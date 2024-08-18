@@ -17,8 +17,8 @@
 	type Props = {
 		buttonText?: string;
 	};
-
 	let { buttonText = 'Update Image?' }: Props = $props();
+
 	let myState = getRegisterState();
 
 	let imageDialogOpen = $state(false);
@@ -33,7 +33,7 @@
 				cancel();
 				imageDialogOpen = false;
 			}
-			myState.workingImage = { ...result?.data?.image };
+			myState.workingImage = { ...result?.data?.newImage };
 			toast.success('Image uploaded successfully');
 			cancel();
 			imageDialogOpen = false;
@@ -45,7 +45,6 @@
 	let previewImageContainer: HTMLDivElement;
 
 	const renderPreview: ChangeEventHandler<HTMLInputElement> = (e) => {
-		console.log('file', $file);
 		if (!e.currentTarget.files || e.currentTarget.files.length === 0) return;
 		const [imageToUpload] = e.currentTarget.files;
 		const previewImage = document.createElement('img');

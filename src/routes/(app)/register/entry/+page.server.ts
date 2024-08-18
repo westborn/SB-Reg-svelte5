@@ -7,35 +7,21 @@ import { redirect } from '@sveltejs/kit';
 import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
-import { ExhibitionYear, GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
+import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
 import { entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
-import { createImage, getEntries, type CurrentImage } from '$lib/components/server/registrationDB';
+import {
+	createImage,
+	createNewRegistration,
+	getSubmission,
+	type CurrentImage
+} from '$lib/components/server/registrationDB';
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
-
-async function fetchEntries(userEmail: string) {
-	const result = await getEntries(userEmail);
-	if (!result) {
-		console.log('No Artist Found');
-		return [];
-	}
-	if (!result.registrations) {
-		console.log('No Registration Found');
-		return [];
-	}
-	if (result.registrations.length === 0) {
-		console.log('No Entries Found');
-		return [];
-	}
-	console.log(`Entries Found - ${result.registrations[0].entries.length}`);
-	return result.registrations[0].entries;
-}
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
-	const entries = await fetchEntries(user.email);
-	return { entries };
+	return;
 };
 
 const updateEntry = async (event: RequestEvent) => {
@@ -47,8 +33,7 @@ const updateEntry = async (event: RequestEvent) => {
 	if (!user || !session) return redirect(302, '/login');
 
 	try {
-		const entryEmail = user.email; // TODO Assuming email is the correct identifier
-		console.log('updateEntry', entryEmail);
+		// TODO validate the correct entry before updating....
 		const result = await prisma.entryTable.update({
 			where: { id: 1 },
 			data: {}
@@ -67,57 +52,54 @@ const updateEntry = async (event: RequestEvent) => {
 };
 const createEntry = async (event: RequestEvent) => {
 	const newImageSchema = entrySchemaUI.extend({ image: z.string().nullable() });
-	const form = await superValidate(event, zod(newImageSchema));
+	const formValidationResult = await superValidate(event, zod(newImageSchema));
 
-	console.log('createEntry', form);
-	if (!form.valid) {
-		return message(form, 'Entry is Invalid - please reload and try again, or, call us!!', { status: 400 });
+	if (!formValidationResult.valid) {
+		return message(formValidationResult, 'Entry is Invalid - please reload and try again, or, call us!!', {
+			status: 400
+		});
 	}
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) return redirect(302, '/login');
 	// Process image data if available
 	let workingImage = null;
 	try {
-		if (form.data.image) {
-			workingImage = JSON.parse(form.data.image);
-			console.log('workingImage', workingImage);
+		if (formValidationResult.data.image) {
+			workingImage = JSON.parse(formValidationResult.data.image);
 		}
 	} catch (error) {
 		console.error('Error parsing image data:', error);
-		return message(form, 'Error processing image data.', { status: 400 });
+		return message(formValidationResult, 'Error processing image data.', { status: 400 });
 	}
-	// workingImage {
-	// 	id: 58,
-	// 	artistId: 1,
-	// 	registrationId: null,
-	// 	entryId: null,
-	// 	cloudId: 'wciz3du4iowgrudhwden',
-	// 	cloudURL: 'https://res.cloudinary.com/dpkmx9mow/image/upload/wciz3du4iowgrudhwden?_a=BAMADKRg0',
-	// 	originalFileName: 'Arena Carpark.JPG'
-	// }
-
-	// get the registration id and the artist id from the registration table by using the artist email
 
 	const artistEmail = user.email; // TODO Ensure email is correctly identified
-	const registration = await prisma.artistTable.findUnique({
-		where: {
-			email: artistEmail
-		},
-		select: {
-			registrations: {
-				where: { registrationYear: ExhibitionYear.toString() },
-				select: {
-					artistId: true,
-					id: true
-				}
-			}
-		}
-	});
+	let artistId: number;
+	let registrationId: number;
 
-	if (!registration) {
-		console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-		return message(form, GENERIC_ERROR_MESSAGE);
+	// Get the submission from the database and make sure we have a registration to attach the entry to
+	try {
+		const submissionFromDB = await getSubmission(artistEmail);
+		if (!submissionFromDB) {
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+
+		// if this is the first entry create a new registration
+		const [firstRegistration] = submissionFromDB.registrations;
+		if (submissionFromDB.registrations.length === 0) {
+			const newRegistration = await createNewRegistration(submissionFromDB.id);
+			artistId = newRegistration.artistId;
+			registrationId = newRegistration.id;
+		} else {
+			artistId = firstRegistration.artistId;
+			registrationId = firstRegistration.id;
+		}
+	} catch (error) {
+		console.error(`${event.route.id} - `, error);
+		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
+
+	// Create the entry
 	const {
 		title,
 		price,
@@ -129,13 +111,14 @@ const createEntry = async (event: RequestEvent) => {
 		dimHeight,
 		dimLength,
 		dimWidth
-	} = form.data;
+	} = formValidationResult.data;
 
+	let newEntry;
 	try {
-		const result = await prisma.entryTable.create({
+		newEntry = await prisma.entryTable.create({
 			data: {
-				artistId: registration.registrations[0].artistId,
-				registrationId: registration.registrations[0].id,
+				artistId,
+				registrationId,
 				accepted: false,
 				title: title ?? '',
 				inOrOut: inOrOut === 'Outdoor' ? 'Outdoor' : 'Indoor',
@@ -147,21 +130,36 @@ const createEntry = async (event: RequestEvent) => {
 				price: price * 100
 			}
 		});
-		if (!result) {
+		if (!newEntry) {
 			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(form, GENERIC_ERROR_MESSAGE);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 	} catch (error) {
 		console.error(`${event.route.id} - `, error);
-		return message(form, GENERIC_ERROR_UNEXPECTED);
+		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
-	return message(form, SUCCESS_MESSAGE);
+
+	// If an image was provided, update the image with the new entry details
+	if (workingImage) {
+		//TODO Update image with entry details
+		const updatedImage = await prisma.imageTable.update({
+			where: { id: workingImage.id },
+			data: {
+				registrationId,
+				entryId: newEntry.id
+			}
+		});
+	}
+
+	// Return the updated submission
+	const updatedSubmission = await getSubmission(artistEmail);
+	const returnData = { formValidationResult, updatedSubmission };
+	return returnData;
 };
 
 const uploadImage = async (event: RequestEvent) => {
 	console.log(`${event.route.id} - uploadImage - ACTION`);
 	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
-	console.log(`${event.route.id} ${JSON.stringify(formValidationResult, null, 2)}`);
 	if (!formValidationResult.valid) {
 		return fail(400, withFiles({ formValidationResult }));
 	}
@@ -174,18 +172,19 @@ const uploadImage = async (event: RequestEvent) => {
 		}
 		// Extract Cloudinary URL and ID from the successful upload result
 		const { public_id: cloudId, secure_url: cloudURL } = uploadResult.result;
-		console.log(`Image uploaded successfully to Cloudinary. ID: ${cloudId}, URL: ${cloudURL}`);
+
 		// save to database, return success response with image URL, etc.
-		const image = await createImage({
+		const newImage = await createImage({
 			id: 0,
 			artistId: 1,
 			cloudId,
 			cloudURL,
 			originalFileName: formValidationResult.data.image.name
 		} as CurrentImage);
+
 		//TODO update tag when image is attached to an entry
 		// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
-		const returnData = { formValidationResult, image };
+		const returnData = { formValidationResult, newImage };
 		return withFiles(returnData);
 	} catch (error) {
 		console.error(`${event.route.id} - Error during image upload:`, error);

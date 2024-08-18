@@ -1,20 +1,17 @@
 <script lang="ts">
 	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
 	import { getStep } from '$lib/regState.svelte.ts';
-	import type { ReturnedEntries } from '$lib/components/server/registrationDB.js';
+	import { getRegisterState } from '$lib/context.svelte.js';
 
-	type Props = {
-		entries: ReturnedEntries;
-	};
+	const myState = getRegisterState();
 
-	let { data } = $props();
-	let { entries } = data;
-	let currentEntries = $state(entries);
-
-	let entriesExist = $derived(currentEntries.length > 0);
-	let costOfRegistration = $derived(currentEntries ? 20 + currentEntries.length * 20 : 20);
+	let costOfRegistration = $derived(myState.currentEntries ? 20 + myState.currentEntries.length * 20 : 20);
 	let numberOfEntries = $derived(
-		currentEntries ? (currentEntries.length === 1 ? `1 entry` : `${currentEntries.length} entries`) : 'wtf'
+		myState.currentEntries
+			? myState.currentEntries.length === 1
+				? `1 entry`
+				: `${myState.currentEntries.length} entries`
+			: 'wtf'
 	);
 
 	let currentStep = getStep();
@@ -29,21 +26,20 @@
 	}
 </script>
 
-<!-- <SuperDebug data={currentEntries} /> -->
 <section class="mx-auto mt-10 px-3">
-	{#if !entriesExist}
+	{#if !myState.entriesExist}
 		<div>
 			<div class="mb-10 mt-10">Create your first entry</div>
-			<EntryCreateForm bind:currentEntries />
+			<EntryCreateForm />
 		</div>
 	{:else}
 		<p class="mt-2 text-base font-bold text-primary-400">
 			Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
 		</p>
 		<div class="mt-6">
-			<EntryAccordion bind:currentEntries {doUpdate} {doDelete} />
+			<EntryAccordion {doUpdate} {doDelete} />
 			<div class="mt-6">
-				<EntryCreateDialog bind:currentEntries />
+				<EntryCreateDialog />
 			</div>
 		</div>
 	{/if}

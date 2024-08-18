@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { page } from '$app/stores';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -13,37 +12,29 @@
 	import { toast } from 'svelte-sonner';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
-	import type { CurrentImage, ReturnedEntries } from '$lib/components/server/registrationDB';
 	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
 	import { ImageUploadForm, OptimisedImage } from '$lib/components';
 
 	let myState = getRegisterState();
 	updateWorkingImage(null);
 
-	type Props = {
-		currentEntries: ReturnedEntries;
-	};
-	let { currentEntries = $bindable() }: Props = $props();
-
-	let currentImage = $state(null) as CurrentImage;
 	const form = superForm(myState.entryForm, {
 		id: `createEntryForm`,
 		validators: zodClient(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
 			// pass the image that we accepted, into this form's data when they save the new entry
-			console.log('onSubmit - myState.workingImage', myState.workingImage);
 			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage) });
 		},
-		onUpdated: () => {
-			if ($message === 'Success') {
-				currentEntries = $page.data.entries;
-				$message = null;
-				toast.success('Entry Added');
-				myState.dialogOpen = false;
-			} else {
-				toast.error('Entry Creation Failed!');
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			if (result.type != 'success') {
+				toast.error('Failed to upload entry');
+				cancel();
+				myState.dialogOpen = false; //TODO: this is not working
 			}
+			myState.submission = result?.data?.updatedSubmission;
+			toast.success('Entry Added');
+			myState.dialogOpen = false; //TODO: this is not working
 		}
 	});
 
@@ -79,7 +70,7 @@
 		</div>
 	{/if}
 
-	<ImageUploadForm buttonText={'Upload Image'} {currentImage} />
+	<ImageUploadForm buttonText={'Upload Image'} />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>

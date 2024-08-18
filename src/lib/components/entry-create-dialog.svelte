@@ -4,12 +4,7 @@
 
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { EntryCreateForm } from '$lib/components';
-	import type { ReturnedEntries } from './server/registrationDB';
 
-	type Props = {
-		currentEntries: ReturnedEntries;
-	};
-	let { currentEntries = $bindable() }: Props = $props();
 	let myState = getRegisterState();
 </script>
 
@@ -20,6 +15,6 @@
 			<Dialog.Title>Create a NEW entry</Dialog.Title>
 			<Dialog.Description>Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
-		<EntryCreateForm bind:currentEntries />
+		<EntryCreateForm />
 	</Dialog.Content>
 </Dialog.Root>

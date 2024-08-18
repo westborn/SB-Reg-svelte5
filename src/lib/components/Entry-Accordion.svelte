@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type { ReturnedEntries } from '$lib/components/server/registrationDB.ts';
-
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import { getRegisterState } from '$lib/context.svelte';
 
 	type Props = {
 		doUpdate: (id: number) => void;
 		doDelete: (id: number) => void;
-		currentEntries: ReturnedEntries;
 	};
-	let { doUpdate, doDelete, currentEntries = $bindable() }: Props = $props();
+	let { doUpdate, doDelete }: Props = $props();
+
+	let myState = getRegisterState();
 
 	const convertToDollars = (price: number | null | undefined) => {
 		if (!price) return '';
@@ -23,7 +23,7 @@
 </script>
 
 <Accordion.Root class="w-full">
-	{#each currentEntries as entryItem, entryKey}
+	{#each myState.currentEntries as entryItem, entryKey}
 		<Accordion.Item value={entryItem.id.toString()}>
 			<Accordion.Trigger>Entry {entryKey + 1} - {entryItem.title}</Accordion.Trigger>
 			<Accordion.Content>

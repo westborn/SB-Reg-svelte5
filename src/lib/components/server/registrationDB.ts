@@ -126,6 +126,23 @@ export const getEntries = async (artistEmail: string) => {
 	return entries;
 };
 
+export const createNewRegistration = async (artistId: number) => {
+	const registration = await prisma.registrationTable.create({
+		data: {
+			artistId,
+			registrationYear: ExhibitionYear.toString(),
+			closed: false,
+			bumpIn: '',
+			bumpOut: '',
+			displayRequirements: '',
+			accommodation: false,
+			crane: false,
+			transport: false
+		}
+	});
+	return registration;
+};
+
 export const createEntry = async (workingEntry: EntryTable) => {
 	const {
 		artistId,

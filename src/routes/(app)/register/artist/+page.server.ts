@@ -16,6 +16,7 @@ export const load: PageServerLoad = async (event) => {
 	console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
+
 const updateArtist = async (event: RequestEvent) => {
 	const form = await superValidate(event, zod(artistSchemaUI));
 	if (!form.valid) {
@@ -53,7 +54,6 @@ const createArtist = async (event: RequestEvent) => {
 	if (!user || !session) return redirect(302, '/login');
 
 	const artistEmail = user.email; // TODO Ensure email is correctly identified
-	// console.log('createArtist', artistEmail);
 	const newArtist = { ...form.data, email: artistEmail };
 
 	try {
