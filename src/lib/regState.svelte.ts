@@ -1,4 +1,5 @@
 import { STEPS } from '$lib/constants';
+import type { RegisterStateType } from '$lib/context.svelte';
 
 let step = $state(0);
 
@@ -10,7 +11,7 @@ export function getStep() {
 		set step(init) {
 			step = init;
 		},
-		calcAllowableNextStep(myState, newStep: number) {
+		calcAllowableNextStep(myState: RegisterStateType, newStep: number) {
 			// Ensure newStep is within the bounds of the steps array
 			const nextStepIndex = Math.max(0, Math.min(newStep, STEPS.length - 1));
 			if (!myState.artistExists) return 0; // 'Register' step

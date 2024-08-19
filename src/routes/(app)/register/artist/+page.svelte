@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getRegisterState } from '$lib/context.svelte.js';
+	import { getRegisterState, type RegisterStateType } from '$lib/context.svelte.js';
 	import { getStep } from '$lib/regState.svelte.ts';
 	import * as Card from '$lib/components/ui/card/index.js';
 
@@ -16,7 +16,7 @@
 			<Card.Title class="text-xl">Artist Registration</Card.Title>
 		</Card.Header>
 		<Card.Content class="p-2 sm:px-6">
-			{#if myState?.artistExists && myState?.submission}
+			{#if myState && myState.artistExists && myState.submission}
 				<p class="text-sm text-muted-foreground">Some basic information we use to contact you:</p>
 				<div class="mb-3 grid grid-cols-[14ch_1fr] items-center">
 					<p class="text-sm">Email:</p>

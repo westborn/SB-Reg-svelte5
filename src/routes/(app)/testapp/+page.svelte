@@ -12,7 +12,7 @@
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<p class="my-6">This is an image upload page</p>
-	<ImageUploadForm buttonText={'Change Image'} {currentImage} {imageUploadForm} />
+	<ImageUploadForm buttonText={'Change Image'} />
 </div>
 
 {#if myState.workingImage?.id}

@@ -141,7 +141,6 @@ const createEntry = async (event: RequestEvent) => {
 
 	// If an image was provided, update the image with the new entry details
 	if (workingImage) {
-		//TODO Update image with entry details
 		const updatedImage = await prisma.imageTable.update({
 			where: { id: workingImage.id },
 			data: {
@@ -149,6 +148,8 @@ const createEntry = async (event: RequestEvent) => {
 				entryId: newEntry.id
 			}
 		});
+		//TODO Update image tag to be attached
+		// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
 	}
 
 	// Return the updated submission

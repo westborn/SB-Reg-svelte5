@@ -25,7 +25,7 @@
 				toast.success('Artist Profile Added');
 				$message = null;
 				myState.dialogOpen = false;
-				// todo update return value from load function
+				// TODO update return value from load function
 			} else {
 				toast.error('Artist Profile Create Failed!');
 			}

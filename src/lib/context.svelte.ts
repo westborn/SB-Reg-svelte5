@@ -29,6 +29,7 @@ export class RegisterState {
 		this.imageUploadForm = init.imageUploadForm;
 	}
 }
+export type RegisterStateType = InstanceType<typeof RegisterState>;
 
 export const REGISTER_CTX = Symbol('register_ctx');
 export function setRegisterState(init: SetRegState) {

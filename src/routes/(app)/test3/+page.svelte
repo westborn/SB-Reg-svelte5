@@ -1,49 +1,42 @@
 <script lang="ts">
-	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
 	import { getStep } from '$lib/regState.svelte.ts';
 
-	import { type SuperValidated } from 'sveltekit-superforms';
-	import type { ReturnedEntries } from '$lib/components/server/registrationDB.js';
 	import { getRegisterState, updateSubmission } from '$lib/context.svelte.js';
 
-	type Props = {
-		entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
-		imageUploadForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
-		entries: ReturnedEntries;
-	};
-
 	let { data } = $props();
-	let { submission, entries, entryForm, imageUploadForm } = data;
-	let currentEntries = $state(entries);
+	let { submission } = data;
 
 	updateSubmission(submission);
-	const myState = getRegisterState();
 
-	let entriesExist = $derived(currentEntries.length > 0);
-	let costOfRegistration = $derived(currentEntries ? 20 + currentEntries.length * 20 : 20);
-	let numberOfEntries = $derived(
-		currentEntries ? (currentEntries.length === 1 ? `1 entry` : `${currentEntries.length} entries`) : 'wtf'
-	);
+	let myState = getRegisterState();
 
 	let currentStep = getStep();
-	currentStep.step = 1;
-
-	function doUpdate(id: number) {
-		console.log('doUpdate for ', id);
-	}
-
-	function doDelete(id: number) {
-		console.log('doDelete for ', id);
-	}
+	currentStep.step = 0;
 </script>
 
-<!-- <SuperDebug data={currentEntries} /> -->
 <section class="mx-auto mt-10 max-w-prose px-3">
-	<p class="mt-2 text-base font-bold text-primary-400">
-		Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
-	</p>
-	<EntryAccordion {currentEntries} {doUpdate} {doDelete} />
-	<div class="mt-10">
-		<EntryCreateDialog bind:currentEntries {entryForm} {imageUploadForm} />
-	</div>
+	<p>artistExists: {myState.artistExists}</p>
+	<p>registrationExists: {myState.registrationExists}</p>
+	<p>entriesExist: {myState.entriesExist}</p>
+	<p>currentEntries: {myState.currentEntries}</p>
+	<p>Current: {currentStep.step}</p>
+	<p>Allowable: {currentStep.calcAllowableNextStep(myState, currentStep.step)}</p>
+	<button
+		class="m-6 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+		onclick={() => {
+			currentStep.step++;
+			if (currentStep.calcAllowableNextStep(myState, currentStep.step) < currentStep.step) {
+				currentStep.step = currentStep.calcAllowableNextStep(myState, currentStep.step);
+			}
+		}}>Increment step</button
+	>
+	<button
+		class="m-6 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+		onclick={() => {
+			currentStep.step--;
+			if (currentStep.calcAllowableNextStep(myState, currentStep.step) < currentStep.step) {
+				currentStep.step = currentStep.calcAllowableNextStep(myState, currentStep.step);
+			}
+		}}>Decrement step</button
+	>
 </section>

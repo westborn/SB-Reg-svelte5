@@ -9,8 +9,10 @@
 
 	let currentStep = getStep();
 
-	if (currentStep.calcAllowableNextStep(myState, currentStep.step) < currentStep.step) {
-		currentStep.step = currentStep.calcAllowableNextStep(myState, currentStep.step);
+	function nextAllowableStep(step: number) {
+		const nextStep =
+			currentStep.calcAllowableNextStep(myState, step) < step ? currentStep.calcAllowableNextStep(myState, step) : step;
+		return STEPS[nextStep]?.link ?? STEPS[0].link;
 	}
 </script>
 
@@ -19,7 +21,7 @@
 <div class="flex items-center justify-between p-4">
 	{#each STEPS as step, index}
 		<div class="flex w-full items-center">
-			<a href={step.link} class="flex items-center gap-2 text-xl disabled:text-white/50 lg:gap-5">
+			<a href={nextAllowableStep(index)} class="flex items-center gap-2 text-xl disabled:text-white/50 lg:gap-5">
 				<div class="relative flex flex-col items-center">
 					<div
 						class="flex h-12 w-12 flex-col items-center justify-center rounded-full border-4 border-gray-300 font-semibold text-gray-600
