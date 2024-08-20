@@ -25,7 +25,7 @@
 			if (myState.submission) {
 				myState.submission = { ...myState.submission, ...e.form.data };
 			}
-			myState.dialogOpen = false;
+			myState.artistDialogOpen = false;
 		}
 	});
 	const { form: formData, enhance, errors, message } = form;

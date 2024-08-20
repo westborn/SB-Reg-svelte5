@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
+	import { EntryAccordion, EntryCreateDialog, EntryCreateForm, EntryUpdateDialog } from '$lib/components';
 	import { getStep } from '$lib/regState.svelte.ts';
 	import { getRegisterState } from '$lib/context.svelte.js';
 
@@ -13,34 +13,65 @@
 				: `${myState.currentEntries.length} entries`
 			: 'wtf'
 	);
+	const entryType = {
+		create: 'create',
+		update: 'update',
+		delete: 'delete'
+	};
+
+	// default to create a new entry
+	let actionType = $state(entryType.create);
+	let currentEntryId = $state(0);
+
+	if (!myState.entriesExist) {
+		actionType = entryType.create;
+	}
 
 	let currentStep = getStep();
 	currentStep.step = 1;
 
 	function doUpdate(id: number) {
+		actionType = entryType.update;
+		currentEntryId = id;
 		console.log('doUpdate for ', id);
 	}
 
 	function doDelete(id: number) {
+		actionType = entryType.delete;
+		currentEntryId = id;
 		console.log('doDelete for ', id);
 	}
 </script>
 
 <section class="mx-auto mt-10 px-3">
-	{#if !myState.entriesExist}
-		<div>
-			<div class="mb-10 mt-10">Create your first entry</div>
-			<EntryCreateForm />
-		</div>
-	{:else}
-		<p class="mt-2 text-base font-bold text-primary-400">
-			Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
-		</p>
-		<div class="mt-6">
-			<EntryAccordion {doUpdate} {doDelete} />
-			<div class="mt-6">
-				<EntryCreateDialog />
+	{#if actionType === entryType.create}
+		{#if !myState.entriesExist}
+			<div>
+				<div class="mb-10 mt-10">Create your first entry</div>
+				<EntryCreateForm />
 			</div>
+		{:else}
+			<p class="mt-2 text-base font-bold text-primary-400">
+				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
+			</p>
+			<div class="mt-6">
+				<EntryAccordion {doUpdate} {doDelete} />
+				<div class="mt-6">
+					<EntryCreateDialog />
+				</div>
+			</div>
+		{/if}
+	{/if}
+	{#if actionType === entryType.update}
+		<div>
+			<div class="mb-10 mt-10">Update your entry</div>
+			<EntryUpdateDialog {currentEntryId} />
 		</div>
 	{/if}
+	<!-- {#if (actionType = entryType.delete)}
+		<div>
+			<div class="mb-10 mt-10">Delete your entry</div>
+			<EntryDeleteForm />
+		</div>
+	{/if} -->
 </section>

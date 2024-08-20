@@ -20,8 +20,6 @@
 	let { buttonText = 'Update Image?' }: Props = $props();
 
 	let myState = getRegisterState();
-
-	let imageDialogOpen = $state(false);
 	let showButton = $state(false);
 
 	const { form, enhance, errors, delayed } = superForm(myState.imageUploadForm, {
@@ -31,12 +29,12 @@
 			if (result.type != 'success') {
 				toast.error('Failed to upload image');
 				cancel();
-				imageDialogOpen = false;
+				myState.imageUploadDialogOpen = false;
 			}
 			myState.workingImage = { ...result?.data?.newImage };
 			toast.success('Image uploaded successfully');
 			cancel();
-			imageDialogOpen = false;
+			myState.imageUploadDialogOpen = false;
 		}
 	});
 
@@ -69,14 +67,14 @@
 	};
 </script>
 
-<Dialog.Root bind:open={imageDialogOpen} onOpenChange={openChange}>
+<Dialog.Root bind:open={myState.imageUploadDialogOpen} onOpenChange={openChange}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>{buttonText}</Dialog.Trigger>
 	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
 		<Dialog.Header>
 			<Dialog.Title>Image Upload</Dialog.Title>
 		</Dialog.Header>
 		<div class="grid grid-cols-1 gap-4 py-4">
-			<form method="POST" enctype="multipart/form-data" use:enhance action="?/uploadImage" id="imageUploadForm">
+			<form method="POST" enctype="multipart/form-data" use:enhance action="?/imageUpload" id="imageUploadForm">
 				<div class="flex flex-col">
 					<div class="px-10">
 						<div bind:this={previewImageContainer}></div>

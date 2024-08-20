@@ -77,7 +77,7 @@ async function createRegistration(artistId: number, year: string) {
 	return registration;
 }
 
-async function createEntry(artistId: number, registrationId: number) {
+async function entryCreate(artistId: number, registrationId: number) {
 	const entry = await prisma.entryTable.create({
 		data: makeEntry(artistId, registrationId)
 	});
@@ -100,7 +100,7 @@ try {
 		const year = (2024 + i).toString();
 		const registration = await createRegistration(artist.id, year);
 		for (let i = 0; i < 3; i++) {
-			const entry = await createEntry(artist.id, registration.id);
+			const entry = await entryCreate(artist.id, registration.id);
 			const image = await createImage(artist.id, registration.id, entry.id);
 		}
 	}
@@ -116,7 +116,7 @@ try {
 		const year = (2024 + i).toString();
 		const registration = await createRegistration(artist.id, year);
 		for (let i = 0; i < 3; i++) {
-			const entry = await createEntry(artist.id, registration.id);
+			const entry = await entryCreate(artist.id, registration.id);
 			const image = await createImage(artist.id, registration.id, entry.id);
 		}
 	}
@@ -138,7 +138,7 @@ try {
 	const artist = await createArtist('regOnly@example.com');
 	const registration = await createRegistration(artist.id, '2024');
 	for (let i = 0; i < 3; i++) {
-		const entry = await createEntry(artist.id, registration.id);
+		const entry = await entryCreate(artist.id, registration.id);
 		const image = await createImage(artist.id, registration.id, entry.id);
 	}
 	const registration2 = await createRegistration(artist.id, '2025');

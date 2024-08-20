@@ -2,13 +2,13 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
-	import { getRegisterState } from '$lib/context.svelte.js';
+	import { getRegisterState } from '$lib/context.svelte';
 	import { EntryCreateForm } from '$lib/components';
 
-	let myState = getRegisterState();
+	const myState = getRegisterState();
 </script>
 
-<Dialog.Root bind:open={myState.dialogOpen}>
+<Dialog.Root bind:open={myState.entryCreateDialogOpen}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Add a New Entry?</Dialog.Trigger>
 	<Dialog.Content class="max-h-full max-w-[600px] overflow-y-auto bg-card">
 		<Dialog.Header>

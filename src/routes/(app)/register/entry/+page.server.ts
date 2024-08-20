@@ -7,7 +7,7 @@ import { redirect } from '@sveltejs/kit';
 import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
-import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
+import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
 import { entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
 import {
 	createImage,
@@ -24,33 +24,115 @@ export const load: PageServerLoad = async (event) => {
 	return;
 };
 
-const updateEntry = async (event: RequestEvent) => {
-	const form = await superValidate(event, zod(entrySchemaUI));
-	if (!form.valid) {
-		return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', { status: 400 });
+const entryUpdate = async (event: RequestEvent) => {
+	const updateImageSchema = entrySchemaUI.extend({ image: z.string().nullable(), idToUpdate: z.number() });
+	const formValidationResult = await superValidate(event, zod(updateImageSchema));
+
+	if (!formValidationResult.valid) {
+		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
+			status: 400
+		});
 	}
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) return redirect(302, '/login');
 
+	// extract the image data and entry id that we need to update
+	let workingImage = null;
+	let idToUpdate = null;
 	try {
-		// TODO validate the correct entry before updating....
-		const result = await prisma.entryTable.update({
-			where: { id: 1 },
-			data: {}
-		});
-
-		if (!result) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(form, GENERIC_ERROR_MESSAGE);
+		if (formValidationResult.data.image) {
+			workingImage = JSON.parse(formValidationResult.data.image);
 		}
+		if (!formValidationResult.data.idToUpdate) {
+			console.error('No entry ID provided for update - aborting update.');
+			return message(formValidationResult, 'No entry ID provided for update - aborting update.', { status: 400 });
+		}
+		idToUpdate = formValidationResult.data.idToUpdate;
 	} catch (error) {
-		console.error(`${event.route.id}`, error);
-		return message(form, GENERIC_ERROR_MESSAGE);
+		console.error('Error parsing update data:', error);
+		return message(formValidationResult, 'Error processing update data.', { status: 400 });
 	}
 
-	return message(form, SUCCESS_MESSAGE);
+	console.log('About to update entry with ID:', idToUpdate);
+	const artistEmail = user.email; // TODO Ensure email is correctly identified
+	// Get the submission from the database
+	try {
+		const submissionFromDB = await getSubmission(artistEmail);
+		if (!submissionFromDB) {
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+
+		const entryFromDB = submissionFromDB.registrations[0].entries.find((entry) => entry.id === idToUpdate);
+		if (!entryFromDB) {
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+
+		const imageFromDB = entryFromDB.images.find((image) => image.entryId === idToUpdate);
+		if (!imageFromDB) {
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+		//check if the user is trying to update the image (the cloudinary id will have changed)
+		if (workingImage && workingImage.cloudId !== imageFromDB.cloudId) {
+			// update the DB image to link to this entry
+			console.log('Updating image with new entry details');
+			const updatedImage = await prisma.imageTable.update({
+				where: { id: workingImage.id },
+				data: {
+					registrationId: entryFromDB.registrationId,
+					entryId: entryFromDB.id
+				}
+			});
+			//TODO Update image tag to be attached
+			// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
+		}
+
+		const {
+			title,
+			price,
+			inOrOut,
+			material,
+			specialRequirements,
+			enterMajorPrize,
+			description,
+			dimHeight,
+			dimLength,
+			dimWidth
+		} = formValidationResult.data;
+
+		const updatedEntry = await prisma.entryTable.update({
+			where: { id: idToUpdate },
+			data: {
+				title: title ?? '',
+				inOrOut: inOrOut === 'Outdoor' ? 'Outdoor' : 'Indoor',
+				material: material ?? '',
+				description: description ?? '',
+				specialRequirements: specialRequirements ?? '',
+				enterMajorPrize: enterMajorPrize === 'Yes' ? true : false,
+				dimensions: `${dimLength ?? '0'}x${dimWidth ?? '0'}x${dimHeight ?? '0'}`,
+				price: price * 100
+			}
+		});
+
+		if (!updatedEntry) {
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+		console.log('Entry updated successfully', updatedEntry);
+	} catch (error) {
+		console.error(`${event.route.id}`, error);
+		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+	}
+
+	// Return the updated submission
+	const updatedSubmission = await getSubmission(artistEmail);
+	const returnData = { formValidationResult, updatedSubmission };
+	return returnData;
 };
-const createEntry = async (event: RequestEvent) => {
+
+const entryCreate = async (event: RequestEvent) => {
 	const newImageSchema = entrySchemaUI.extend({ image: z.string().nullable() });
 	const formValidationResult = await superValidate(event, zod(newImageSchema));
 
@@ -158,8 +240,8 @@ const createEntry = async (event: RequestEvent) => {
 	return returnData;
 };
 
-const uploadImage = async (event: RequestEvent) => {
-	console.log(`${event.route.id} - uploadImage - ACTION`);
+const imageUpload = async (event: RequestEvent) => {
+	console.log(`${event.route.id} - imageUpload - ACTION`);
 	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
 	if (!formValidationResult.valid) {
 		return fail(400, withFiles({ formValidationResult }));
@@ -193,4 +275,4 @@ const uploadImage = async (event: RequestEvent) => {
 	}
 };
 
-export const actions: Actions = { updateEntry, createEntry, uploadImage };
+export const actions: Actions = { entryUpdate, entryCreate, imageUpload };

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import type { SuperValidated } from 'sveltekit-superforms';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -24,7 +23,7 @@
 			if ($message === 'Success') {
 				toast.success('Artist Profile Added');
 				$message = null;
-				myState.dialogOpen = false;
+				myState.artistDialogOpen = false;
 				// TODO update return value from load function
 			} else {
 				toast.error('Artist Profile Create Failed!');

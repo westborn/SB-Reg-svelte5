@@ -143,7 +143,7 @@ export const createNewRegistration = async (artistId: number) => {
 	return registration;
 };
 
-export const createEntry = async (workingEntry: EntryTable) => {
+export const entryCreate = async (workingEntry: EntryTable) => {
 	const {
 		artistId,
 		registrationId,

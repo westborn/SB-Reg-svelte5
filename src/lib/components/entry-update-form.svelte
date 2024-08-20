@@ -15,40 +15,69 @@
 	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
 	import { ImageUploadForm, OptimisedImage } from '$lib/components';
 
+	type Props = {
+		currentEntryId: number;
+	};
+
+	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
 	updateWorkingImage(null);
 
 	const form = superForm(myState.entryForm, {
-		id: `entryCreateForm`,
+		id: `entryUpdateForm`,
 		validators: zodClient(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
 			// pass the image that we accepted, into this form's data when they save the new entry
-			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage) });
+			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage), idToUpdate: currentEntryId });
 		},
 		onResult({ result, cancel }: { result: any; cancel: () => void }) {
 			if (result.type != 'success') {
-				toast.error('Failed to upload entry');
+				toast.error('Failed to update entry');
 				cancel();
-				myState.entryCreateDialogOpen = false; //TODO: this is not working
+				myState.entryUpdateDialogOpen = false; //TODO: is this working??
 			}
 			myState.submission = result?.data?.updatedSubmission;
-			toast.success('Entry Added');
-			myState.entryCreateDialogOpen = false; //TODO: this is not working
+			toast.success('Entry Updated');
+			myState.entryUpdateDialogOpen = false; //TODO: is this working??
 		}
 	});
 
 	const { form: formData, enhance, message, errors } = form;
+
+	// get the form field values from the submission object using the id that was passed in
+	const entry = myState?.submission?.registrations[0].entries.find((entry) => entry.id === currentEntryId);
+	if (entry) {
+		({
+			id: $formData.id,
+			inOrOut: $formData.inOrOut,
+			description: $formData.description,
+			material: $formData.material,
+			specialRequirements: $formData.specialRequirements,
+			title: $formData.title
+		} = entry);
+		$formData.price = entry.price ? entry.price / 100 : 0;
+		//split the dimensions string into the three fields
+		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = entry?.dimensions
+			? entry.dimensions.split('x')
+			: ['', '', ''];
+		// set the radio button values
+		$formData.enterMajorPrize = entry?.enterMajorPrize ? 'Yes' : 'No';
+		//set the working image to the current image if there is one
+		if (entry.images[0]) {
+			updateWorkingImage({ ...entry.images[0], artistId: myState.submission?.registrations[0].artistId as number });
+		}
+	}
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <form
 	method="POST"
-	action="?/entryCreate"
+	action="?/entryUpdate"
 	class="w-full space-y-4"
 	use:enhance
 	onkeydown={(event) => event.key != 'Enter'}
-	id="entryCreateForm"
+	id="entryUpdateForm"
 >
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>
@@ -70,7 +99,7 @@
 		</div>
 	{/if}
 
-	<ImageUploadForm buttonText={'Upload Image'} />
+	<ImageUploadForm buttonText={'Replace Image?'} />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>

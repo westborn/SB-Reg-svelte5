@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { SuperValidated } from 'sveltekit-superforms';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
@@ -9,7 +8,7 @@
 	let myState = getRegisterState();
 </script>
 
-<Dialog.Root bind:open={myState.dialogOpen}>
+<Dialog.Root bind:open={myState.artistDialogOpen}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update Your Details?</Dialog.Trigger>
 	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
 		<Dialog.Header>

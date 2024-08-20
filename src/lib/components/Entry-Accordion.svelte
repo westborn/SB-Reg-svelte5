@@ -3,6 +3,7 @@
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { getRegisterState } from '$lib/context.svelte';
+	import { EntryUpdateDialog } from '.';
 
 	type Props = {
 		doUpdate: (id: number) => void;
@@ -24,6 +25,7 @@
 
 <Accordion.Root class="w-full">
 	{#each myState.currentEntries as entryItem, entryKey}
+		{@const currentEntryId = myState.currentEntries[entryKey].id}
 		<Accordion.Item value={entryItem.id.toString()}>
 			<Accordion.Trigger>Entry {entryKey + 1} - {entryItem.title}</Accordion.Trigger>
 			<Accordion.Content>
@@ -51,9 +53,7 @@
 						<!-- <pre>{JSON.stringify(entryItem, null, 2)}</pre> -->
 						{#if showButtons}
 							<div class="flex justify-between py-2">
-								<Button variant="outline" size="sm" class=" text-sm" onclick={() => doUpdate(entryItem.id)}>
-									<span class="text-xs"> Edit </span></Button
-								>
+								<EntryUpdateDialog {currentEntryId} />
 								<Button class="bg-red-700" size="sm" onclick={() => doDelete(entryItem.id)}
 									><span class="text-xs"> Delete </span>
 								</Button>

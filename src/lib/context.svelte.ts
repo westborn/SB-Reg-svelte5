@@ -17,11 +17,14 @@ export class RegisterState {
 	registrationExists = $derived((this.submission?.registrations?.length ?? 0 > 0) ? true : false);
 	entriesExist = $derived((this.submission?.registrations?.[0]?.entries?.length ?? 0 > 0) ? true : false);
 	currentEntries = $derived(this.submission?.registrations?.[0]?.entries ?? []);
-	dialogOpen = $state(false);
 	stepsAllowed = $state(false);
 	artistForm = $state() as SuperValidated<Infer<typeof artistSchemaUI>>;
+	artistDialogOpen = $state(false);
 	entryForm = $state() as SuperValidated<Infer<typeof entrySchemaUI>>;
+	entryCreateDialogOpen = $state(false);
+	entryUpdateDialogOpen = $state(false);
 	imageUploadForm = $state() as SuperValidated<Infer<typeof fileUploadSchema>>;
+	imageUploadDialogOpen = $state(false);
 
 	constructor(init: SetRegState) {
 		this.artistForm = init.artistForm;
