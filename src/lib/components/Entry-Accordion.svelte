@@ -3,7 +3,7 @@
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { getRegisterState } from '$lib/context.svelte';
-	import { EntryUpdateDialog } from '.';
+	import { EntryUpdateDialog, OptimisedImage } from '$lib/components';
 
 	type Props = {
 		doUpdate: (id: number) => void;
@@ -29,30 +29,33 @@
 		<Accordion.Item value={entryItem.id.toString()}>
 			<Accordion.Trigger>Entry {entryKey + 1} - {entryItem.title}</Accordion.Trigger>
 			<Accordion.Content>
-				<Card.Root>
-					<Card.Content class="p-2 text-sm sm:p-6">
-						<p class="text-xs">({entryItem.inOrOut})</p>
+				<Card.Root class="mb-4">
+					<Card.Title class="pl-4 pt-4 capitalize">{entryItem.title}</Card.Title>
+					<Card.Content class="p-0 pl-4 text-sm">
+						<p class="text-xs">({entryItem.inOrOut}){entryItem?.enterMajorPrize ? ' +Major Prize Entry' : ''}</p>
 						<p>{entryItem.description}</p>
-
-						<div class="mx-auto flex items-center justify-between">
-							<p class="text-lg">{convertToDollars(entryItem.price)}</p>
-							<p class="text-xs">{entryItem?.enterMajorPrize ? 'Major Prize Entry' : ''}</p>
-							<p>({entryItem.dimensions})</p>
-						</div>
-
-						<p>{entryItem.material}</p>
-						<p>{entryItem?.specialRequirements}</p>
-
-						<div class="mx-auto flex h-48 w-48 flex-col items-center justify-center">
-							{#if entryItem?.images?.[0]?.cloudURL}
-								<img class="h-48 w-48 object-scale-down p-1" src={entryItem?.images[0]?.cloudURL} alt="Preview" />
-							{:else}
-								<span>Image Preview</span>
-							{/if}
+						<div class="grid grid-cols-2">
+							<div class="flex items-center justify-around">
+								<OptimisedImage
+									path={entryItem?.images?.[0]?.cloudURL
+										? entryItem?.images?.[0]?.cloudURL
+										: '/dummy_160x160_ffffff_cccccc.png'}
+									alt="Current Image"
+									width={160}
+									height={160}
+									class="h-40 w-40 overflow-hidden rounded object-contain"
+								/>
+							</div>
+							<div class="mx-auto flex flex-col">
+								<p class="mt-3 text-lg">{convertToDollars(entryItem.price)}</p>
+								<p>{entryItem.material}</p>
+								<p>{entryItem?.specialRequirements}</p>
+								<p>({entryItem.dimensions})</p>
+							</div>
 						</div>
 						<!-- <pre>{JSON.stringify(entryItem, null, 2)}</pre> -->
 						{#if showButtons}
-							<div class="flex justify-between py-2">
+							<div class="flex justify-around py-2">
 								<EntryUpdateDialog {currentEntryId} />
 								<Button class="bg-red-700" size="sm" onclick={() => doDelete(entryItem.id)}
 									><span class="text-xs"> Delete </span>
