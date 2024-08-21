@@ -52,13 +52,10 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form
-	method="POST"
-	action="?/updateArtist&id={myState?.submission?.id}"
-	use:enhance
-	class="w-full space-y-4"
-	onkeydown={(event) => event.key != 'Enter'}
->
+<form method="POST" action="?/updateArtist&id={myState?.submission?.id}" use:enhance class="w-full space-y-4">
+	<!-- stop the form from submitting on enter key press -->
+	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>

@@ -59,19 +59,19 @@ const entryUpdate = async (event: RequestEvent) => {
 	try {
 		const submissionFromDB = await getSubmission(artistEmail);
 		if (!submissionFromDB) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 
 		const entryFromDB = submissionFromDB.registrations[0].entries.find((entry) => entry.id === idToUpdate);
 		if (!entryFromDB) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			console.error(`${event.route.id} - Getting DB Entry${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 
 		const imageFromDB = entryFromDB.images.find((image) => image.entryId === idToUpdate);
 		if (!imageFromDB) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			console.error(`${event.route.id} - Getting DB IMage${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 		//check if the user is trying to update the image (the cloudinary id will have changed)
@@ -85,6 +85,16 @@ const entryUpdate = async (event: RequestEvent) => {
 					entryId: entryFromDB.id
 				}
 			});
+			if (!updatedImage) {
+				console.error(`${event.route.id} - Updating DB Image${GENERIC_ERROR_MESSAGE}`);
+				return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+			}
+			//delete the old image from the database
+			const deletedImage = await prisma.imageTable.delete({ where: { id: imageFromDB.id } });
+			if (!deletedImage) {
+				console.error(`${event.route.id} - Deleting Old DB Image${GENERIC_ERROR_MESSAGE}`);
+				return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+			}
 			//TODO Update image tag to be attached
 			// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
 		}
@@ -242,11 +252,22 @@ const entryCreate = async (event: RequestEvent) => {
 
 const imageUpload = async (event: RequestEvent) => {
 	console.log(`${event.route.id} - imageUpload - ACTION`);
+	const { session, user } = await event.locals.V1safeGetSession();
+	if (!user || !session) return redirect(302, '/login');
+
 	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
 	if (!formValidationResult.valid) {
 		return fail(400, withFiles({ formValidationResult }));
 	}
+	const artistEmail = user.email; // TODO Ensure email is correctly identified
+	// Get the submission from the database and make sure we have a registration to attach the entry to
 	try {
+		const submissionFromDB = await getSubmission(artistEmail);
+		if (!submissionFromDB) {
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+
 		// Attempt to upload the image to Cloudinary
 		const uploadResult = await uploadImageToCloudinary(formValidationResult.data.image, 'UnAttachedImages');
 		if (!uploadResult.success) {
@@ -259,7 +280,7 @@ const imageUpload = async (event: RequestEvent) => {
 		// save to database, return success response with image URL, etc.
 		const newImage = await createImage({
 			id: 0,
-			artistId: 1,
+			artistId: submissionFromDB.id,
 			cloudId,
 			cloudURL,
 			originalFileName: formValidationResult.data.image.name

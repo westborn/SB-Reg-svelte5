@@ -32,14 +32,16 @@
 			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage), idToUpdate: currentEntryId });
 		},
 		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			console.log('Action result', result);
 			if (result.type != 'success') {
 				toast.error('Failed to update entry');
-				cancel();
 				myState.entryUpdateDialogOpen = false; //TODO: is this working??
+				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Entry Updated');
 			myState.entryUpdateDialogOpen = false; //TODO: is this working??
+			return;
 		}
 	});
 
@@ -71,14 +73,10 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form
-	method="POST"
-	action="?/entryUpdate"
-	class="w-full space-y-4"
-	use:enhance
-	onkeydown={(event) => event.key != 'Enter'}
-	id="entryUpdateForm"
->
+<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm">
+	<!-- stop the form from submitting on enter key press -->
+	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>
 			<Form.Label>Title for this Exhibit</Form.Label>

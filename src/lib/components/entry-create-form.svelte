@@ -42,14 +42,10 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form
-	method="POST"
-	action="?/entryCreate"
-	class="w-full space-y-4"
-	use:enhance
-	onkeydown={(event) => event.key != 'Enter'}
-	id="entryCreateForm"
->
+<form method="POST" action="?/entryCreate" class="w-full space-y-4" use:enhance id="entryCreateForm">
+	<!-- stop the form from submitting on enter key press -->
+	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>
 			<Form.Label>Title for this Exhibit</Form.Label>

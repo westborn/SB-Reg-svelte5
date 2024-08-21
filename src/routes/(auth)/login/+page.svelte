@@ -22,7 +22,10 @@
 		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<form method="POST" use:enhance class="w-full space-y-4" onkeydown={(event) => event.key != 'Enter'}>
+	<form method="POST" use:enhance class="w-full space-y-4">
+		<!-- stop the form from submitting on enter key press -->
+		<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
 		<Form.Field {form} name="email">
 			<Form.Control let:attrs>
 				<Form.Label>Email Address</Form.Label>
