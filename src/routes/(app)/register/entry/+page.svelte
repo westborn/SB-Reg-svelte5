@@ -29,18 +29,6 @@
 
 	let currentStep = getStep();
 	currentStep.step = 1;
-
-	function doUpdate(id: number) {
-		actionType = entryType.update;
-		currentEntryId = id;
-		console.log('doUpdate for ', id);
-	}
-
-	function doDelete(id: number) {
-		actionType = entryType.delete;
-		currentEntryId = id;
-		console.log('doDelete for ', id);
-	}
 </script>
 
 <section class="mx-auto mt-10 px-3">
@@ -55,7 +43,7 @@
 				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
 			</p>
 			<div class="mt-6">
-				<EntryAccordion {doUpdate} {doDelete} />
+				<EntryAccordion />
 				<div class="mt-6">
 					<EntryCreateDialog />
 				</div>
@@ -68,10 +56,4 @@
 			<EntryUpdateDialog {currentEntryId} />
 		</div>
 	{/if}
-	<!-- {#if (actionType = entryType.delete)}
-		<div>
-			<div class="mb-10 mt-10">Delete your entry</div>
-			<EntryDeleteForm />
-		</div>
-	{/if} -->
 </section>

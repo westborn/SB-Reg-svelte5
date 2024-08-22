@@ -147,6 +147,10 @@ export const entrySchemaUI = z.object({
 });
 export type EntryUI = z.infer<typeof entrySchemaUI>;
 
+export const entryDeleteSchemaUI = z.object({
+	id: z.string()
+});
+
 export const imageSchemaUI = z.object({
 	id: z.number().int(),
 	cloudId: z.string(),

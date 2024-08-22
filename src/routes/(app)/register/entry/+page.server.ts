@@ -8,7 +8,7 @@ import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
-import { entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
+import { entryDeleteSchemaUI, entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
 import {
 	createImage,
 	createNewRegistration,
@@ -300,4 +300,52 @@ const imageUpload = async (event: RequestEvent) => {
 	}
 };
 
-export const actions: Actions = { entryUpdate, entryCreate, imageUpload };
+const entryDelete = async (event: RequestEvent) => {
+	console.log(`${event.route.id} - entryDelete - ACTION`);
+	const { session, user } = await event.locals.V1safeGetSession();
+	if (!user || !session) return redirect(302, '/login');
+
+	const formValidationResult = await superValidate(event, zod(entryDeleteSchemaUI));
+	if (!formValidationResult.valid) {
+		return fail(400, formValidationResult);
+	}
+
+	const artistEmail = user.email; // TODO Ensure email is correctly identified
+	const idAsString = event.url.searchParams.get('id');
+	if (!idAsString) {
+		console.error('No ID provided for delete - aborting delete.');
+		return message(formValidationResult, 'No ID provided for delete - aborting delete.', { status: 400 });
+	}
+	const idToDelete = parseInt(idAsString);
+	console.log('Deleting entry with id:', idToDelete);
+
+	try {
+		const submissionFromDB = await getSubmission(artistEmail);
+		if (!submissionFromDB) {
+			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+
+		const entryFromDB = submissionFromDB.registrations[0].entries.find((entry) => entry.id === idToDelete);
+		if (!entryFromDB) {
+			console.error(`${event.route.id} - Finding entry to delete${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+
+		const deletedEntry = await prisma.entryTable.delete({ where: { id: idToDelete } });
+		if (!deletedEntry) {
+			console.error(`${event.route.id} - Deleting DB Entry${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
+	} catch (error) {
+		console.error(`${event.route.id} - Error during entry delete:`, error);
+		return fail(500, withFiles({ formValidationResult }));
+	}
+	// Return the updated submission
+	console.log('completed entry delete');
+	const updatedSubmission = await getSubmission(artistEmail);
+	const returnData = { formValidationResult, updatedSubmission };
+	return returnData;
+};
+
+export const actions: Actions = { entryUpdate, entryCreate, entryDelete, imageUpload };

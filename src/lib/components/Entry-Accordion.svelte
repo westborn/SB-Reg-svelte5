@@ -1,15 +1,8 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { getRegisterState } from '$lib/context.svelte';
-	import { EntryUpdateDialog, OptimisedImage } from '$lib/components';
-
-	type Props = {
-		doUpdate: (id: number) => void;
-		doDelete: (id: number) => void;
-	};
-	let { doUpdate, doDelete }: Props = $props();
+	import { EntryUpdateDialog, EntryDeleteDialog, OptimisedImage, EntryCreateDialog } from '$lib/components';
 
 	let myState = getRegisterState();
 
@@ -57,9 +50,7 @@
 						{#if showButtons}
 							<div class="flex justify-around py-2">
 								<EntryUpdateDialog {currentEntryId} />
-								<Button class="bg-red-700" size="sm" onclick={() => doDelete(entryItem.id)}
-									><span class="text-xs"> Delete </span>
-								</Button>
+								<EntryDeleteDialog {currentEntryId} />
 							</div>
 						{/if}
 					</Card.Content>

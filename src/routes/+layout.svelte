@@ -10,7 +10,7 @@
 
 	let { children, data } = $props();
 	let { supabase, session, user } = data;
-	let { artistForm, entryForm, imageUploadForm } = data.universal;
+	let { artistForm, entryForm, entryDeleteForm, imageUploadForm } = data.universal;
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
@@ -24,6 +24,7 @@
 	setRegisterState({
 		artistForm,
 		entryForm,
+		entryDeleteForm,
 		imageUploadForm
 	});
 </script>
