@@ -19,7 +19,8 @@ export class RegisterState {
 	currentEntries = $derived(this.submission?.registrations?.[0]?.entries ?? []);
 	stepsAllowed = $state(false);
 	artistForm = $state() as SuperValidated<Infer<typeof artistSchemaUI>>;
-	artistDialogOpen = $state(false);
+	artistCreateDialogOpen = $state(false);
+	artistUpdateDialogOpen = $state(false);
 	entryForm = $state() as SuperValidated<Infer<typeof entrySchemaUI>>;
 	entryCreateDialogOpen = $state(false);
 	entryUpdateDialogOpen = $state(false);

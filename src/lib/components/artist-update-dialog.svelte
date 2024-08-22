@@ -8,7 +8,7 @@
 	let myState = getRegisterState();
 </script>
 
-<Dialog.Root bind:open={myState.artistDialogOpen}>
+<Dialog.Root bind:open={myState.artistUpdateDialogOpen}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update Your Details?</Dialog.Trigger>
 	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
 		<Dialog.Header>

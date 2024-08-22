@@ -95,9 +95,9 @@ export type ImageTable = z.infer<typeof imageTableSchema>;
 /////////////////////////////////////////
 // ARTIST SCHEMA UI - just the columns that are editable or used in forms
 /////////////////////////////////////////
+// id: z.number().int(),
+// email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
 export const artistSchemaUI = z.object({
-	id: z.number().int(),
-	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
 	firstName: z
 		.string({ required_error: 'First Name is required' })
 		.min(2, { message: 'First Name must be at least 2 characters' })

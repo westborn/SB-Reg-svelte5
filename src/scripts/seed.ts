@@ -61,7 +61,7 @@ function makeImage(artistId: number, registrationId: number, entryId: number) {
 	};
 }
 
-async function createArtist(email: string) {
+async function artistCreate(email: string) {
 	const artist = await prisma.artistTable.create({
 		data: makeArtist(email)
 	});
@@ -95,7 +95,7 @@ async function createImage(artistId: number, registrationId: number, entryId: nu
 
 // create an Artist record, 2 Registration records (2024 and 2025), and three Entry records each with an associated Image record
 try {
-	const artist = await createArtist('full@example.com');
+	const artist = await artistCreate('full@example.com');
 	for (let i = 0; i < 2; i++) {
 		const year = (2024 + i).toString();
 		const registration = await createRegistration(artist.id, year);
@@ -111,7 +111,7 @@ try {
 
 //and for my email address
 try {
-	const artist = await createArtist('george@westborn.com.au');
+	const artist = await artistCreate('george@westborn.com.au');
 	for (let i = 0; i < 2; i++) {
 		const year = (2024 + i).toString();
 		const registration = await createRegistration(artist.id, year);
@@ -127,7 +127,7 @@ try {
 
 // create an Artist record only
 try {
-	const artist = await createArtist('artist@example.com');
+	const artist = await artistCreate('artist@example.com');
 } catch (e) {
 	console.error(e);
 	process.exit(1);
@@ -135,7 +135,7 @@ try {
 
 // create an Artist record, with 2 Registration records (2024 and 2025) - entries for 2024 only
 try {
-	const artist = await createArtist('regOnly@example.com');
+	const artist = await artistCreate('regOnly@example.com');
 	const registration = await createRegistration(artist.id, '2024');
 	for (let i = 0; i < 3; i++) {
 		const entry = await entryCreate(artist.id, registration.id);

@@ -16,18 +16,19 @@
 	let myState = getRegisterState();
 
 	let form = superForm(myState.artistForm, {
-		id: `createArtistForm`,
+		id: `artistCreateForm`,
 		validators: zodClient(artistSchemaUI),
-		applyAction: true,
-		onUpdated: () => {
-			if ($message === 'Success') {
-				toast.success('Artist Profile Added');
-				$message = null;
-				myState.artistDialogOpen = false;
-				// TODO update return value from load function
-			} else {
-				toast.error('Artist Profile Create Failed!');
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			if (result.type != 'success') {
+				toast.error('Failed to Register the Artist');
+				cancel();
+				myState.artistCreateDialogOpen = false; //TODO: this is not working
+				return;
 			}
+			myState.submission = result?.data?.updatedSubmission;
+			toast.success('Artist is now Registered');
+			myState.artistCreateDialogOpen = false; //TODO: this is not working
+			return;
 		}
 	});
 
@@ -35,7 +36,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form method="POST" action="?/createArtist" use:enhance class="w-full space-y-4">
+<form method="POST" action="?/artistCreate" use:enhance class="w-full space-y-4">
 	<!-- stop the form from submitting on enter key press -->
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 

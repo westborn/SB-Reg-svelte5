@@ -31,10 +31,12 @@
 				toast.error('Failed to upload entry');
 				cancel();
 				myState.entryCreateDialogOpen = false; //TODO: this is not working
+				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Entry Added');
 			myState.entryCreateDialogOpen = false; //TODO: this is not working
+			return;
 		}
 	});
 

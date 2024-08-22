@@ -17,15 +17,19 @@
 	let myState = getRegisterState();
 
 	let form = superForm(myState.artistForm, {
-		id: `updateArtistForm-${myState?.submission?.id}`,
+		id: `artistUpdateForm-${myState?.submission?.id}`,
 		validators: zodClient(artistSchemaUI),
-		resetForm: false,
-		onUpdated: (e) => {
-			toast.success('Profile Updated');
-			if (myState.submission) {
-				myState.submission = { ...myState.submission, ...e.form.data };
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			if (result.type != 'success') {
+				toast.error('Failed to Update the Registration');
+				cancel();
+				myState.artistUpdateDialogOpen = false; //TODO: this is not working
+				return;
 			}
-			myState.artistDialogOpen = false;
+			myState.submission = result?.data?.updatedSubmission;
+			toast.success(' Registration Updated');
+			myState.artistUpdateDialogOpen = false; //TODO: this is not working
+			return;
 		}
 	});
 	const { form: formData, enhance, errors, message } = form;
@@ -52,7 +56,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form method="POST" action="?/updateArtist&id={myState?.submission?.id}" use:enhance class="w-full space-y-4">
+<form method="POST" action="?/artistUpdate&id={myState?.submission?.id}" use:enhance class="w-full space-y-4">
 	<!-- stop the form from submitting on enter key press -->
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 

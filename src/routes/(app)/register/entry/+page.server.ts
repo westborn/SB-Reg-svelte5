@@ -240,6 +240,10 @@ const entryCreate = async (event: RequestEvent) => {
 				entryId: newEntry.id
 			}
 		});
+		if (!updatedImage) {
+			console.error(`${event.route.id} - Updating DB Image${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		}
 		//TODO Update image tag to be attached
 		// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
 	}
