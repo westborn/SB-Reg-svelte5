@@ -1,13 +1,20 @@
 import { getContext, setContext } from 'svelte';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
 
-import type { artistSchemaUI, entrySchemaUI, entryDeleteSchemaUI, fileUploadSchema } from '$lib/zod-schemas';
+import type {
+	artistSchemaUI,
+	entrySchemaUI,
+	confirmSchemaUI,
+	entryDeleteSchemaUI,
+	fileUploadSchema
+} from '$lib/zod-schemas';
 import type { CurrentEntry, CurrentImage, Submission } from '$lib/components/server/registrationDB';
 
 type SetRegState = {
 	artistForm: SuperValidated<Infer<typeof artistSchemaUI>>;
 	entryForm: SuperValidated<Infer<typeof entrySchemaUI>>;
 	entryDeleteForm: SuperValidated<Infer<typeof entryDeleteSchemaUI>>;
+	confirmForm: SuperValidated<Infer<typeof confirmSchemaUI>>;
 	imageUploadForm: SuperValidated<Infer<typeof fileUploadSchema>>;
 };
 export class RegisterState {
@@ -28,12 +35,14 @@ export class RegisterState {
 	artistForm = $state() as SuperValidated<Infer<typeof artistSchemaUI>>;
 	entryForm = $state() as SuperValidated<Infer<typeof entrySchemaUI>>;
 	entryDeleteForm = $state() as SuperValidated<Infer<typeof entryDeleteSchemaUI>>;
+	confirmForm = $state() as SuperValidated<Infer<typeof confirmSchemaUI>>;
 	imageUploadForm = $state() as SuperValidated<Infer<typeof fileUploadSchema>>;
 
 	constructor(init: SetRegState) {
 		this.artistForm = init.artistForm;
 		this.entryForm = init.entryForm;
 		this.entryDeleteForm = init.entryDeleteForm;
+		this.confirmForm = init.confirmForm;
 		this.imageUploadForm = init.imageUploadForm;
 	}
 }

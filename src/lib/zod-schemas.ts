@@ -115,7 +115,8 @@ export const artistSchemaUI = z.object({
 });
 export type ArtistUI = z.infer<typeof artistSchemaUI>;
 
-export const registrationSchemaUI = z.object({
+// this UI updates both the registration and artist tables
+export const confirmSchemaUI = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),
 	registrationYear: z.string().nullish(),
@@ -123,11 +124,14 @@ export const registrationSchemaUI = z.object({
 	bumpIn: z.string().nullish(),
 	bumpOut: z.string().nullish(),
 	displayRequirements: z.string().nullish(),
-	accomodation: z.string().default('No'),
+	accommodation: z.string().default('No'),
 	crane: z.string().default('No'),
-	transport: z.string().default('No')
+	transport: z.string().default('No'),
+	bankAccountName: z.string().nullish(),
+	bankBSB: z.coerce.string().nullish(),
+	bankAccount: z.coerce.string().nullish()
 });
-export type RegistrationUI = z.infer<typeof registrationSchemaUI>;
+export type RegistrationUI = z.infer<typeof confirmSchemaUI>;
 
 export const entrySchemaUI = z.object({
 	id: z.number().int(),
