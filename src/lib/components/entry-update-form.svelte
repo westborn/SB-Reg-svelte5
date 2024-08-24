@@ -60,9 +60,8 @@
 		} = entry);
 		$formData.price = entry.price ? entry.price / 100 : 0;
 		//split the dimensions string into the three fields
-		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = entry?.dimensions
-			? entry.dimensions.split('x')
-			: ['', '', ''];
+		const dimensions = entry?.dimensions?.split('x') || [];
+		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
 		// set the radio button values
 		$formData.enterMajorPrize = entry?.enterMajorPrize ? 'Yes' : 'No';
 		//set the working image to the current image if there is one
