@@ -111,6 +111,8 @@ const entryUpdate = async (event: RequestEvent) => {
 			dimLength,
 			dimWidth
 		} = formValidationResult.data;
+		// put the dimensions into a single string with 'x' separator
+		const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join('x') || '';
 
 		const updatedEntry = await prisma.entryTable.update({
 			where: { id: idToUpdate },
@@ -121,7 +123,7 @@ const entryUpdate = async (event: RequestEvent) => {
 				description: description ?? '',
 				specialRequirements: specialRequirements ?? '',
 				enterMajorPrize: enterMajorPrize === 'Yes' ? true : false,
-				dimensions: `${dimLength ?? '0'}x${dimWidth ?? '0'}x${dimHeight ?? '0'}`,
+				dimensions,
 				price: price * 100
 			}
 		});
@@ -205,6 +207,9 @@ const entryCreate = async (event: RequestEvent) => {
 		dimWidth
 	} = formValidationResult.data;
 
+	// put the dimensions into a single string with 'x' separator
+	const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join('x') || '';
+
 	let newEntry;
 	try {
 		newEntry = await prisma.entryTable.create({
@@ -218,7 +223,7 @@ const entryCreate = async (event: RequestEvent) => {
 				description: description ?? '',
 				specialRequirements: specialRequirements ?? '',
 				enterMajorPrize: enterMajorPrize === 'Yes' ? true : false,
-				dimensions: `${dimLength ?? '0'}x${dimWidth ?? '0'}x${dimHeight ?? '0'}`,
+				dimensions,
 				price: price * 100
 			}
 		});
