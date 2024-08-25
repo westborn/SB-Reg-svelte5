@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getStep } from '$lib/regState.svelte.ts';
+	import { getStep } from '$lib/stepsState.svelte';
 
 	import { STEPS } from '$lib/constants';
 	import Button from '$lib/components/ui/button/button.svelte';

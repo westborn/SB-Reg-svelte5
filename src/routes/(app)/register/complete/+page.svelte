@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getRegisterState } from '$lib/context.svelte.js';
-	import { getStep } from '$lib/regState.svelte.ts';
+	import { getStep } from '$lib/stepsState.svelte.js';
 
 	let { data } = $props();
 

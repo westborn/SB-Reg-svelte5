@@ -10,7 +10,7 @@ import type {
 } from '$lib/zod-schemas';
 import type { CurrentEntry, CurrentImage, Submission } from '$lib/components/server/registrationDB';
 
-type SetRegState = {
+type RegisterInitial = {
 	artistForm: SuperValidated<Infer<typeof artistSchemaUI>>;
 	entryForm: SuperValidated<Infer<typeof entrySchemaUI>>;
 	entryDeleteForm: SuperValidated<Infer<typeof entryDeleteSchemaUI>>;
@@ -27,6 +27,7 @@ export class RegisterState {
 	currentEntries = $derived(this.submission?.registrations?.[0]?.entries ?? []);
 	artistCreateDialogOpen = $state(false);
 	artistUpdateDialogOpen = $state(false);
+	confirmDialogOpen = $state(false);
 	entryCreateDialogOpen = $state(false);
 	entryUpdateDialogOpen = $state(false);
 	entryDeleteDialogOpen = $state(false);
@@ -38,7 +39,7 @@ export class RegisterState {
 	confirmForm = $state() as SuperValidated<Infer<typeof confirmSchemaUI>>;
 	imageUploadForm = $state() as SuperValidated<Infer<typeof fileUploadSchema>>;
 
-	constructor(init: SetRegState) {
+	constructor(init: RegisterInitial) {
 		this.artistForm = init.artistForm;
 		this.entryForm = init.entryForm;
 		this.entryDeleteForm = init.entryDeleteForm;
@@ -49,7 +50,7 @@ export class RegisterState {
 export type RegisterStateType = InstanceType<typeof RegisterState>;
 
 export const REGISTER_CTX = Symbol('register_ctx');
-export function setRegisterState(init: SetRegState) {
+export function setRegisterState(init: RegisterInitial) {
 	const registerState = new RegisterState(init);
 	setContext(REGISTER_CTX, registerState);
 	return registerState;

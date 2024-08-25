@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getRegisterState, type RegisterStateType } from '$lib/context.svelte.js';
-	import { getStep } from '$lib/regState.svelte.ts';
+	import { getStep } from '$lib/stepsState.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 
 	import { ArtistCreateForm, ArtistUpdateDialog } from '$lib/components';
@@ -8,6 +8,18 @@
 	let myState = getRegisterState();
 	let currentStep = getStep();
 	currentStep.step = 0;
+
+	const textList = $derived([
+		['Email:', myState?.submission?.email ?? ''],
+		['First Name:', myState?.submission?.firstName ?? ''],
+		['Surname:', myState?.submission?.lastName ?? ''],
+		['Phone:', myState?.submission?.phone ?? ''],
+		['Postcode:', myState?.submission?.postcode ?? ''],
+		['firstNation:', myState?.submission?.firstNations ?? ''],
+		['Bank Account:', myState?.submission?.bankAccountName ?? ''],
+		['BSB:', myState?.submission?.bankBSB ?? ''],
+		['Account:', myState?.submission?.bankAccount ?? '']
+	]);
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
@@ -19,24 +31,9 @@
 			{#if myState && myState.artistExists && myState.submission}
 				<p class="text-sm text-muted-foreground">Some basic information we use to contact you:</p>
 				<div class="mb-3 grid grid-cols-[14ch_1fr] items-center">
-					<p class="text-sm">Email:</p>
-					<p class="mb-2">{myState.submission.email}</p>
-					<p class="text-sm">First Name:</p>
-					<p class="">{myState.submission.firstName}</p>
-					<p class="text-sm">Last Name:</p>
-					<p class="">{myState.submission.lastName}</p>
-					<p class="text-sm">Phone:</p>
-					<p class="">{myState.submission.phone}</p>
-					<p class="text-sm">Postcode:</p>
-					<p class="">{myState.submission.postcode}</p>
-					<p class="text-sm">First Nation:</p>
-					<p class="">{myState.submission.firstNations}</p>
-					<p class="text-sm">BSB:</p>
-					<p class="">{myState.submission.bankBSB}</p>
-					<p class="text-sm">Account:</p>
-					<p class="">{myState.submission.bankAccount}</p>
-					<p class="text-sm">Account Name:</p>
-					<p class="">{myState.submission.bankAccountName}</p>
+					{#each textList as [textItem, textValue]}
+						{@render TextList(textItem, textValue)}
+					{/each}
 				</div>
 				<ArtistUpdateDialog />
 			{:else}
@@ -48,3 +45,8 @@
 		</Card.Content>
 	</Card.Root>
 </div>
+
+{#snippet TextList(textItem: string, textValue: string)}
+	<p class="text-sm">{textItem}</p>
+	<p class="mb-1">{textValue}</p>
+{/snippet}

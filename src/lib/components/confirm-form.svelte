@@ -22,11 +22,13 @@
 		onResult({ result, cancel }: { result: any; cancel: () => void }) {
 			if (result.type != 'success') {
 				toast.error('Failed to Update the Registration');
+				myState.confirmDialogOpen = false; //TODO: is this working??
 				cancel();
 				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success(' Registration Updated');
+			myState.confirmDialogOpen = false; //TODO: is this working??
 			return;
 		}
 	});
@@ -69,7 +71,7 @@
 	</Form.Field>
 
 	<Form.Field class="px-2" {form} name="bumpIn">
-		<Form.Legend class="mb-2">Indicate when you require the Bump In team to be on hand to assist</Form.Legend>
+		<Form.Legend class="mb-2">When/if you require Bump In assistance?</Form.Legend>
 		<RadioGroup.Root class="ml-6" bind:value={$formData.bumpIn as string}>
 			<div class="flex">
 				<RadioGroup.Item value="Thursday morning 7 March" id="bi1" />
@@ -88,7 +90,7 @@
 	</Form.Field>
 
 	<Form.Field class="px-2" {form} name="bumpOut">
-		<Form.Legend class="mb-2">Indicate when you require the Bump Out team to be on hand to assist</Form.Legend>
+		<Form.Legend class="mb-2">When/if you require Bump Out assistance?</Form.Legend>
 		<RadioGroup.Root class="ml-6" bind:value={$formData.bumpOut as string}>
 			<div class="flex">
 				<RadioGroup.Item value="Sunday afternoon from 3.00 pm 17 March" id="bo1" />

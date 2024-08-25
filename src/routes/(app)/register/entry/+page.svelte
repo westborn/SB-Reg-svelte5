@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { EntryAccordion, EntryCreateDialog, EntryCreateForm, EntryUpdateDialog } from '$lib/components';
-	import { getStep } from '$lib/regState.svelte.ts';
+	import { getStep } from '$lib/stepsState.svelte';
 	import { getRegisterState } from '$lib/context.svelte.js';
 
 	const myState = getRegisterState();
@@ -8,11 +8,10 @@
 	let costOfRegistration = $derived(myState.currentEntries ? 20 + myState.currentEntries.length * 20 : 20);
 	let numberOfEntries = $derived(
 		myState.currentEntries
-			? myState.currentEntries.length === 1
-				? `1 entry`
-				: `${myState.currentEntries.length} entries`
-			: 'wtf'
+			? myState.currentEntries.length + (myState.currentEntries.length === 1 ? ' entry' : ' entries')
+			: ''
 	);
+
 	const entryType = {
 		create: 'create',
 		update: 'update',
