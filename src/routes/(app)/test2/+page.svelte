@@ -11,7 +11,7 @@
 		myState = updateSubmission(submission);
 	});
 
-	let myState = getRegisterState();
+	let myState = $state(getRegisterState());
 	let firstName = $state('');
 </script>
 
