@@ -88,7 +88,7 @@
 		}
 	});
 
-	async function tokenize(paymentMethod) {
+	async function tokenize(paymentMethod: { attach?: (containerId: string) => Promise<any>; tokenize: any }) {
 		const tokenResult = await paymentMethod.tokenize();
 		if (tokenResult.status === 'OK') {
 			return tokenResult.token;
@@ -101,11 +101,11 @@
 		}
 	}
 
-	let sendCompleteToServer = async (data) => {
+	let sendCompleteToServer = async (data: { registrationId: number | undefined; email: string | undefined }) => {
 		errorMessage = '';
 		console.log('sending to backend? TODO');
 		console.log(data);
-		return { result: 'success' };
+		return { result: 'success', data: null };
 	};
 
 	async function readyToPay() {
@@ -123,7 +123,7 @@
 		return;
 	}
 
-	async function completeRegistration(squarePaymentResponse) {
+	async function completeRegistration(squarePaymentResponse: { payment: { receiptUrl: any } }) {
 		console.log('completeRegistration: here');
 		console.log(squarePaymentResponse.payment.receiptUrl);
 		fetchingData = true;
