@@ -2,22 +2,18 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
-	import { handleError, handleUnexpectedError, processResponse, apiResponse } from '$lib/utils';
+	import { handleError, handleUnexpectedError, processResponse, apiResponse } from '$lib/utils.ts';
+
 	import { PUBLIC_SQUARE_APP_ID, PUBLIC_SQUARE_LOCATION_ID } from '$env/static/public';
-	import { getRegisterState } from '$lib/context.svelte.js';
-	import * as Card from '$lib/components/ui/card/index.js';
+	import { getRegisterState } from '$lib/context.svelte';
 	import { getStep } from '$lib/stepsState.svelte';
 
 	apiResponse.lastStatus = {
-		ok: false,
-		status: 0,
-		statusText: '',
+		ok: true,
+		status: 200,
+		statusText: 'OK',
 		url: ''
 	};
-
-	let currentStep = getStep();
-	currentStep.step = 3;
-	const myState = getRegisterState();
 
 	const appId = PUBLIC_SQUARE_APP_ID;
 	const locationId = PUBLIC_SQUARE_LOCATION_ID;
@@ -29,6 +25,10 @@
 		FINISHED: 'FINISH',
 		PAYMENTERROR: 'PAYMENTERROR'
 	};
+
+	let currentStep = getStep();
+	currentStep.step = 3;
+	const myState = getRegisterState();
 
 	let currentState = $state('');
 	currentState = validStates.COMMENCING;
@@ -52,34 +52,39 @@
 	let card: Card;
 
 	onMount(async () => {
-		const originalStyle = {
-			input: {
-				backgroundColor: '#f5f7f9'
-			},
-			'.input-container': {
-				borderColor: 'transparent',
-				borderRadius: '.25em'
+		if (myState.submission) {
+			fetchingData = true;
+
+			const originalStyle = {
+				input: {
+					backgroundColor: '#f5f7f9'
+				},
+				'.input-container': {
+					borderColor: 'transparent',
+					borderRadius: '.25em'
+				}
+			};
+
+			if (!Square) {
+				throw new Error('Square.js failed to load properly');
 			}
-		};
+			errorMessage = '';
+			const payments = Square.payments(appId, locationId);
+			console.log('adding payment container');
 
-		if (!(window as any).Square) {
-			throw new Error('Square.js failed to load properly');
-		}
-		errorMessage = '';
-		const payments = (window as any).Square.payments(appId, locationId);
-		// console.log('adding payment container')
-
-		// INIT CARD
-		try {
-			card = await payments.card({
-				style: originalStyle
-			});
-			await card.attach('#card-container');
-		} catch (e) {
-			// TODO: error handling
-			errorMessage = 'Initializing card failed - please try again later';
-			console.error(errorMessage);
-			return;
+			// INIT CARD
+			try {
+				card = await payments.card({
+					style: originalStyle
+				});
+				await card.attach('#card-container');
+			} catch (e) {
+				// TODO: error handling
+				errorMessage = 'Initializing card failed - please try again later';
+				console.error(errorMessage);
+				return;
+			}
+			fetchingData = false;
 		}
 	});
 
@@ -98,18 +103,13 @@
 
 	let sendCompleteToServer = async (data) => {
 		errorMessage = '';
-		// console.log('sending ', actionType)
-		// console.log(data)
-		const res = await fetch(`/api/sheets`, {
-			method: 'POST',
-			body: JSON.stringify({ action: 'completeRegistration', data })
-		});
-		return await res.json();
+		console.log('sending to backend? TODO');
+		console.log(data);
+		return { result: 'success' };
 	};
 
 	async function readyToPay() {
-		// console.log('readyToPay: here')
-
+		console.log('readyToPay: here');
 		//try to make the CC  payment
 		await handlePaymentSubmission();
 		//if not OK - show any errors and allow retry?
@@ -124,12 +124,12 @@
 	}
 
 	async function completeRegistration(squarePaymentResponse) {
-		// console.log('completeRegistration: here')
-		// console.log(squarePaymentResponse.payment.receiptUrl)
+		console.log('completeRegistration: here');
+		console.log(squarePaymentResponse.payment.receiptUrl);
 		fetchingData = true;
 		errorMessage = '';
 		const response = await sendCompleteToServer({
-			registrationId: myState?.submission?.id,
+			registrationId: myState?.submission?.registrations[0].id,
 			email: myState?.submission?.email
 		});
 		// console.log('completeRegistration' + response)
@@ -138,26 +138,27 @@
 			handleUnexpectedError(errorMessage);
 		} else {
 			fetchingData = false;
-			//TODO set submission to closed
+			// currentRegistration.set(response.data.registration)
+			// entryStore.set(response.data.entries)
 			currentState = validStates.COMPLETING;
 		}
 		return;
 	}
 
 	async function finishRegistration() {
-		// console.log('finishRegistration: here')
+		console.log('finishRegistration: here');
 		fetchingData = false;
 		currentState = validStates.FINISHED;
 		goto('/view');
 	}
 
 	async function handlePaymentSubmission() {
-		// console.log('handlePaymentSubmission: here')
+		console.log('handlePaymentSubmission: here');
 		fetchingData = true;
 		errorMessage = 'Sending payment to Card Processor (Square)';
 		let token;
 		try {
-			token = (await tokenize(card)) as TokenResult;
+			token = await tokenize(card);
 		} catch (e) {
 			errorMessage = 'Card details not correct - try again';
 			console.error(e.message);
@@ -165,11 +166,12 @@
 			return;
 		}
 		apiResponse.lastStatus = {
-			ok: false,
-			status: 0,
-			statusText: '',
+			ok: true,
+			status: 200,
+			statusText: 'OK',
 			url: ''
 		};
+
 		currentState = validStates.PAYING;
 		try {
 			const paymentResponse = await fetch(`/api/payment`, {
@@ -182,12 +184,12 @@
 					sourceId: token,
 					amount: costOfRegistrationInCents,
 					email: myState?.submission?.email,
-					note: `Registration - ${myState?.submission?.firstName} ${myState?.submission?.lastName} (${myState?.submission?.email}) - ID:${myState?.submission?.id} `,
-					reference_id: `Registration ${myState?.submission?.id}`
+					note: `Registration - ${myState?.submission?.firstName} ${myState?.submission?.lastName} (${myState?.submission?.email}) - ID:${myState?.submission?.registrations[0].id} `,
+					reference_id: `Registration ${myState?.submission?.registrations[0].id}`
 				})
 			});
 			const data = await processResponse(paymentResponse);
-			// console.log(`handlePaymentSubmission-data: ${JSON.stringify(data, null, 4)}`)
+			console.log(`handlePaymentSubmission-data: ${JSON.stringify(data, null, 4)}`);
 			apiResponse.lastStatus.response = data;
 			if (!apiResponse.lastStatus.ok) {
 				errorMessage = `Payment Failed, try again later - ${handleError(apiResponse.lastStatus).detail}`;
@@ -198,7 +200,7 @@
 			currentState = validStates.COMPLETING;
 			return;
 		} catch (err) {
-			// console.log('handlePaymentSubmission-err' + err)
+			console.log('handlePaymentSubmission-err' + err);
 			currentState = validStates.PAYMENTERROR;
 			errorMessage = 'Payment failed';
 			handleUnexpectedError(err);
@@ -239,12 +241,6 @@
 	//     versionToken: '9oVj8WymLtKNjFrVyRducOkPvOW98wIlUrOQCdZTUZX6o'
 	//   }
 	// }
-
-	const textList = $derived([
-		['First Name:', myState?.submission?.firstName ?? ''],
-		['Surname:', myState?.submission?.lastName ?? ''],
-		['Email:', myState?.submission?.email ?? '']
-	]);
 </script>
 
 <section class="container mx-auto max-w-prose px-3">
@@ -258,10 +254,19 @@
 		</button>
 	{:else}
 		<div class="mt-4 text-base">
-			<div class="mb-3 grid grid-cols-[14ch_1fr] items-center">
-				{#each textList as [textItem, textValue]}
-					{@render TextList(textItem, textValue)}
-				{/each}
+			<div class="mt-6 grid grid-cols-[13ch_1fr] items-center">
+				<div>
+					<p>First Name:</p>
+					<p>{myState.submission?.firstName}</p>
+				</div>
+				<div>
+					<p>Surname:</p>
+					<p>{myState.submission?.lastName}</p>
+				</div>
+				<div>
+					<p>Email:</p>
+					<p>{myState.submission?.email}</p>
+				</div>
 			</div>
 			<p class="mt-6 text-xl text-red-400">
 				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}{registrationPaid}
@@ -275,22 +280,14 @@
 
 		{#if currentState === validStates.COMMENCING || currentState === validStates.PAYMENTERROR}
 			<div class="mt-6 max-w-prose px-3">
-				<form
-					onsubmit={() => {
-						readyToPay();
-					}}
-					id="payment-form"
-					method="POST"
+				<!-- this is the container that gets the Credit Card fields dropped into it by Square -->
+				<div id="card-container" class="w-100 mx-auto"></div>
+				<button
+					onclick={readyToPay}
+					disabled={fetchingData}
+					class="mt-8 inline-block w-auto rounded-lg bg-red-400 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-200 active:shadow-lg disabled:cursor-not-allowed"
+					>Pay Registration of ${costOfRegistration}</button
 				>
-					<!-- this is the container that gets the Credit Card fields dropped into it by Square -->
-					<div id="card-container" class="w-100 mx-auto"></div>
-					<button
-						type="submit"
-						disabled={fetchingData}
-						class="mt-8 inline-block w-auto rounded-lg bg-red-400 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-200 active:shadow-lg disabled:cursor-not-allowed"
-						>Pay Registration of ${costOfRegistration}</button
-					>
-				</form>
 			</div>
 		{/if}
 
@@ -312,13 +309,3 @@
 		{/if}
 	{/if}
 </section>
-<!--
-<pre class="whitespace-pre-wrap">
-	{apiResponse?.lastStatus?.response?.payment?.receiptUrl}<br />
-	{currentStateNow}<br />
-	{JSON.stringify(apiThings, null, 4)}
-</pre> -->
-{#snippet TextList(textItem: string, textValue: string)}
-	<p class="text-sm">{textItem}</p>
-	<p class="mb-1">{textValue}</p>
-{/snippet}

@@ -51,6 +51,8 @@
 		src={PUBLIC_SQUARE_ENVIRONMENT === 'sandbox'
 			? 'https://sandbox.web.squarecdn.com/v1/square.js'
 			: 'https://web.squarecdn.com/v1/square.js'}
+		type="text/javascript"
+		async
 	></script>
 </svelte:head>
 

@@ -96,7 +96,7 @@ export const apiResponse = {
 		status: 200,
 		statusText: 'OK',
 		url: ''
-	}
+	} as LastStatus
 };
 
 export function handleUnexpectedError(error: Error) {
