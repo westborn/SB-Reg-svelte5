@@ -69,13 +69,11 @@ const entryUpdate = async (event: RequestEvent) => {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 
+		// Get the image from the database if there is one
 		const imageFromDB = entryFromDB.images.find((image) => image.entryId === idToUpdate);
-		if (!imageFromDB) {
-			console.error(`${event.route.id} - Getting DB IMage${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
+
 		//check if the user is trying to update the image (the cloudinary id will have changed)
-		if (workingImage && workingImage.cloudId !== imageFromDB.cloudId) {
+		if (workingImage && workingImage.cloudId !== imageFromDB?.cloudId) {
 			// update the DB image to link to this entry
 			console.log('Updating image with new entry details');
 			const updatedImage = await prisma.imageTable.update({
@@ -89,11 +87,13 @@ const entryUpdate = async (event: RequestEvent) => {
 				console.error(`${event.route.id} - Updating DB Image${GENERIC_ERROR_MESSAGE}`);
 				return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 			}
-			//delete the old image from the database
-			const deletedImage = await prisma.imageTable.delete({ where: { id: imageFromDB.id } });
-			if (!deletedImage) {
-				console.error(`${event.route.id} - Deleting Old DB Image${GENERIC_ERROR_MESSAGE}`);
-				return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+			if (imageFromDB) {
+				//delete the old image from the database
+				const deletedImage = await prisma.imageTable.delete({ where: { id: imageFromDB.id } });
+				if (!deletedImage) {
+					console.error(`${event.route.id} - Deleting Old DB Image${GENERIC_ERROR_MESSAGE}`);
+					return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+				}
 			}
 			//TODO Update image tag to be attached
 			// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
