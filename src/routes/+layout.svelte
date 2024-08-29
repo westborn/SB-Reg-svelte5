@@ -21,12 +21,14 @@
 				invalidate('supabase:auth');
 			}
 		});
+		console.info(`env dev:${dev} meta.env.MODE:${import.meta.env.MODE}`);
+		console.info(`running in "${PUBLIC_SQUARE_ENVIRONMENT}" mode`);
 
+		// update this to add square in the head - see below
 		// const src =
 		// 	PUBLIC_SQUARE_ENVIRONMENT === 'sandbox'
 		// 		? 'https://sandbox.web.squarecdn.com/v1/square.js'
 		// 		: 'https://web.squarecdn.com/v1/square.js';
-		// console.log(`env dev:${dev} meta.env.MODE:${import.meta.env.MODE}`);
 		// const scriptEl = document.createElement('script');
 		// scriptEl.async = false;
 		// scriptEl.type = 'text/javascript';
@@ -36,6 +38,7 @@
 		return () => data.subscription.unsubscribe();
 	});
 
+	//load all the Superform forms into context
 	setRegisterState({
 		artistForm,
 		entryForm,
@@ -45,6 +48,7 @@
 	});
 </script>
 
+<!-- add the appropriate square.js script to the head of the document -->
 <svelte:head>
 	<title>Registration</title>
 	<script
