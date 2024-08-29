@@ -1,6 +1,8 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Button } from '$lib/components/ui/button';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 </script>
 
 <DropdownMenu.Root>
@@ -8,17 +10,11 @@
 		<div class="absolute left-2 top-3">🚀</div>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content class="ml-6 mt-4 w-56">
-		<DropdownMenu.Label>Admin Menu</DropdownMenu.Label>
+		<DropdownMenu.Label>Admin Menu<span class="block text-xs">({$page.data.user.proxyEmail})</span></DropdownMenu.Label>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
-			<DropdownMenu.Item>
-				<a href="/register/confirm"> Confirm </a>
-				<DropdownMenu.Shortcut>⌘S</DropdownMenu.Shortcut>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item>
-				Keyboard shortcuts
-				<DropdownMenu.Shortcut>⌘K</DropdownMenu.Shortcut>
-			</DropdownMenu.Item>
+			<DropdownMenu.Item><a class="w-full" href="\admin">Admin</a></DropdownMenu.Item>
+			<DropdownMenu.Item><a class="w-full" href="\view">View</a></DropdownMenu.Item>
 		</DropdownMenu.Group>
 
 		<DropdownMenu.Separator />

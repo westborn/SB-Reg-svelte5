@@ -1,10 +1,12 @@
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { createServerClient } from '@supabase/ssr';
 import type { Handle } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 
 // https://khromov.se/the-comprehensive-guide-to-locals-in-sveltekit/
+// https://joyofcode.xyz/sveltekit-hooks#creating-routes
 
-export const handle: Handle = async ({ event, resolve }) => {
+const auth: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		cookies: {
 			getAll() {
@@ -35,6 +37,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 			return { session: null, user: null };
 		}
 
+		//  type UserResponse =
+		// | {
+		// 		data: {
+		// 			user: User
+		// 		}
+		// 		error: null
+		// 	}
+		// | {
+		// 		data: {
+		// 			user: null
+		// 		}
+		// 		error: AuthError
+		// 	}
+
 		const {
 			data: { user },
 			error
@@ -42,6 +58,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (error) {
 			// JWT validation has failed
 			return { session: null, user: null };
+		}
+
+		const userDomain = user.email.split('@')[1];
+		const isAdmin = userDomain === 'sculpturebermagui.org.au';
+		if (isAdmin && session && user) {
+			user.isAdmin = true;
+			user.proxyEmail = event.cookies.get('proxyEmail');
+		} else {
+			user.isAdmin = false;
 		}
 
 		return { session, user };
@@ -53,3 +78,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	});
 };
+
+export const handle = sequence(auth);

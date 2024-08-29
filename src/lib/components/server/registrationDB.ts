@@ -19,8 +19,56 @@ type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
 // also this for unpacking an array Element
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 
+// User object returned from supabase
+// we need to add isAdmin and proxyEmail to the user object
+export interface User {
+	id: string;
+	aud: string;
+	role: string;
+	email: string;
+	email_confirmed_at: Date;
+	phone: string;
+	confirmed_at: Date;
+	new_email: string;
+	email_change_sent_at: Date;
+	last_sign_in_at: Date;
+	app_metadata: AppMetadata;
+	user_metadata: Data;
+	identities: Identity[];
+	created_at: Date;
+	updated_at: Date;
+	is_anonymous: boolean;
+	isAdmin?: boolean;
+	proxyEmail?: string;
+}
+
+export interface AppMetadata {
+	provider: string;
+	providers: string[];
+}
+
+export interface Identity {
+	identity_id: string;
+	id: string;
+	user_id: string;
+	identity_data: Data;
+	provider: string;
+	last_sign_in_at: Date;
+	created_at: Date;
+	updated_at: Date;
+	email: string;
+}
+
+export interface Data {
+	email: string;
+	email_verified: boolean;
+	phone_verified: boolean;
+	sub: string;
+}
+
 export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
-export const getSubmission = async (artistEmail: string) => {
+export const getSubmission = async ({ isAdmin, proxyEmail, email }: User) => {
+	const artistEmail = isAdmin ? proxyEmail : email;
 	const submission = await prisma.artistTable.findFirst({
 		where: {
 			email: artistEmail

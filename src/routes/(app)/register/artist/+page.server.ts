@@ -9,7 +9,7 @@ import { prisma } from '$lib/components/server/prisma';
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
 
 import { artistSchemaUI } from '$lib/zod-schemas';
-import { getSubmission } from '$lib/components/server/registrationDB';
+import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
@@ -28,7 +28,8 @@ const artistUpdate = async (event: RequestEvent) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) return redirect(302, '/login');
 
-	const artistEmail = user.email; // TODO Assuming email is the correct identifier
+	// If the user is an admin, they can update any artist
+	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
 
 	try {
 		const result = await prisma.artistTable.update({
@@ -46,7 +47,7 @@ const artistUpdate = async (event: RequestEvent) => {
 	}
 
 	// Return the updated submission
-	const updatedSubmission = await getSubmission(artistEmail);
+	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
 	return returnData;
 };
@@ -63,7 +64,8 @@ const artistCreate = async (event: RequestEvent) => {
 		});
 	}
 
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
+	// If the user is an admin, they can update any artist
+	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
 	const newArtist = { ...formValidationResult.data, email: artistEmail };
 
 	try {
@@ -78,7 +80,7 @@ const artistCreate = async (event: RequestEvent) => {
 	}
 
 	// Return the updated submission
-	const updatedSubmission = await getSubmission(artistEmail);
+	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
 	return returnData;
 };

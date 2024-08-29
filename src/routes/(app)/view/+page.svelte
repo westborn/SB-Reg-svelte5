@@ -35,7 +35,7 @@
 
 <section class="mx-auto mt-2 max-w-[500px] px-3">
 	<h4 class="text-xl font-bold text-primary">Registration Details</h4>
-	<div class="mb-3 grid grid-cols-[14ch_1fr] items-center">
+	<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 		{#each textList as [textItem, textValue]}
 			{@render TextList(textItem, textValue)}
 		{/each}
@@ -76,5 +76,5 @@
 
 {#snippet TextList(textItem: string, textValue: string)}
 	<p class="text-sm">{textItem}</p>
-	<p class="mb-1">{textValue}</p>
+	<p>{textValue}&nbsp</p>
 {/snippet}

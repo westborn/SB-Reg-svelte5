@@ -11,7 +11,9 @@
 
 <section class="flex flex-row items-center justify-between sm:container">
 	<div>
-		<AdminMenu />
+		{#if user.isAdmin}
+			<AdminMenu />
+		{/if}
 		<a href="/" class="text-2xl font-bold leading-tight tracking-tighter text-primary md:text-3xl">
 			SB Exhibit Registration
 		</a>

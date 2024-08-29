@@ -34,7 +34,7 @@
 		</Card.Header>
 		<Card.Content class="p-2 sm:px-6">
 			{#if myState && myState.artistExists && myState.submission}
-				<div class="mb-3 grid grid-cols-[14ch_1fr] items-center">
+				<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 					{#each textList as [textItem, textValue]}
 						{@render TextList(textItem, textValue)}
 					{/each}
@@ -51,5 +51,5 @@
 
 {#snippet TextList(textItem: string, textValue: string)}
 	<p class="text-sm">{textItem}</p>
-	<p class="mb-1">{textValue}</p>
+	<p>{textValue}&nbsp</p>
 {/snippet}

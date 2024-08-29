@@ -8,7 +8,7 @@ import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
 import { confirmSchemaUI } from '$lib/zod-schemas';
-import { getSubmission } from '$lib/components/server/registrationDB';
+import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
@@ -29,11 +29,13 @@ const confirmUpdate = async (event: RequestEvent) => {
 	if (!user || !session) return redirect(302, '/login');
 
 	console.log('About to update confirm');
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
+
+	// If the user is an admin, they can update any artist
+	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
 	let idToUpdate: number;
 	// Get the submission from the database
 	try {
-		const submissionFromDB = await getSubmission(artistEmail);
+		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
 			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -86,7 +88,7 @@ const confirmUpdate = async (event: RequestEvent) => {
 	}
 
 	// Return the updated submission
-	const updatedSubmission = await getSubmission(artistEmail);
+	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
 	return returnData;
 };

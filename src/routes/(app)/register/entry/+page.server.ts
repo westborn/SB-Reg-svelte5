@@ -13,7 +13,8 @@ import {
 	createImage,
 	createNewRegistration,
 	getSubmission,
-	type CurrentImage
+	type CurrentImage,
+	type User
 } from '$lib/components/server/registrationDB';
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
 
@@ -54,10 +55,9 @@ const entryUpdate = async (event: RequestEvent) => {
 	}
 
 	console.log('About to update entry with ID:', idToUpdate);
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
 	// Get the submission from the database
 	try {
-		const submissionFromDB = await getSubmission(artistEmail);
+		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
 			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -139,7 +139,7 @@ const entryUpdate = async (event: RequestEvent) => {
 	}
 
 	// Return the updated submission
-	const updatedSubmission = await getSubmission(artistEmail);
+	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
 	return returnData;
 };
@@ -166,13 +166,12 @@ const entryCreate = async (event: RequestEvent) => {
 		return message(formValidationResult, 'Error processing image data.', { status: 400 });
 	}
 
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
 	let artistId: number;
 	let registrationId: number;
 
 	// Get the submission from the database and make sure we have a registration to attach the entry to
 	try {
-		const submissionFromDB = await getSubmission(artistEmail);
+		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
 			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -254,7 +253,7 @@ const entryCreate = async (event: RequestEvent) => {
 	}
 
 	// Return the updated submission
-	const updatedSubmission = await getSubmission(artistEmail);
+	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
 	return returnData;
 };
@@ -268,10 +267,9 @@ const imageUpload = async (event: RequestEvent) => {
 	if (!formValidationResult.valid) {
 		return fail(400, withFiles({ formValidationResult }));
 	}
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
 	// Get the submission from the database and make sure we have a registration to attach the entry to
 	try {
-		const submissionFromDB = await getSubmission(artistEmail);
+		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
 			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -315,7 +313,6 @@ const entryDelete = async (event: RequestEvent) => {
 		return fail(400, formValidationResult);
 	}
 
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
 	const idAsString = event.url.searchParams.get('id');
 	if (!idAsString) {
 		console.error('No ID provided for delete - aborting delete.');
@@ -325,7 +322,7 @@ const entryDelete = async (event: RequestEvent) => {
 	console.log('Deleting entry with id:', idToDelete);
 
 	try {
-		const submissionFromDB = await getSubmission(artistEmail);
+		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
 			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -348,7 +345,7 @@ const entryDelete = async (event: RequestEvent) => {
 	}
 	// Return the updated submission
 	console.log('completed entry delete');
-	const updatedSubmission = await getSubmission(artistEmail);
+	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
 	return returnData;
 };
