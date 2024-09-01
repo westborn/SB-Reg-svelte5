@@ -30,6 +30,9 @@
 			</Tooltip.Trigger>
 			<Tooltip.Content>
 				<p>{loggedInEmail}</p>
+				{#if user.isAdmin && user.proxyEmail}
+					<p><span class="text-xs text-primary">as: {user.proxyEmail}</span></p>
+				{/if}
 			</Tooltip.Content>
 		</Tooltip.Root>
 		<ThemeToggle></ThemeToggle>

@@ -1,11 +1,14 @@
 import { fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { getArtists } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
-	return;
+
+	const artists = await getArtists();
+	return { artists };
 };
 
 export const actions: Actions = {

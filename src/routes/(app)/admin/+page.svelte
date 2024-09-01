@@ -6,14 +6,23 @@
 
 	let form: HTMLFormElement;
 	let { data } = $props();
+	const { artists } = data;
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
-	<form method="post" use:enhance>
-		<label>User to masquerade as <input class="block w-full" type="email" name="proxyEmail" /></label>
-		{#if form?.error}<p>{form.error}</p>{/if}
-		<Button type="submit">Set this user?</Button>
-	</form>
+	{#each artists as artist}
+		<div class="grid grid-cols-[14ch_1fr] items-center">
+			<p>{artist.firstName}</p>
+			<p>{artist.email}</p>
+		</div>
+	{/each}
+	<div class="mt-4">
+		<form method="post" use:enhance>
+			<label>User to masquerade as <input class="block w-full" type="email" name="proxyEmail" /></label>
+			{#if form?.error}<p>{form.error}</p>{/if}
+			<Button type="submit">Set this user?</Button>
+		</form>
+	</div>
 </div>
 <pre>Current User: {data.user.email}</pre>
 <pre>Admin Status: {data.user.isAdmin}</pre>

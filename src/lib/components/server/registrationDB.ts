@@ -130,6 +130,19 @@ export const getSubmission = async ({ isAdmin, proxyEmail, email }: User) => {
 	return submission;
 };
 
+export type Artists = ThenArg<ReturnType<typeof getArtists>>;
+export const getArtists = async () => {
+	return await prisma.artistTable.findMany({
+		select: {
+			id: true,
+			email: true,
+			firstName: true,
+			lastName: true,
+			phone: true
+		}
+	});
+};
+
 type ReturnedEntriesEntry = Omit<EntryTable, 'createdAt' | 'updatedAt'>;
 type ReturnedEntriesImage = Pick<ImageTable, 'id' | 'originalFileName' | 'cloudId' | 'cloudURL'>;
 export type ReturnedEntry = ReturnedEntriesEntry & { images: ReturnedEntriesImage[] };
