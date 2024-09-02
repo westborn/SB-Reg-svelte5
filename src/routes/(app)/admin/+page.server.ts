@@ -2,13 +2,19 @@ import { fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getArtists } from '$lib/components/server/registrationDB';
 
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+
+import { schema } from './schema.ts';
+
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
 
+	const langForm = await superValidate(zod(schema));
 	const artists = await getArtists();
-	return { artists };
+	return { langForm, artists };
 };
 
 export const actions: Actions = {
@@ -16,6 +22,7 @@ export const actions: Actions = {
 		const { request, cookies, locals } = event;
 		const { user } = await locals.V1safeGetSession();
 		const formData = await request.formData();
+		console.log('formData', formData);
 		const proxyEmail = formData.get('proxyEmail') as string;
 		console.log('proxyEmail', proxyEmail);
 		console.log('proxyUser:', user.email);

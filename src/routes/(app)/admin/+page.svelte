@@ -1,33 +1,85 @@
-<!-- +page.svelte -->
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Select } from 'bits-ui';
+	import { Field, Control, Label, FieldErrors } from 'formsnap';
+	import { z } from 'zod';
 
-	let form: HTMLFormElement;
+	const languages = {
+		en: 'English',
+		es: 'Spanish',
+		fr: 'French',
+		de: 'German',
+		it: 'Italian',
+		pt: 'Portuguese',
+		ru: 'Russian',
+		zh: 'Chinese',
+		ja: 'Japanese',
+		ko: 'Korean'
+	};
+
+	type Language = keyof typeof languages;
+
+	const langSchema = z.object({
+		language: z.enum(Object.keys(languages) as [Language, ...Language[]]).default('en')
+	});
+	type LangForm = SuperValidated<Infer<typeof langSchema>>;
+	type Artists = {
+		firstName: string;
+		lastName: string;
+		phone: string;
+		id: number;
+		email: string;
+	}[];
+
 	let { data } = $props();
-	const { artists } = data;
+	const { langForm, artists }: { langForm: LangForm; artists: Artists } = data;
+	console.log(langForm);
+	console.log(artists);
+
+	const form = superForm(langForm, {
+		validators: zodClient(langSchema),
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			if (result.type != 'success') {
+				console.error('Failed to Update the Registration');
+				cancel();
+				return;
+			}
+			console.log(' Registration Updated');
+			return;
+		}
+	});
+
+	const { form: formData, enhance } = form;
+
+	const selectedLanguage = $derived({
+		label: languages[$formData.language],
+		value: $formData.language
+	});
 </script>
 
-<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
-	{#each artists as artist}
-		<div class="grid grid-cols-[14ch_1fr] items-center">
-			<p>{artist.firstName}</p>
-			<p>{artist.email}</p>
-		</div>
-	{/each}
-	<div class="mt-4">
-		<form method="post" use:enhance>
-			<label>User to masquerade as <input class="block w-full" type="email" name="proxyEmail" /></label>
-			{#if form?.error}<p>{form.error}</p>{/if}
-			<Button type="submit">Set this user?</Button>
-		</form>
-	</div>
-</div>
-<pre>Current User: {data.user.email}</pre>
-<pre>Admin Status: {data.user.isAdmin}</pre>
-{#if data.user.isAdmin}
-	<pre>Proxy Email: {data.user.proxyEmail}</pre>
-{/if}
-<!-- <pre>User: {JSON.stringify(data.user, null, 4)}</pre> -->
-<pre>User: {JSON.stringify($page.data.user.proxyEmail, null, 4)}</pre>
+<form method="POST" use:enhance>
+	<Field {form} name="language">
+		<Control let:attrs>
+			<Label>Language</Label>
+			<Select.Root
+				selected={selectedLanguage}
+				onSelectedChange={(s) => {
+					s && ($formData.language = s.value);
+				}}
+			>
+				<Select.Input name={attrs.name} />
+				<Select.Trigger {...attrs}>
+					<Select.Value placeholder="Select a language" />
+				</Select.Trigger>
+				<Select.Content>
+					{#each Object.entries(languages) as [value, label]}
+						<Select.Item {value} {label} />
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</Control>
+		<FieldErrors />
+	</Field>
+	<button type="submit">Submit</button>
+</form>
