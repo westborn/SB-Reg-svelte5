@@ -1,31 +1,37 @@
 import { fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getArtists } from '$lib/components/server/registrationDB';
-
-import { superValidate } from 'sveltekit-superforms';
+import { z } from 'zod';
+import { artistTableSchema } from '$lib/zod-schemas';
+import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-import { schema } from './schema.ts';
+const schema = z.object({
+	email: artistTableSchema.shape.email
+});
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
 
-	const langForm = await superValidate(zod(schema));
+	const form = await superValidate(zod(schema));
 	const artists = await getArtists();
-	return { langForm, artists };
+	return { form, artists };
 };
 
 export const actions: Actions = {
 	default: async (event: RequestEvent) => {
 		const { request, cookies, locals } = event;
 		const { user } = await locals.V1safeGetSession();
-		const formData = await request.formData();
-		console.log('formData', formData);
-		const proxyEmail = formData.get('proxyEmail') as string;
-		console.log('proxyEmail', proxyEmail);
-		console.log('proxyUser:', user.email);
+
+		const form = await superValidate(request, zod(schema));
+		console.log('POST', form);
+
+		if (!form.valid) {
+			return message(form, 'Invalid email for artist.');
+		}
+		const proxyEmail = form.data.email;
 		if (user.isAdmin) {
 			cookies.set('proxyEmail', proxyEmail, {
 				path: '/',

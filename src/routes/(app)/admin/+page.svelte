@@ -1,29 +1,8 @@
 <script lang="ts">
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Select } from 'bits-ui';
-	import { Field, Control, Label, FieldErrors } from 'formsnap';
-	import { z } from 'zod';
+	import { superForm } from 'sveltekit-superforms';
+	import { artists2024 } from '$lib/data/artists';
+	import { page } from '$app/stores';
 
-	const languages = {
-		en: 'English',
-		es: 'Spanish',
-		fr: 'French',
-		de: 'German',
-		it: 'Italian',
-		pt: 'Portuguese',
-		ru: 'Russian',
-		zh: 'Chinese',
-		ja: 'Japanese',
-		ko: 'Korean'
-	};
-
-	type Language = keyof typeof languages;
-
-	const langSchema = z.object({
-		language: z.enum(Object.keys(languages) as [Language, ...Language[]]).default('en')
-	});
-	type LangForm = SuperValidated<Infer<typeof langSchema>>;
 	type Artists = {
 		firstName: string;
 		lastName: string;
@@ -33,53 +12,56 @@
 	}[];
 
 	let { data } = $props();
-	const { langForm, artists }: { langForm: LangForm; artists: Artists } = data;
-	console.log(langForm);
-	console.log(artists);
+	const { form, artists: notNeeded } = data;
+	const artists = artists2024.sort((a, b) => a.email.localeCompare(b.email));
 
-	const form = superForm(langForm, {
-		validators: zodClient(langSchema),
-		onResult({ result, cancel }: { result: any; cancel: () => void }) {
-			if (result.type != 'success') {
-				console.error('Failed to Update the Registration');
-				cancel();
-				return;
-			}
-			console.log(' Registration Updated');
-			return;
-		}
-	});
+	let searchTerm = $state('');
 
-	const { form: formData, enhance } = form;
+	// Setup the filter for searching / join a few fields to search on
+	// if no search term entered - return them all
+	const filteredEntries = $derived(
+		artists.filter((x) => {
+			if (searchTerm === '') return false;
+			const searchText = x.firstName + x.lastName + x.email;
+			return searchText.toLocaleLowerCase().includes(searchTerm.toLowerCase());
+		})
+	);
 
-	const selectedLanguage = $derived({
-		label: languages[$formData.language],
-		value: $formData.language
+	const { message, enhance, formId } = superForm(form, {
+		clearOnSubmit: 'errors'
 	});
 </script>
 
-<form method="POST" use:enhance>
-	<Field {form} name="language">
-		<Control let:attrs>
-			<Label>Language</Label>
-			<Select.Root
-				selected={selectedLanguage}
-				onSelectedChange={(s) => {
-					s && ($formData.language = s.value);
-				}}
-			>
-				<Select.Input name={attrs.name} />
-				<Select.Trigger {...attrs}>
-					<Select.Value placeholder="Select a language" />
-				</Select.Trigger>
-				<Select.Content>
-					{#each Object.entries(languages) as [value, label]}
-						<Select.Item {value} {label} />
-					{/each}
-				</Select.Content>
-			</Select.Root>
-		</Control>
-		<FieldErrors />
-	</Field>
-	<button type="submit">Submit</button>
-</form>
+<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
+	<p>Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail}</span></p>
+	<!-- Search Box -->
+	<div>
+		<div class="w-80 rounded p-4">
+			<input
+				bind:value={searchTerm}
+				type="search"
+				class="w-full rounded border border-solid border-gray-300 bg-white px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+				placeholder="First Name, Last Name or Email"
+				aria-label="Search"
+			/>
+		</div>
+	</div>
+
+	<form method="POST" use:enhance>
+		{#each filteredEntries as artist}
+			<div class="flex flex-row items-center justify-between pl-6">
+				<button
+					class="cursor-pointer text-sm font-semibold"
+					name="email"
+					value={artist.email}
+					onclick={() => ($formId = artist.email)}
+				>
+					{artist.firstName} {artist.lastName} - {artist.email}</button
+				>
+			</div>
+		{/each}
+	</form>
+	{#if $message}
+		<div class="text-red-500">{$message}</div>
+	{/if}
+</div>
