@@ -51,7 +51,7 @@
 				<p class="text-xs">({entryItem.inOrOut}){entryItem?.enterMajorPrize ? ' +Major Prize Entry' : ''}</p>
 				<p>{entryItem.description}</p>
 				<div class="grid grid-cols-2">
-					<div class="flex items-center justify-around">
+					<div class="flex items-center justify-around py-2">
 						<OptimisedImage
 							path={entryItem?.images?.[0]?.cloudURL
 								? entryItem?.images?.[0]?.cloudURL

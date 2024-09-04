@@ -12,8 +12,6 @@ import {
 export const load: LayoutServerLoad = async ({ locals: { V1safeGetSession }, cookies }) => {
 	const { session, user } = await V1safeGetSession();
 	console.log('+layout.server.ts LOAD - DONE');
-	console.log('layout user?', user ? 'yes' : 'no');
-	console.log('layout proxy?', user.proxyEmail ? 'yes' : 'no');
 
 	const [artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm] = await Promise.all([
 		superValidate(zod(artistSchemaUI)),

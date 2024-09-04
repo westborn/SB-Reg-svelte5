@@ -1,8 +1,6 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { Button } from '$lib/components/ui/button';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 </script>
 
 <DropdownMenu.Root>
@@ -14,12 +12,12 @@
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
 			<DropdownMenu.Item><a class="w-full" href="\admin">Admin</a></DropdownMenu.Item>
-			<DropdownMenu.Item><a class="w-full" href="\view">View</a></DropdownMenu.Item>
 		</DropdownMenu.Group>
 
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
-			<DropdownMenu.Item>Team</DropdownMenu.Item>
+			<DropdownMenu.Item><a class="w-full" href="\view">View</a></DropdownMenu.Item>
+			<DropdownMenu.Item><a class="w-full" href="\register">Register</a></DropdownMenu.Item>
 			<DropdownMenu.Sub>
 				<DropdownMenu.SubTrigger>Invite users</DropdownMenu.SubTrigger>
 				<DropdownMenu.SubContent>

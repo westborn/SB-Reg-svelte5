@@ -113,7 +113,7 @@ export function handleError(lastStatus: LastStatus) {
 			msg = lastStatus.response[0] || 'something bad happened!';
 			break;
 		case 404:
-			console.log(404);
+			// console.log(404);
 			if (lastStatus.response) {
 				msg = lastStatus.response;
 			} else {
@@ -121,11 +121,11 @@ export function handleError(lastStatus: LastStatus) {
 			}
 			break;
 		case 500:
-			console.log(500);
+			// console.log(500);
 			msg = JSON.parse(lastStatus.response).message;
 			break;
 		default:
-			console.log('default');
+			// console.log('default');
 			msg = JSON.stringify(lastStatus);
 			break;
 	}

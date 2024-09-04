@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { artists2024 } from '$lib/data/artists';
+	import { artists2024 } from '$lib/data/schema.ts';
 	import { page } from '$app/stores';
 
 	type Artists = {
@@ -12,14 +12,15 @@
 	}[];
 
 	let { data } = $props();
-	const { form, artists: notNeeded } = data;
-	const artists = artists2024.sort((a, b) => a.email.localeCompare(b.email));
+	const { form, artists: artistsFromServer } = data;
+	//don't mutate the original array
+	const artists = [...artistsFromServer].sort((a, b) => a.email.localeCompare(b.email));
 
 	let searchTerm = $state('');
 
 	// Setup the filter for searching / join a few fields to search on
-	// if no search term entered - return them all
-	const filteredEntries = $derived(
+	// if no search term entered - don't return anything
+	const filteredArtists = $derived(
 		artists.filter((x) => {
 			if (searchTerm === '') return false;
 			const searchText = x.firstName + x.lastName + x.email;
@@ -48,7 +49,7 @@
 	</div>
 
 	<form method="POST" use:enhance>
-		{#each filteredEntries as artist}
+		{#each filteredArtists as artist}
 			<div class="flex flex-row items-center justify-between pl-6">
 				<button
 					class="cursor-pointer text-sm font-semibold"
@@ -56,7 +57,7 @@
 					value={artist.email}
 					onclick={() => ($formId = artist.email)}
 				>
-					{artist.firstName} {artist.lastName} - {artist.email}</button
+					{artist.email} - {artist.firstName} {artist.lastName}</button
 				>
 			</div>
 		{/each}

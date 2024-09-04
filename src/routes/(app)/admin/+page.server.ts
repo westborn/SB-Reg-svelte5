@@ -26,8 +26,6 @@ export const actions: Actions = {
 		const { user } = await locals.V1safeGetSession();
 
 		const form = await superValidate(request, zod(schema));
-		console.log('POST', form);
-
 		if (!form.valid) {
 			return message(form, 'Invalid email for artist.');
 		}
@@ -35,8 +33,8 @@ export const actions: Actions = {
 		if (user.isAdmin) {
 			cookies.set('proxyEmail', proxyEmail, {
 				path: '/',
-				maxAge: 60 * 60 * 24 * 365
-				// httpOnly: false // <-- if you want to read it in the browser
+				maxAge: 60 * 60 * 24 * 365,
+				httpOnly: false // <-- if you want to read it in the browser
 			});
 			redirect(302, '/admin');
 		}
