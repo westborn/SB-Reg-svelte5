@@ -1,91 +1,61 @@
-// NOTE: Import fail from Superforms, not from @sveltejs/kit!
-import { superValidate, fail, message } from 'sveltekit-superforms';
+import type { PageServerLoad, RequestEvent } from './$types';
+
+import { superValidate, fail, withFiles } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { z } from 'zod';
-import type { PageServerLoad } from '../$types';
-import { v2 as cloudinary, type UploadApiErrorResponse, type UploadApiResponse } from 'cloudinary';
-import { CLOUDINARY_API_SECRET, CLOUDINARY_API_KEY } from '$env/static/private';
-import { PUBLIC_CLOUDINARY_CLOUD_NAME } from '$env/static/public';
-import { createImage, getEntries } from '$lib/components/server/registrationDB';
-import type { ImageTable } from '$lib/zod-schemas';
+import { fileUploadSchema } from '$lib/zod-schemas';
+import { createImage, getImage, type CurrentImage } from '$lib/components/server/registrationDB';
+import { redirect } from '@sveltejs/kit';
 
-cloudinary.config({
-	cloud_name: PUBLIC_CLOUDINARY_CLOUD_NAME,
-	api_key: CLOUDINARY_API_KEY,
-	api_secret: CLOUDINARY_API_SECRET,
-	secure: true
-});
-
-const fileSchema = z.object({
-	image: z
-		.instanceof(File, { message: 'Please upload a file.' })
-		.refine((f) => f.size < 5 * 1024 * 1024, 'Max 5Mb upload size.')
-});
+import { getCloudinaryURL, uploadImageToCloudinary } from '$lib/components/server/cloudinary.ts';
 
 export const load: PageServerLoad = async (event) => {
+	console.log(`${event.route.id} - LOAD - START`);
 	const { session, user } = await event.locals.V1safeGetSession();
-	// if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
+	if (!user) redirect(302, '/'); //already logged in so we have a valid email address in user
 
-	const record = await getEntries(user.email);
-
+	// TODO pass in the corredct image id
+	const currentImage = await getImage(4);
 	return {
 		session,
 		user,
-		form: await superValidate(zod(fileSchema)),
-		record
+		form: await superValidate(zod(fileUploadSchema)),
+		currentImage
 	};
 };
 
-const getURL = (imagePath: string) => {
-	return cloudinary.url(imagePath, { secure: true });
-};
-
-const insertImage = async (cloudId: string, cloudURL: string, originalFileName: string) => {
-	const workingImage = {
-		id: 0,
-		artistId: 1,
-		cloudId,
-		cloudURL,
-		originalFileName
-	} as ImageTable;
-	return await createImage(workingImage);
-};
-
 export const actions = {
-	default: async ({ request }) => {
-		console.log('doing action');
-		const form = await superValidate(request, zod(fileSchema));
-
+	default: async (event: RequestEvent) => {
+		console.log(`${event.route.id} - default - ACTION`);
+		const form = await superValidate(event, zod(fileUploadSchema));
 		if (!form.valid) {
-			return fail(400, { form });
+			return fail(400, withFiles({ form }));
 		}
+		// Upload the inmage to cloudinary as an unattached image
+		const result = await uploadImageToCloudinary(form.data.image, 'UnAttachedImages');
+		if (!result.success) {
+			console.log('Error uploading image to cloudinary');
+			console.error(result);
+			return fail(500, withFiles({ form }));
+		}
+		const cloudId = result.result.public_id;
+		const cloudURL = getCloudinaryURL(cloudId);
 
-		// https://dev.to/emmabase/image-upload-to-cloudinary-using-nodejs-typescript-4oje
-		// TODO: Do something with the image
-		// console.log(form.data.image.name, form.data.image.size, form.data.image.type);
-		const arrayBuffer = await form.data.image.arrayBuffer();
-		const buffer = new Uint8Array(arrayBuffer);
-		const uploadStream = await new Promise((resolve, reject) => {
-			cloudinary.uploader
-				.upload_stream({}, function (err: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) {
-					if (err) {
-						console.error(err);
-						return reject(err);
-					}
-					return resolve(result);
-				})
-				.end(buffer);
-		});
-		const { public_id: cloudId } = uploadStream as UploadApiResponse;
-		const cloudURL = getURL(cloudId);
-
+		console.log(result);
 		console.log('cloudId:', cloudId);
 		console.log('cloudURL:', cloudURL);
 		console.log('originalFileName:', form.data.image.name);
 
-		const image = await insertImage(cloudId, cloudURL, form.data.image.name);
+		const image = await createImage({
+			id: 0,
+			artistId: 1,
+			cloudId,
+			cloudURL,
+			originalFileName: form.data.image.name
+		} as CurrentImage);
 
+		//TODO update tag when image is attached to an entry
+		// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
 		console.log('image:', image);
-		return message(form, 'You have uploaded a valid file!');
+		return withFiles({ form, image });
 	}
 };

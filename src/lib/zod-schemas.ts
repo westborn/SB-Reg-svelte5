@@ -1,4 +1,5 @@
 import { boolean, z } from 'zod';
+import { MAX_IMAGE_SIZE } from '$lib/constants';
 
 export const signupSchema = z.object({
 	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
@@ -94,9 +95,9 @@ export type ImageTable = z.infer<typeof imageTableSchema>;
 /////////////////////////////////////////
 // ARTIST SCHEMA UI - just the columns that are editable or used in forms
 /////////////////////////////////////////
+// id: z.number().int(),
+// email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
 export const artistSchemaUI = z.object({
-	id: z.number().int(),
-	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
 	firstName: z
 		.string({ required_error: 'First Name is required' })
 		.min(2, { message: 'First Name must be at least 2 characters' })
@@ -114,7 +115,8 @@ export const artistSchemaUI = z.object({
 });
 export type ArtistUI = z.infer<typeof artistSchemaUI>;
 
-export const registrationSchemaUI = z.object({
+// this UI updates both the registration and artist tables
+export const confirmSchemaUI = z.object({
 	id: z.number().int(),
 	artistId: z.number().int(),
 	registrationYear: z.string().nullish(),
@@ -122,17 +124,23 @@ export const registrationSchemaUI = z.object({
 	bumpIn: z.string().nullish(),
 	bumpOut: z.string().nullish(),
 	displayRequirements: z.string().nullish(),
-	accomodation: z.string().default('No'),
+	accommodation: z.string().default('No'),
 	crane: z.string().default('No'),
-	transport: z.string().default('No')
+	transport: z.string().default('No'),
+	bankAccountName: z.string().nullish(),
+	bankBSB: z.coerce.string().nullish(),
+	bankAccount: z.coerce.string().nullish()
 });
-export type RegistrationUI = z.infer<typeof registrationSchemaUI>;
+export type RegistrationUI = z.infer<typeof confirmSchemaUI>;
 
 export const entrySchemaUI = z.object({
 	id: z.number().int(),
-	title: z.string({ required_error: 'Title is required' }).nullish(),
+	title: z.string({ required_error: 'Title is required' }),
 	inOrOut: z.lazy(() => EntryTypeSchema).default('Outdoor'),
-	price: z.string({ required_error: 'Price is required' }).nullish(),
+	price: z.coerce
+		.number()
+		.int()
+		.refine((val) => val > 0, { message: 'Number is required.' }),
 	material: z.string().nullish(),
 	dimLength: z.string().nullish(),
 	dimWidth: z.string().nullish(),
@@ -143,6 +151,10 @@ export const entrySchemaUI = z.object({
 });
 export type EntryUI = z.infer<typeof entrySchemaUI>;
 
+export const entryDeleteSchemaUI = z.object({
+	id: z.string()
+});
+
 export const imageSchemaUI = z.object({
 	id: z.number().int(),
 	cloudId: z.string(),
@@ -150,3 +162,10 @@ export const imageSchemaUI = z.object({
 	originalFileName: z.string()
 });
 export type ImageUI = z.infer<typeof imageSchemaUI>;
+
+export const fileUploadSchema = z.object({
+	image: z
+		.instanceof(File, { message: 'Please upload a file.' })
+		.refine((f) => f.size < MAX_IMAGE_SIZE, 'Upload must be less than 5Mb!')
+});
+export type FileUpload = z.infer<typeof fileUploadSchema>;

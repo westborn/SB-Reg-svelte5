@@ -6,70 +6,83 @@ import { redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
-import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED, SUCCESS_MESSAGE } from '$lib/constants';
+import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
 
 import { artistSchemaUI } from '$lib/zod-schemas';
+import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
-	const artistForm = await superValidate(zod(artistSchemaUI));
-	return { artistForm };
+	return;
 };
 
-const updateArtist = async (event: RequestEvent) => {
-	const form = await superValidate(event, zod(artistSchemaUI));
-	if (!form.valid) {
-		return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', { status: 400 });
+const artistUpdate = async (event: RequestEvent) => {
+	const formValidationResult = await superValidate(event, zod(artistSchemaUI));
+	if (!formValidationResult.valid) {
+		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
+			status: 400
+		});
 	}
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) return redirect(302, '/login');
 
+	// If the user is an admin, they can update any artist
+	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
+
 	try {
-		const artistEmail = user.email; // TODO Assuming email is the correct identifier
-		console.log('updateArtist', artistEmail);
 		const result = await prisma.artistTable.update({
 			where: { email: artistEmail },
-			data: form.data
+			data: formValidationResult.data
 		});
 
 		if (!result) {
-			console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(form, GENERIC_ERROR_MESSAGE);
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 	} catch (error) {
-		console.log(`${event.route.id}`, error);
-		return message(form, GENERIC_ERROR_MESSAGE);
+		console.error(`${event.route.id}`, error);
+		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
-	return message(form, SUCCESS_MESSAGE);
+	// Return the updated submission
+	const updatedSubmission = await getSubmission(user as User);
+	const returnData = { formValidationResult, updatedSubmission };
+	return returnData;
 };
 
-const createArtist = async (event: RequestEvent) => {
-	const form = await superValidate(event, zod(artistSchemaUI));
-	if (!form.valid) {
-		return message(form, 'Registration is Invalid - please reload and try again, or, call us!!', { status: 400 });
-	}
+const artistCreate = async (event: RequestEvent) => {
+	console.log(`${event.route.id} - artistCreate - START`);
 	const { session, user } = await event.locals.V1safeGetSession();
 	if (!user || !session) return redirect(302, '/login');
 
-	const artistEmail = user.email; // TODO Ensure email is correctly identified
-	console.log('createArtist', artistEmail);
-	const newArtist = { ...form.data, email: artistEmail };
+	const formValidationResult = await superValidate(event, zod(artistSchemaUI));
+	if (!formValidationResult.valid) {
+		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
+			status: 400
+		});
+	}
+
+	// If the user is an admin, they can update any artist
+	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
+	const newArtist = { ...formValidationResult.data, email: artistEmail };
 
 	try {
 		const result = await prisma.artistTable.create({ data: newArtist });
 		if (!result) {
-			console.log(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(form, GENERIC_ERROR_MESSAGE);
+			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 	} catch (error) {
-		console.log(`${event.route.id} - `, error);
-		return message(form, GENERIC_ERROR_UNEXPECTED);
+		console.error(`${event.route.id} - `, error);
+		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
 
-	return message(form, SUCCESS_MESSAGE);
+	// Return the updated submission
+	const updatedSubmission = await getSubmission(user as User);
+	const returnData = { formValidationResult, updatedSubmission };
+	return returnData;
 };
 
-export const actions: Actions = { updateArtist, createArtist };
+export const actions: Actions = { artistUpdate, artistCreate };

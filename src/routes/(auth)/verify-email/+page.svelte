@@ -15,7 +15,7 @@
 	const { form: formData, enhance, errors } = form;
 	const url = $page.url;
 	const validatingEmail = url.searchParams.get('email');
-	$formData.email = validatingEmail || '';
+	$formData.email = validatingEmail ?? '';
 </script>
 
 <AuthPage type="verify-email" {session} {user}>

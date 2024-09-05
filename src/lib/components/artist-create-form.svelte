@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import type { SuperValidated } from 'sveltekit-superforms';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -15,41 +14,32 @@
 	import { getRegisterState } from '$lib/context.svelte.js';
 
 	let myState = getRegisterState();
-	let { artistForm }: { artistForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>> } = $props();
 
-	let form = superForm(artistForm, {
-		id: `createArtistForm`,
+	let form = superForm(myState.artistForm, {
+		id: `artistCreateForm`,
 		validators: zodClient(artistSchemaUI),
-		applyAction: true,
-		onUpdated: () => {
-			console.log('onUpdated');
-			if ($message === 'Success') {
-				toast.success('Artist Profile Added');
-				console.log('Artist Profile Added');
-				$message = null;
-				myState.dialogOpen = false;
-			} else {
-				toast.error('Artist Profile Create Failed!');
-				console.log('Artist Profile Create Failed!');
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			if (result.type != 'success') {
+				toast.error('Failed to Register the Artist');
+				cancel();
+				myState.artistCreateDialogOpen = false; //TODO: this is not working
+				return;
 			}
-		},
-		onResult: ({ result, formElement }) => {
-			console.log('onResult', JSON.stringify(result, null, 2), JSON.stringify(formElement, null, 2));
-			if (result.type) {
-				$message = 'Success1';
-			} else {
-				$message = 'Failed1';
-			}
-		},
-		onUpdate: () => {
-			console.log('onUpdated');
+			myState.submission = result?.data?.updatedSubmission;
+			toast.success('Artist is now Registered');
+			myState.artistCreateDialogOpen = false; //TODO: this is not working
+			return;
 		}
 	});
 
 	const { form: formData, enhance, errors, message } = form;
 </script>
 
-<form method="POST" action="?/createArtist" use:enhance class="w-full space-y-4">
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<form method="POST" action="?/artistCreate" use:enhance class="w-full space-y-4">
+	<!-- stop the form from submitting on enter key press -->
+	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>

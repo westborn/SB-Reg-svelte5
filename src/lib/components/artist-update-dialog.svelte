@@ -1,20 +1,14 @@
 <script lang="ts">
-	import type { SuperValidated } from 'sveltekit-superforms';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { ArtistUpdateForm } from '$lib/components';
 
-	type Props = {
-		artistForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>>;
-	};
-
-	let { artistForm }: Props = $props();
 	let myState = getRegisterState();
 </script>
 
-<Dialog.Root bind:open={myState.dialogOpen}>
+<Dialog.Root bind:open={myState.artistUpdateDialogOpen}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update Your Details?</Dialog.Trigger>
 	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
 		<Dialog.Header>
@@ -22,7 +16,7 @@
 			<Dialog.Description>Make changes to your profile here.<br />Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<ArtistUpdateForm {artistForm} />
+			<ArtistUpdateForm />
 		</div>
 	</Dialog.Content>
 </Dialog.Root>

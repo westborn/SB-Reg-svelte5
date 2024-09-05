@@ -48,7 +48,17 @@ const config = {
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
-					foreground: 'hsl(var(--accent-foreground) / <alpha-value>)'
+					foreground: 'hsl(var(--accent-foreground) / <alpha-value>)',
+					50: '#FFF1BD',
+					100: '#FFEDA8',
+					200: '#FFE47F',
+					300: '#FFDB57',
+					400: '#FFD32E',
+					500: '#FFCA05',
+					600: '#CCA100',
+					700: '#947400',
+					800: '#5C4800',
+					900: '#241C00'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover) / <alpha-value>)',

@@ -2,6 +2,9 @@
 	import '../app.pcss';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { dev } from '$app/environment';
+
+	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 
 	import { setRegisterState } from '$lib/context.svelte.js';
 
@@ -10,6 +13,7 @@
 
 	let { children, data } = $props();
 	let { supabase, session, user } = data;
+	let { artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm } = data.universal;
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
@@ -17,23 +21,55 @@
 				invalidate('supabase:auth');
 			}
 		});
+		console.info(`env dev:${dev} meta.env.MODE:${import.meta.env.MODE}`);
+		console.info(`running in "${PUBLIC_SQUARE_ENVIRONMENT}" mode`);
+
+		// update this to add square in the head - see below
+		// const src =
+		// 	PUBLIC_SQUARE_ENVIRONMENT === 'sandbox'
+		// 		? 'https://sandbox.web.squarecdn.com/v1/square.js'
+		// 		: 'https://web.squarecdn.com/v1/square.js';
+		// const scriptEl = document.createElement('script');
+		// scriptEl.async = false;
+		// scriptEl.type = 'text/javascript';
+		// scriptEl.src = src;
+		// document.head.appendChild(scriptEl);
+
 		return () => data.subscription.unsubscribe();
 	});
 
-	setRegisterState();
+	//load all the Superform forms into context
+	setRegisterState({
+		artistForm,
+		entryForm,
+		entryDeleteForm,
+		confirmForm,
+		imageUploadForm
+	});
 </script>
 
+<!-- add the appropriate square.js script to the head of the document -->
 <svelte:head>
 	<title>Registration</title>
+	<script
+		src={PUBLIC_SQUARE_ENVIRONMENT === 'sandbox'
+			? 'https://sandbox.web.squarecdn.com/v1/square.js'
+			: 'https://web.squarecdn.com/v1/square.js'}
+		type="text/javascript"
+		async
+	></script>
 </svelte:head>
 
 <ModeWatcher />
 <Toaster
+	position="top-left"
+	duration={4000}
+	offset={60}
 	toastOptions={{
 		unstyled: true,
 		classes: {
 			error: 'bg-red-400',
-			success: 'text-green-400',
+			success: 'text-green-600',
 			warning: 'text-yellow-400',
 			info: 'bg-blue-400'
 		}

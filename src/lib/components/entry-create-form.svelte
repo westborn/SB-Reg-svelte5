@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
-	import { superForm, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
@@ -8,43 +7,68 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
-	import { Textarea } from './ui/textarea';
 
-	import { getRegisterState } from '$lib/context.svelte.js';
 	import { entrySchemaUI } from '$lib/zod-schemas';
+	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
+	import { ImageUploadForm, OptimisedImage } from '$lib/components';
 
 	let myState = getRegisterState();
+	updateWorkingImage(null);
 
-	let { entryForm }: { entryForm: SuperValidated<Record<string, unknown>, any, Record<string, unknown>> } = $props();
-
-	const form = superForm(entryForm, {
-		id: `createEntryForm`,
+	const form = superForm(myState.entryForm, {
+		id: `entryCreateForm`,
 		validators: zodClient(entrySchemaUI),
-		onUpdated: () => {
-			if ($message === 'Success') {
-				toast.success('Entry Added');
-				$message = null;
-				myState.dialogOpen = false;
-				invalidateAll();
-			} else {
-				toast.error('Entry Creation Failed!');
+		dataType: 'json',
+		onSubmit({ jsonData }) {
+			// pass the image that we accepted, into this form's data when they save the new entry
+			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage) });
+		},
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			if (result.type != 'success') {
+				toast.error('Failed to upload entry');
+				cancel();
+				myState.entryCreateDialogOpen = false; //TODO: this is not working
+				return;
 			}
+			myState.submission = result?.data?.updatedSubmission;
+			toast.success('Entry Added');
+			myState.entryCreateDialogOpen = false; //TODO: this is not working
+			return;
 		}
 	});
 
 	const { form: formData, enhance, message, errors } = form;
 </script>
 
-<form method="POST" action="?/createEntry" use:enhance class="w-full space-y-4">
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<form method="POST" action="?/entryCreate" class="w-full space-y-4" use:enhance id="entryCreateForm">
+	<!-- stop the form from submitting on enter key press -->
+	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
 	<Form.Field {form} name="title">
 		<Form.Control let:attrs>
 			<Form.Label>Title for this Exhibit</Form.Label>
-			<Input autofocus type="text" {...attrs} bind:value={$formData.title} />
+			<Input autofocus type="text" {...attrs} bind:value={$formData.title} required />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
+
+	{#if myState.workingImage?.cloudURL}
+		<div class="self-center">
+			<OptimisedImage
+				path={myState.workingImage?.cloudURL ? myState.workingImage?.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
+				alt="Current Image"
+				width={128}
+				height={128}
+				class="h-32 w-32 overflow-hidden rounded object-contain"
+			/>
+		</div>
+	{/if}
+
+	<ImageUploadForm buttonText={'Upload Image'} />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>
@@ -77,13 +101,13 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<p class="mb-4 mt-8 text-gray-600">
+	<p class="text-gray-600">
 		Size of this piece <span class="font-semibold">in centimetres</span> (L x W x H)
 	</p>
 	<div class="grid grid-cols-3 gap-4">
 		<Form.Field {form} name="dimLength">
 			<Form.Control let:attrs>
-				<Form.Label class="mb-4 mt-8 text-gray-600">Length</Form.Label>
+				<Form.Label>Length</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.dimLength} />
 			</Form.Control>
 			<Form.FieldErrors />
@@ -91,7 +115,7 @@
 
 		<Form.Field {form} name="dimWidth">
 			<Form.Control let:attrs>
-				<Form.Label class="mb-4 mt-8 text-gray-600">Width</Form.Label>
+				<Form.Label>Width</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.dimWidth} />
 			</Form.Control>
 			<Form.FieldErrors />
@@ -99,7 +123,7 @@
 
 		<Form.Field {form} name="dimHeight">
 			<Form.Control let:attrs>
-				<Form.Label class="mb-4 mt-8 text-gray-600">Height</Form.Label>
+				<Form.Label>Height</Form.Label>
 				<Input type="text" {...attrs} bind:value={$formData.dimHeight} />
 			</Form.Control>
 			<Form.FieldErrors />
@@ -155,8 +179,7 @@
 	<Form.Errors errors={$errors._errors} />
 	{#if !$message}
 		<div>
-			<Form.Button>Add New Entry?</Form.Button>
-			<span class="text-sm text-muted-foreground"> Just a little note</span>
+			<Form.Button>Save New Entry?</Form.Button>
 		</div>
 	{:else}
 		<div class="font-semibold text-red-700">{$message}</div>

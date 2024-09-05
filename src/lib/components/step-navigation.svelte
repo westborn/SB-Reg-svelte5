@@ -1,26 +1,27 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
+	import { getStep } from '$lib/stepsState.svelte';
 
-	import { getStep } from '$lib/regState.svelte.ts';
-	import SuperDebug from 'sveltekit-superforms';
-
-	import { REGISTER_ROUTES, STEPS } from '$lib/constants';
+	import { STEPS } from '$lib/constants';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { getRegisterState } from '$lib/context.svelte.js';
+
+	let myState = getRegisterState();
 
 	let currentStep = getStep();
 
-	if (browser) {
-		goto(REGISTER_ROUTES.REGISTER);
+	function nextAllowableStep(step: number) {
+		const nextStep =
+			currentStep.calcAllowableNextStep(myState, step) < step ? currentStep.calcAllowableNextStep(myState, step) : step;
+		return STEPS[nextStep]?.link ?? STEPS[0].link;
 	}
 </script>
 
-<SuperDebug data={{ currentStep }} />
+<!-- <SuperDebug data={{ currentStep }} /> -->
 <!-- list of form STEPS -->
 <div class="flex items-center justify-between p-4">
 	{#each STEPS as step, index}
 		<div class="flex w-full items-center">
-			<a href={step.link} class="flex items-center gap-2 text-xl disabled:text-white/50 lg:gap-5">
+			<a href={nextAllowableStep(index)} class="flex items-center gap-2 text-xl disabled:text-white/50 lg:gap-5">
 				<div class="relative flex flex-col items-center">
 					<div
 						class="flex h-12 w-12 flex-col items-center justify-center rounded-full border-4 border-gray-300 font-semibold text-gray-600
@@ -46,7 +47,7 @@
 	<!-- back button -->
 	<div class="min-w-10">
 		{#if currentStep.step > 0}
-			<a href={STEPS[currentStep.step - 1]?.link || STEPS[0].link}>
+			<a href={STEPS[currentStep.step - 1]?.link ?? STEPS[0].link}>
 				<Button variant="ghost" class="bg-primary-50 text-white">Back</Button>
 			</a>
 		{/if}

@@ -1,55 +1,58 @@
 <script lang="ts">
-	import { EntryAccordion, EntryCreateDialog, EntryCreateForm } from '$lib/components';
-	import { getStep } from '$lib/regState.svelte.ts';
+	import { EntryAccordion, EntryCreateDialog, EntryCreateForm, EntryUpdateDialog } from '$lib/components';
+	import { getStep } from '$lib/stepsState.svelte';
+	import { getRegisterState } from '$lib/context.svelte.js';
 
-	import SuperDebug from 'sveltekit-superforms';
-	import type { ReturnedEntries } from '$lib/components/server/registrationDB.ts';
-	// TODO fix this type!
+	const myState = getRegisterState();
 
-	let { data } = $props();
-	let { currentEntries, entryForm } = data;
+	let costOfRegistration = $derived(myState.currentEntries ? 20 + myState.currentEntries.length * 20 : 20);
+	let numberOfEntries = $derived(
+		myState.currentEntries
+			? myState.currentEntries.length + (myState.currentEntries.length === 1 ? ' entry' : ' entries')
+			: ''
+	);
+
+	const entryType = {
+		create: 'create',
+		update: 'update',
+		delete: 'delete'
+	};
+
+	// default to create a new entry
+	let actionType = $state(entryType.create);
+	let currentEntryId = $state(0);
+
+	if (!myState.entriesExist) {
+		actionType = entryType.create;
+	}
 
 	let currentStep = getStep();
 	currentStep.step = 1;
-	// console.log('currentEntries', JSON.stringify(currentEntries, null, 2));
-
-	let entryArray = (
-		currentEntries && currentEntries.registrations.length > 0 ? currentEntries.registrations[0].entries : []
-	) as ReturnedEntries;
-
-	let entriesExist = entryArray.length > 0;
-
-	let showButtons = true;
-
-	let costOfRegistration = entryArray ? 20 + entryArray.length * 20 : 20;
-	let numberOfEntries = entryArray ? (entryArray.length === 1 ? `1 entry` : `${entryArray.length} entries`) : 'wtf';
-
-	function doUpdate(id: number) {
-		console.log('doUpdate for ', id);
-	}
-
-	function doDelete(id: number) {
-		console.log('doDelete for ', id);
-	}
 </script>
 
-<section class="mx-auto mt-10 max-w-prose px-3">
-	{#if !entriesExist}
-		<div>
-			<div class="mb-10 mt-10">Create your first entry</div>
-			<EntryCreateForm {entryForm} />
-		</div>
-	{:else}
-		<p class="mt-2 text-base font-bold text-primary-400">
-			Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
-		</p>
-		<div class="mt-6">
-			<EntryAccordion {showButtons} {doDelete} {doUpdate} {entryArray} />
-			<div class="mt-6">
-				<EntryCreateDialog {entryForm} />
+<section class="mx-auto mt-10 px-3">
+	{#if actionType === entryType.create}
+		{#if !myState.entriesExist}
+			<div>
+				<div class="mb-10 mt-10">Create your first entry</div>
+				<EntryCreateForm />
 			</div>
-			<!-- <Button class="mt-6" onclick={() => (showAdd = true)}>or - Add a New Entry?</Button> -->
+		{:else}
+			<p class="mt-2 text-base font-bold text-primary-400">
+				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
+			</p>
+			<div class="mt-6">
+				<EntryAccordion />
+				<div class="mt-6">
+					<EntryCreateDialog />
+				</div>
+			</div>
+		{/if}
+	{/if}
+	{#if actionType === entryType.update}
+		<div>
+			<div class="mb-10 mt-10">Update your entry</div>
+			<EntryUpdateDialog {currentEntryId} />
 		</div>
 	{/if}
 </section>
-<!-- <SuperDebug data={currentEntries} /> -->

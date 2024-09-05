@@ -1,7 +1,6 @@
 <script lang="ts">
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import type { SuperValidated } from 'sveltekit-superforms';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -15,33 +14,36 @@
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { untrack } from 'svelte';
 
-	let { artistForm }: { artistForm: SuperValidated<Record<string, unknown>> } = $props();
 	let myState = getRegisterState();
 
-	let form = superForm(artistForm, {
-		id: `updateArtistForm-${myState?.submission?.id}`,
+	let form = superForm(myState.artistForm, {
+		id: `artistUpdateForm-${myState?.submission?.id}`,
 		validators: zodClient(artistSchemaUI),
-		resetForm: false,
-		onUpdated: (e) => {
-			toast.success('Profile Updated');
-			if (myState.submission) {
-				myState.submission = { ...myState.submission, ...e.form.data };
+		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+			if (result.type != 'success') {
+				toast.error('Failed to Update the Registration');
+				cancel();
+				myState.artistUpdateDialogOpen = false; //TODO: this is not working
+				return;
 			}
-			myState.dialogOpen = false;
+			myState.submission = result?.data?.updatedSubmission;
+			toast.success(' Registration Updated');
+			myState.artistUpdateDialogOpen = false; //TODO: this is not working
+			return;
 		}
 	});
 	const { form: formData, enhance, errors, message } = form;
 
 	// grab the form field values from the submission object
 	$effect(() => {
-		const firstName = untrack(() => myState?.submission?.firstName || '');
-		const lastName = untrack(() => myState?.submission?.lastName || '');
-		const phone = untrack(() => myState?.submission?.phone || '');
-		const postcode = untrack(() => myState?.submission?.postcode || '');
-		const firstNations = untrack(() => myState?.submission?.firstNations || 'Declined');
-		const bankAccountName = untrack(() => myState?.submission?.bankAccountName || '');
-		const bankBSB = untrack(() => myState?.submission?.bankBSB || '');
-		const bankAccount = untrack(() => myState?.submission?.bankAccount || '');
+		const firstName = untrack(() => myState?.submission?.firstName ?? '');
+		const lastName = untrack(() => myState?.submission?.lastName ?? '');
+		const phone = untrack(() => myState?.submission?.phone ?? '');
+		const postcode = untrack(() => myState?.submission?.postcode ?? '');
+		const firstNations = untrack(() => myState?.submission?.firstNations ?? 'Declined');
+		const bankAccountName = untrack(() => myState?.submission?.bankAccountName ?? '');
+		const bankBSB = untrack(() => myState?.submission?.bankBSB ?? '');
+		const bankAccount = untrack(() => myState?.submission?.bankAccount ?? '');
 		$formData.firstName = firstName;
 		$formData.lastName = lastName;
 		$formData.phone = phone;
@@ -53,7 +55,11 @@
 	});
 </script>
 
-<form method="POST" action="?/updateArtist&id={myState?.submission?.id}" use:enhance class="w-full space-y-4">
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<form method="POST" action="?/artistUpdate&id={myState?.submission?.id}" use:enhance class="w-full space-y-4">
+	<!-- stop the form from submitting on enter key press -->
+	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
 	<Form.Field {form} name="firstName">
 		<Form.Control let:attrs>
 			<Form.Label>First Name</Form.Label>

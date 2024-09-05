@@ -39,7 +39,7 @@ export const actions = {
 				form
 			});
 		}
-		console.log('verify-email:', data);
+		// console.log('verify-email:', data);
 		redirect(302, '/');
 	}
 };

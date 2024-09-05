@@ -26,10 +26,9 @@ function getNextExhibitionYear(): number {
 }
 
 export const ExhibitionYear = getNextExhibitionYear();
-
 export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again later.';
 export const GENERIC_ERROR_UNEXPECTED = "Something went wrong. Sorry, we're broken!";
-export const SUCCESS_MESSAGE = 'Success';
+export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export enum REGISTER_ROUTES {
 	REGISTER = '/register/artist',
@@ -60,3 +59,5 @@ export const STEPS = [
 		link: REGISTER_ROUTES.COMPLETE
 	}
 ];
+import { PUBLIC_REGISTRATIONS_OPEN } from '$env/static/public';
+export const stillTakingRegistrations = PUBLIC_REGISTRATIONS_OPEN === 'YES' ? true : false;

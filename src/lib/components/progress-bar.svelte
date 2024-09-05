@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getStep } from '$lib/regState.svelte.ts';
+	import { getStep } from '$lib/stepsState.svelte';
 	import SuperDebug from 'sveltekit-superforms';
 	let current = getStep();
 
