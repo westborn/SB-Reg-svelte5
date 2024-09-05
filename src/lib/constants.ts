@@ -59,3 +59,5 @@ export const STEPS = [
 		link: REGISTER_ROUTES.COMPLETE
 	}
 ];
+import { PUBLIC_REGISTRATIONS_OPEN } from '$env/static/public';
+export const stillTakingRegistrations = PUBLIC_REGISTRATIONS_OPEN === 'YES' ? true : false;
