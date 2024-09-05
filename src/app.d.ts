@@ -12,7 +12,7 @@ declare global {
 			V1safeGetSession(): Promise<{ session: Session | null; user: User | null }>;
 		}
 		interface PageData {
-			session: Session | null;
+			session?: Session | null;
 			user: User | null;
 		}
 		// interface PageData {}

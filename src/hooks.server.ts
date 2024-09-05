@@ -1,7 +1,8 @@
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { createServerClient } from '@supabase/ssr';
-import type { Handle } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
+import { stillTakingRegistrations } from '$lib/constants';
 
 // https://khromov.se/the-comprehensive-guide-to-locals-in-sveltekit/
 // https://joyofcode.xyz/sveltekit-hooks#creating-routes
@@ -36,21 +37,6 @@ const auth: Handle = async ({ event, resolve }) => {
 		if (!session) {
 			return { session: null, user: null };
 		}
-
-		//  type UserResponse =
-		// | {
-		// 		data: {
-		// 			user: User
-		// 		}
-		// 		error: null
-		// 	}
-		// | {
-		// 		data: {
-		// 			user: null
-		// 		}
-		// 		error: AuthError
-		// 	}
-
 		const {
 			data: { user },
 			error
@@ -59,7 +45,6 @@ const auth: Handle = async ({ event, resolve }) => {
 			// JWT validation has failed
 			return { session: null, user: null };
 		}
-
 		const userDomain = user.email.split('@')[1];
 		const isAdmin = userDomain === 'sculpturebermagui.org.au';
 		if (isAdmin && session && user) {
@@ -68,10 +53,8 @@ const auth: Handle = async ({ event, resolve }) => {
 		} else {
 			user.isAdmin = false;
 		}
-
 		return { session, user };
 	};
-
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === 'content-range' || name === 'x-supabase-api-version';
@@ -79,4 +62,32 @@ const auth: Handle = async ({ event, resolve }) => {
 	});
 };
 
-export const handle = sequence(auth);
+const routesAllowedWithoutUser = ['/signup', '/verify-email', '/login'];
+const routeGuards: Handle = async ({ event, resolve }) => {
+	const { session, user } = await event.locals.V1safeGetSession();
+	console.log(`routeGuards: ${event.url} - ${user?.email} - ${user?.isAdmin}`);
+
+	if (event.url.pathname === '/login' && user) {
+		console.log('/login and user - redirecting to /');
+		throw redirect(303, '/');
+	}
+
+	if ((!session || !user) && !routesAllowedWithoutUser.includes(event.url.pathname)) {
+		console.log(`no session or no user redirecting to /login`);
+		throw redirect(303, '/login');
+	}
+	// only allow /admin if user is admin
+	if (event.url.pathname.startsWith('/admin') && !user.isAdmin) {
+		console.log('/admin and not admin - redirecting to /');
+		throw redirect(303, '/');
+	}
+	// only allow /view if registrations are closed - admin is exempt
+	if (event.url.pathname.startsWith('/register') && !user.isAdmin && !stillTakingRegistrations) {
+		console.log('/register and not taking registrations - redirecting to /view');
+		throw redirect(303, '/view');
+	}
+
+	return resolve(event);
+};
+
+export const handle = sequence(auth, routeGuards);

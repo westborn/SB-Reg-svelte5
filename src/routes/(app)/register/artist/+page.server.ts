@@ -2,7 +2,6 @@ import type { Actions, PageServerLoad } from './$types';
 import type { RequestEvent } from './$types';
 
 import { zod } from 'sveltekit-superforms/adapters';
-import { redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
@@ -12,8 +11,6 @@ import { artistSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
@@ -25,9 +22,7 @@ const artistUpdate = async (event: RequestEvent) => {
 			status: 400
 		});
 	}
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
-
+	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
 	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
 
@@ -54,9 +49,6 @@ const artistUpdate = async (event: RequestEvent) => {
 
 const artistCreate = async (event: RequestEvent) => {
 	console.log(`${event.route.id} - artistCreate - START`);
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
-
 	const formValidationResult = await superValidate(event, zod(artistSchemaUI));
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -64,6 +56,7 @@ const artistCreate = async (event: RequestEvent) => {
 		});
 	}
 
+	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
 	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
 	const newArtist = { ...formValidationResult.data, email: artistEmail };

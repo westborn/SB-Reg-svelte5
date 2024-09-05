@@ -11,8 +11,6 @@ const schema = z.object({
 });
 
 export const load: PageServerLoad = async (event) => {
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
 
 	const form = await superValidate(zod(schema));

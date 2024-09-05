@@ -3,7 +3,6 @@ import type { RequestEvent } from './$types';
 
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
-import { redirect } from '@sveltejs/kit';
 import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
@@ -19,8 +18,6 @@ import {
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
 
 export const load: PageServerLoad = async (event) => {
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
@@ -34,9 +31,7 @@ const entryUpdate = async (event: RequestEvent) => {
 			status: 400
 		});
 	}
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
-
+	const { user } = await event.locals.V1safeGetSession();
 	// extract the image data and entry id that we need to update
 	let workingImage = null;
 	let idToUpdate = null;
@@ -153,8 +148,7 @@ const entryCreate = async (event: RequestEvent) => {
 			status: 400
 		});
 	}
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
+	const { user } = await event.locals.V1safeGetSession();
 	// Process image data if available
 	let workingImage = null;
 	try {
@@ -260,14 +254,14 @@ const entryCreate = async (event: RequestEvent) => {
 
 const imageUpload = async (event: RequestEvent) => {
 	console.log(`${event.route.id} - imageUpload - ACTION`);
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
 
 	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
 	if (!formValidationResult.valid) {
 		return fail(400, withFiles({ formValidationResult }));
 	}
+
 	// Get the submission from the database and make sure we have a registration to attach the entry to
+	const { user } = await event.locals.V1safeGetSession();
 	try {
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
@@ -305,8 +299,6 @@ const imageUpload = async (event: RequestEvent) => {
 
 const entryDelete = async (event: RequestEvent) => {
 	console.log(`${event.route.id} - entryDelete - ACTION`);
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
 
 	const formValidationResult = await superValidate(event, zod(entryDeleteSchemaUI));
 	if (!formValidationResult.valid) {
@@ -321,6 +313,7 @@ const entryDelete = async (event: RequestEvent) => {
 	const idToDelete = parseInt(idAsString);
 	console.log('Deleting entry with id:', idToDelete);
 
+	const { user } = await event.locals.V1safeGetSession();
 	try {
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {

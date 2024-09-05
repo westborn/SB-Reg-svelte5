@@ -192,7 +192,7 @@
 			console.log(`handlePaymentSubmission-data: ${JSON.stringify(data, null, 4)}`);
 			apiResponse.lastStatus.response = data;
 			if (!apiResponse.lastStatus.ok) {
-				errorMessage = `Payment Failed, try again later - ${handleError(apiResponse.lastStatus).detail}`;
+				errorMessage = `Payment Failed, try again later - ${handleError(apiResponse.lastStatus)}`;
 				currentState = validStates.PAYMENTERROR;
 				return;
 			}

@@ -2,7 +2,6 @@ import type { Actions, PageServerLoad } from '../entry/$types';
 import type { RequestEvent } from '../entry/$types';
 
 import { zod } from 'sveltekit-superforms/adapters';
-import { redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
@@ -11,8 +10,6 @@ import { confirmSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) redirect(302, '/login');
 	console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
@@ -25,11 +22,7 @@ const confirmUpdate = async (event: RequestEvent) => {
 			status: 400
 		});
 	}
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) return redirect(302, '/login');
-
-	console.log('About to update confirm');
-
+	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
 	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
 	let idToUpdate: number;

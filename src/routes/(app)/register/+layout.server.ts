@@ -1,10 +1,8 @@
-import { redirect } from '@sveltejs/kit';
 import { getSubmission, type User } from '$lib/components/server/registrationDB';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async (event) => {
-	const { session, user } = await event.locals.V1safeGetSession();
-	if (!user || !session) redirect(302, '/login');
+	const { user } = await event.locals.V1safeGetSession();
 	console.log('register +layout.server.ts LOAD - START');
 
 	const submission = await getSubmission(user as User);

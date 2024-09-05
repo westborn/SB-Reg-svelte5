@@ -3,15 +3,13 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { AdminMenu, ThemeToggle } from '$lib/components';
-	import SuperDebug from 'sveltekit-superforms';
 	import { page } from '$app/stores';
 	let { children, data } = $props();
-	const { session, user } = data;
+	const { user } = data;
 	const loggedInEmail = user ? user.email : 'full@example.com';
 	const avatar = loggedInEmail.slice(0, 2);
 </script>
 
-<!-- <SuperDebug data={$page}></SuperDebug> -->
 <section class="flex flex-row items-center justify-between sm:container">
 	<div>
 		{#if user.isAdmin}
@@ -22,7 +20,11 @@
 		</a>
 	</div>
 	<div class="flex items-center gap-2">
-		<Button href={'/logout'} variant="ghost">Logout</Button>
+		{#if $page.route.id === '/(app)/view'}
+			<Button class="font-semibold text-primary-300" href={'/register'} variant="ghost">Register</Button>
+		{:else}
+			<Button class="font-semibold text-primary-300" href={'/view'} variant="ghost">View</Button>
+		{/if}
 		<Tooltip.Root openDelay={0}>
 			<Tooltip.Trigger>
 				<Avatar.Root>
@@ -38,6 +40,7 @@
 				{/if}
 			</Tooltip.Content>
 		</Tooltip.Root>
+		<Button href={'/logout'} variant="ghost">Logout</Button>
 		<ThemeToggle></ThemeToggle>
 	</div>
 </section>

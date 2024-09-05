@@ -5,11 +5,11 @@
 	import { dev } from '$app/environment';
 
 	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
-
 	import { setRegisterState } from '$lib/context.svelte.js';
 
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { stillTakingRegistrations } from '$lib/constants.js';
 
 	let { children, data } = $props();
 	let { supabase, session, user } = data;
@@ -21,20 +21,9 @@
 				invalidate('supabase:auth');
 			}
 		});
-		console.info(`env dev:${dev} meta.env.MODE:${import.meta.env.MODE}`);
-		console.info(`running in "${PUBLIC_SQUARE_ENVIRONMENT}" mode`);
-
-		// update this to add square in the head - see below
-		// const src =
-		// 	PUBLIC_SQUARE_ENVIRONMENT === 'sandbox'
-		// 		? 'https://sandbox.web.squarecdn.com/v1/square.js'
-		// 		: 'https://web.squarecdn.com/v1/square.js';
-		// const scriptEl = document.createElement('script');
-		// scriptEl.async = false;
-		// scriptEl.type = 'text/javascript';
-		// scriptEl.src = src;
-		// document.head.appendChild(scriptEl);
-
+		console.info(`Environment: dev:${dev} meta.env.MODE:${import.meta.env.MODE}`);
+		console.info(`Running in "${PUBLIC_SQUARE_ENVIRONMENT}" mode`);
+		console.info(`Registrations are ${stillTakingRegistrations ? 'open' : 'closed'}`);
 		return () => data.subscription.unsubscribe();
 	});
 
