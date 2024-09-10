@@ -1,15 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { artists2024 } from '$lib/data/schema.ts';
 	import { page } from '$app/stores';
-
-	type Artists = {
-		firstName: string;
-		lastName: string;
-		phone: string;
-		id: number;
-		email: string;
-	}[];
 
 	let { data } = $props();
 	const { form, artists: artistsFromServer } = data;
