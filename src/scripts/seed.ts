@@ -1,7 +1,16 @@
+const Indigenous = {
+	No: 'No',
+	Yes: 'Yes',
+	Declined: 'Declined'
+} as const;
+
+const EntryType = {
+	Indoor: 'Indoor',
+	Outdoor: 'Outdoor'
+} as const;
+
 import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
-
-import { Indigenous, EntryType } from '$lib/constants';
 
 const prisma = new PrismaClient();
 

@@ -73,6 +73,15 @@ async function makeSubmission() {
 				data: newEntry
 			});
 			console.log('Entry: ', entryDB.id);
+
+			//create a new locationTable record
+			const newLocation = {
+				entryId: entryDB.id,
+				exhibitNumber: exhibit.locationId.toString()
+			};
+			entryDB = await prisma.locationTable.create({
+				data: newLocation
+			});
 		}
 		// now create image record
 		const image = images.find((item) => exhibit.entryId === item.entryId);
@@ -80,7 +89,6 @@ async function makeSubmission() {
 			const newImage = {
 				artistId: artistMap.get(exhibit.email),
 				registrationId: registrationMap.get(exhibit.email),
-				entryId: entryDB.id,
 				originalFileName: image.originalFileName ?? ('' as string),
 				cloudId: exhibit.cloudinaryId as string,
 				cloudURL: exhibit.cloudinaryURL as string

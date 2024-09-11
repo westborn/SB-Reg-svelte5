@@ -12,6 +12,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Indigenous {
+  Yes
+  No
+  Declined
+
+  @@map("indigenous")
+}
+
+enum EntryType {
+  Indoor
+  Outdoor
+
+  @@map("entry_type")
+}
+
 model artistTable {
   id              Int                 @id @default(autoincrement())
   email           String              @unique
@@ -70,6 +85,7 @@ model entryTable {
   images              imageTable[]
   artist              artistTable       @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   registration        registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  locationTable       locationTable?
 
   @@map("entry")
 }
@@ -91,17 +107,13 @@ model imageTable {
   @@map("image")
 }
 
-enum Indigenous {
-  Yes
-  No
-  Declined
+model locationTable {
+  id            Int         @id @default(autoincrement())
+  exhibitNumber String      @unique
+  entryId       Int         @unique
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  entry         entryTable? @relation(fields: [entryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@map("indigenous")
-}
-
-enum EntryType {
-  Indoor
-  Outdoor
-
-  @@map("entry_type")
+  @@map("location")
 }
