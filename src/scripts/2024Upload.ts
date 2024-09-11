@@ -67,7 +67,7 @@ async function makeSubmission() {
 				description: entry.description as string,
 				specialRequirements: entry.specialRequirements as string,
 				enterMajorPrize: entry.enterMajorPrize == 'Yes' ? true : false,
-				price: entry.price as number
+				price: ((entry.price ?? 0) * 100) as number
 			};
 			entryDB = await prisma.entryTable.create({
 				data: newEntry
@@ -79,7 +79,7 @@ async function makeSubmission() {
 				entryId: entryDB.id,
 				exhibitNumber: exhibit.locationId.toString()
 			};
-			entryDB = await prisma.locationTable.create({
+			const locationDB = await prisma.locationTable.create({
 				data: newLocation
 			});
 		}
@@ -89,6 +89,7 @@ async function makeSubmission() {
 			const newImage = {
 				artistId: artistMap.get(exhibit.email),
 				registrationId: registrationMap.get(exhibit.email),
+				entryId: entryDB.id,
 				originalFileName: image.originalFileName ?? ('' as string),
 				cloudId: exhibit.cloudinaryId as string,
 				cloudURL: exhibit.cloudinaryURL as string
