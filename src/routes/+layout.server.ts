@@ -21,13 +21,11 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
 	]);
 
 	return {
-		universal: {
-			cookies: cookies.getAll(),
-			artistForm,
-			entryForm,
-			entryDeleteForm,
-			confirmForm,
-			imageUploadForm
-		}
+		cookies: cookies.getAll(),
+		artistForm,
+		entryForm,
+		entryDeleteForm,
+		confirmForm,
+		imageUploadForm
 	};
 };

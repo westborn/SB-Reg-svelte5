@@ -72,7 +72,7 @@
 									class="h-40 w-40 overflow-hidden rounded object-contain"
 								/>
 							</div>
-							<div class="mx-auto flex flex-col">
+							<div class="flex flex-col">
 								<p class="mt-3 text-lg">{convertToDollars(entryItem.price)}</p>
 								<p>{entryItem.material}</p>
 								<p>{entryItem?.specialRequirements}</p>

@@ -12,8 +12,7 @@
 	import { stillTakingRegistrations } from '$lib/constants.js';
 
 	let { children, data } = $props();
-	let { supabase, session, user } = data;
-	let { artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm } = data.universal;
+	let { artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm, supabase, session, user } = data;
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {

@@ -22,7 +22,7 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 				},
 				cookies: {
 					getAll() {
-						return data.universal.cookies;
+						return data.cookies;
 					}
 				}
 			});
@@ -40,5 +40,5 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 		data: { user }
 	} = await supabase.auth.getUser();
 
-	return { session, supabase, user, universal: data.universal };
+	return { session, supabase, user, ...data };
 };
