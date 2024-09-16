@@ -3,16 +3,10 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { getRegisterState } from '$lib/context.svelte';
 	import { EntryUpdateDialog, EntryDeleteDialog, OptimisedImage, EntryCreateDialog } from '$lib/components';
+	import { convertToDollars } from '$lib/utils.js';
 
 	let myState = getRegisterState();
 
-	const convertToDollars = (price: number | null | undefined) => {
-		if (!price) return '';
-		return (price / 100).toLocaleString('en-AU', {
-			style: 'currency',
-			currency: 'AUD'
-		});
-	};
 	const showButtons = true;
 </script>
 

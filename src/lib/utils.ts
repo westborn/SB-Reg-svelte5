@@ -147,3 +147,27 @@ export async function processResponse(response: Response) {
 		return await response.text();
 	}
 }
+
+export function determinePlacement(exhibitNumberString: string, exhibitionYear: string, inOrOut: string) {
+	if (parseInt(exhibitionYear) < 2024) {
+		return inOrOut;
+	}
+	const exhibitNumber = parseInt(exhibitNumberString);
+	if (exhibitNumber >= 100 && exhibitNumber < 400) {
+		return 'Headland';
+	} else if (exhibitNumber >= 400 && exhibitNumber < 500) {
+		return 'Hotel';
+	} else if (exhibitNumber >= 500 && exhibitNumber < 800) {
+		return 'Surf Gallery';
+	} else if (exhibitNumber >= 800 && exhibitNumber < 900) {
+		return 'Street Gallery';
+	}
+}
+
+export const convertToDollars = (price: number | null | undefined) => {
+	if (!price) return '';
+	return (price / 100).toLocaleString('en-AU', {
+		style: 'currency',
+		currency: 'AUD'
+	});
+};

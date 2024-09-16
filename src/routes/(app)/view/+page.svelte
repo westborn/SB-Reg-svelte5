@@ -4,6 +4,7 @@
 	import { stillTakingRegistrations } from '$lib/constants';
 	import { getRegisterState, updateSubmission } from '$lib/context.svelte.js';
 	import { OptimisedImage } from '$lib/components';
+	import { convertToDollars } from '$lib/utils.js';
 
 	let { data } = $props();
 	let { submission } = data;
@@ -11,14 +12,6 @@
 	updateSubmission(submission);
 
 	let myState = getRegisterState();
-
-	const convertToDollars = (price: number | null | undefined) => {
-		if (!price) return '';
-		return (price / 100).toLocaleString('en-AU', {
-			style: 'currency',
-			currency: 'AUD'
-		});
-	};
 
 	let costOfRegistration = $derived(myState.currentEntries ? 20 + myState.currentEntries.length * 20 : 20);
 	let numberOfEntries = $derived(

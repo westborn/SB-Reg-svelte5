@@ -316,3 +316,107 @@ export const createImage = async (workingImage: CurrentImage) => {
 	});
 	return image;
 };
+
+export const findAccepted = async (emailToFind: string) => {
+	return await prisma.artistTable.findMany({
+		where: {
+			email: emailToFind,
+			entries: {
+				some: {
+					accepted: true
+				}
+			}
+		},
+		select: {
+			email: true,
+			lastName: true, // Assuming `lastName` maps to `last_name` in your database
+			registrations: {
+				select: {
+					registrationYear: true, // Assuming `registrationYear` maps to `registration_year` in your database
+					entries: {
+						select: {
+							id: true, // This will be returned as `entryId`
+							accepted: true,
+							images: {
+								select: {
+									id: true, // This will be returned as `imageId`
+									cloudURL: true
+								}
+							},
+							locationTable: {
+								select: {
+									exhibitNumber: true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+};
+
+export type Exhibits = {
+	artistId: number;
+	email: string;
+	lastName: string;
+	firstName: string;
+	registrationYear: string;
+	entryId: number;
+	imageId: number;
+	cloudURL: string;
+	exhibitNumber: string;
+};
+
+type Exhibit = {
+	artistName: string;
+	cloudURL: string;
+	description: string;
+	registrationYear: string;
+	exhibitNumber: string;
+	inOrOut: string;
+	majorPrize?: string;
+	material: string;
+	price: string;
+	dimensions: string;
+	title: string;
+	email: string;
+	artistId: number;
+	entryId: number;
+	imageId: number;
+};
+
+export const getExhibits = async ({ rows, offset }: { rows: number; offset: number }): Promise<Exhibits[]> => {
+	const exhibits: Exhibits[] = await prisma.$queryRaw`select
+		artist.id as "artistId",
+		artist.email,
+		artist.last_name as "lastName",
+		artist.first_name as "firstName",
+		concat(artist.first_name, ' ', artist.last_name) as "artistName",
+		registration.registration_year as "registrationYear",
+		entry.id as "entryId",
+		entry.description,
+		entry.dimensions,
+		entry.in_or_out as "inOrOut",
+		entry.enter_major_prize as "majorPrize",
+		entry.material,
+		entry.title,
+		entry.price_in_cents as "price",
+		image.id as "imageId",
+		image.cloud_url as "cloudURL",
+		location."exhibitNumber"
+		from
+		artist
+		join registration on artist.id = registration.artist_id
+		join entry on registration.id = entry.registration_id
+		join location on entry.id = location."entryId"
+		join image on entry.id = image.entry_id
+		where
+		-- artist.email = 'epsilonartist@gmail.com' AND
+		entry.accepted = true
+		order by location."exhibitNumber" asc
+		OFFSET ${offset} ROWS
+		LIMIT ${rows}
+		`;
+	return exhibits;
+};
