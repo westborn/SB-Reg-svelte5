@@ -356,38 +356,28 @@ export const findAccepted = async (emailToFind: string) => {
 	});
 };
 
-export type Exhibits = {
+export type Exhibit = {
 	artistId: number;
 	email: string;
 	lastName: string;
 	firstName: string;
-	registrationYear: string;
-	entryId: number;
-	imageId: number;
-	cloudURL: string;
-	exhibitNumber: string;
-};
-
-type Exhibit = {
 	artistName: string;
-	cloudURL: string;
-	description: string;
 	registrationYear: string;
-	exhibitNumber: string;
-	inOrOut: string;
-	majorPrize?: string;
-	material: string;
-	price: string;
-	dimensions: string;
-	title: string;
-	email: string;
-	artistId: number;
 	entryId: number;
+	description: string;
+	dimensions: string;
+	inOrOut: string;
+	majorPrize?: boolean;
+	material: string;
+	title: string;
+	price: number;
 	imageId: number;
+	cloudURL: string;
+	exhibitNumber: string;
 };
 
-export const getExhibits = async ({ rows, offset }: { rows: number; offset: number }): Promise<Exhibits[]> => {
-	const exhibits: Exhibits[] = await prisma.$queryRaw`select
+export const getExhibits = async ({ rows, offset }: { rows: number; offset: number }): Promise<Exhibit[]> => {
+	const exhibits: Exhibit[] = await prisma.$queryRaw`select
 		artist.id as "artistId",
 		artist.email,
 		artist.last_name as "lastName",

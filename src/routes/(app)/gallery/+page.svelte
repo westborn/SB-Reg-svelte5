@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { OptimisedImage } from '$lib/components';
-	import type { Exhibits } from '$lib/components/server/registrationDB.js';
-	import { convertToDollars } from '$lib/utils.js';
+	import { CatalogueCard } from '$lib/components';
 
 	$effect(() => {
 		infiniteScroll({ getData, element });
@@ -11,8 +9,9 @@
 	});
 
 	const { data } = $props();
-	const allExhibits = data.exhibits as Exhibits[];
-	let exhibits = $state(allExhibits.slice(0, 5)); // initial page load to be greater than "body" so user can scroll
+	const allExhibits = data.exhibits.slice(0, 25);
+	let exhibits = $state(allExhibits.slice(0, 15)); // initial page load to be greater than "body" so user can scroll
+	// let exhibits = $state(allExhibits); // initial page load to be greater than "body" so user can scroll
 
 	const pageSize = 3; // Number of items to scroll at a time
 	let element = $state();
@@ -38,33 +37,20 @@
 	};
 </script>
 
-<section class="mx-auto mt-2 max-w-[600px] px-3">
+<section class="mx-auto mt-2 px-3">
 	<h4 class="text-xl font-bold text-primary">Exhibit Information</h4>
 	{#if !exhibits}
 		<p>None Found...</p>
 	{:else}
 		<div>
-			{#each exhibits as exhibit}
-				<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
-					{@render TextList('Email:', exhibit.email)}
-					{@render TextList('Name:', exhibit.artistName)}
-					{@render TextList('Price:', convertToDollars(exhibit.price))}
-
-					<div>
-						<OptimisedImage
-							path={exhibit.cloudURL ? exhibit.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
-							alt="Current Image"
-							width={128}
-							height={128}
-							class="h-32 w-32 overflow-hidden rounded object-contain"
-						/>
-					</div>
-					{@render TextList('', exhibit.exhibitNumber)}
-				</div>
-			{/each}
-			<div bind:this={element as HTMLDivElement}>
-				{exhibits.length == allExhibits.length ? 'No More Exhibits' : 'Loading Exhibits'}.....
+			<div class="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+				{#each exhibits as exhibit}
+					<CatalogueCard {...exhibit} />
+				{/each}
 			</div>
+		</div>
+		<div bind:this={element as HTMLDivElement}>
+			{exhibits.length == allExhibits.length ? 'No More Exhibits' : 'Loading Exhibits'}.....
 		</div>
 		<div class="mt-10"></div>
 	{/if}

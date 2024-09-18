@@ -2,6 +2,7 @@
 export { default as ArtistCreateForm } from './artist-create-form.svelte';
 export { default as ArtistUpdateDialog } from './artist-update-dialog.svelte';
 export { default as ArtistUpdateForm } from './artist-update-form.svelte';
+export { default as CatalogueCard } from './catalogue-card.svelte';
 export { default as ConfirmForm } from './confirm-form.svelte';
 export { default as ConfirmDialog } from './confirm-dialog.svelte';
 export { default as EntryCreateDialog } from './entry-create-dialog.svelte';

@@ -36,7 +36,7 @@
 </script>
 
 <!-- card -->
-<div class="flex max-h-[80vh] flex-col items-center justify-between rounded-xl border-2 bg-blue-50">
+<div class="flex max-w-[400px] flex-col items-center justify-between rounded-xl border-2 bg-blue-50">
 	<div class="flex w-full items-center px-2 py-3">
 		<div class="flex items-center justify-center rounded-full bg-blue-500 p-4 font-bold text-white">
 			<p>{exhibitNumber}</p>
@@ -47,9 +47,9 @@
 		<OptimisedImage
 			path={cloudURL ? cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
 			alt={title}
-			width={256}
-			height={256}
-			class="h-64 w-64 overflow-hidden rounded object-contain"
+			width={128}
+			height={128}
+			class="h-32 w-32 overflow-hidden rounded object-contain"
 		/>
 	</div>
 	<div class="w-full px-3 pb-2">
@@ -59,7 +59,7 @@
 			<p class="text-xs">{dimensions}</p>
 			<p class="text-xs">{determinePlacement(exhibitNumber, registrationYear, inOrOut)}</p>
 		</div>
-		<p class="w-full text-center text-base font-medium text-gray-700">{convertToDollars(price.)}</p>
+		<p class="w-full text-center text-base font-medium text-gray-700">{convertToDollars(parseInt(price))}</p>
 	</div>
 </div>
 <!-- card -->
