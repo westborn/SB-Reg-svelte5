@@ -81,6 +81,11 @@ const routeGuards: Handle = async ({ event, resolve }) => {
 		// console.log('/admin and not admin - redirecting to /');
 		throw redirect(303, '/');
 	}
+	// only allow /list if user is admin
+	if (event.url.pathname.startsWith('/list') && !user.isAdmin) {
+		console.log('/list and not admin - redirecting to /');
+		throw redirect(303, '/');
+	}
 	// only allow /view if registrations are closed - admin is exempt
 	if (event.url.pathname.startsWith('/register') && !user.isAdmin && !stillTakingRegistrations) {
 		// console.log('/register and not taking registrations - redirecting to /view');

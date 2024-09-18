@@ -16,6 +16,7 @@
 
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
+			<DropdownMenu.Item><a class="w-full" href="\list">List</a></DropdownMenu.Item>
 			<DropdownMenu.Item><a class="w-full" href="\view">View</a></DropdownMenu.Item>
 			<DropdownMenu.Item><a class="w-full" href="\register">Register</a></DropdownMenu.Item>
 			<DropdownMenu.Sub>

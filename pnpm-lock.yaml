@@ -20,6 +20,9 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: 4.0.0-next.7
         version: 4.0.0-next.7(svelte@5.0.0-next.244)(vite@5.4.3(@types/node@22.5.4))
+      add:
+        specifier: ^2.0.6
+        version: 2.0.6
       bits-ui:
         specifier: ^0.21.13
         version: 0.21.13(svelte@5.0.0-next.244)
@@ -41,6 +44,9 @@ importers:
       mode-watcher:
         specifier: ^0.4.1
         version: 0.4.1(svelte@5.0.0-next.244)
+      pnpm:
+        specifier: ^9.10.0
+        version: 9.10.0
       square:
         specifier: ^38.0.0
         version: 38.0.0
@@ -72,6 +78,9 @@ importers:
       '@sveltejs/kit':
         specifier: ^2.5.26
         version: 2.5.26(@sveltejs/vite-plugin-svelte@4.0.0-next.7(svelte@5.0.0-next.244)(vite@5.4.3(@types/node@22.5.4)))(svelte@5.0.0-next.244)(vite@5.4.3(@types/node@22.5.4))
+      '@tanstack/svelte-table':
+        specifier: 9.0.0-alpha.10
+        version: 9.0.0-alpha.10(svelte@5.0.0-next.244)
       '@types/eslint':
         specifier: ^9.6.1
         version: 9.6.1
@@ -796,6 +805,16 @@ packages:
   '@swc/helpers@0.5.13':
     resolution: {integrity: sha512-UoKGxQ3r5kYI9dALKJapMmuK+1zWM/H17Z1+iwnNmzcJRnfFuevZs375TA5rW31pu4BS4NoSy1fRsexDXfWn5w==}
 
+  '@tanstack/svelte-table@9.0.0-alpha.10':
+    resolution: {integrity: sha512-H0eAQlpXgK9JYYrgc0cWXVqEJywxkhuYODnVobUZGskFg6J+5PP+7UCjzrY9ftMge6s1hwb2Ipq3u4wPYJz7HA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      svelte: ^5.0.0-next
+
+  '@tanstack/table-core@9.0.0-alpha.10':
+    resolution: {integrity: sha512-f2kEGGL+d+I7evkhU926cID2MyH7nPI8acAPcwpaAR1DrgTNStAMp3NS+tgMDyrYtc8zd+RyTxC8m+NBhHhFmA==}
+    engines: {node: '>=12'}
+
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
@@ -910,6 +929,9 @@ packages:
     resolution: {integrity: sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+
+  add@2.0.6:
+    resolution: {integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==}
 
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
@@ -1628,6 +1650,11 @@ packages:
   pirates@4.0.6:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
+
+  pnpm@9.10.0:
+    resolution: {integrity: sha512-c6Ka+jag0JLs5Scd5Rd+y/gxjUVOzXATQxMbjrwMGpHEh9pGq3fI5ZbWrPFGHjWUztS+zt+JIbB0+9hlPtcFHA==}
+    engines: {node: '>=18.12'}
+    hasBin: true
 
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
@@ -2773,6 +2800,13 @@ snapshots:
     dependencies:
       tslib: 2.7.0
 
+  '@tanstack/svelte-table@9.0.0-alpha.10(svelte@5.0.0-next.244)':
+    dependencies:
+      '@tanstack/table-core': 9.0.0-alpha.10
+      svelte: 5.0.0-next.244
+
+  '@tanstack/table-core@9.0.0-alpha.10': {}
+
   '@types/cookie@0.6.0': {}
 
   '@types/eslint@9.6.1':
@@ -2915,6 +2949,8 @@ snapshots:
       acorn: 8.12.1
 
   acorn@8.12.1: {}
+
+  add@2.0.6: {}
 
   ajv@6.12.6:
     dependencies:
@@ -3630,6 +3666,8 @@ snapshots:
   pify@2.3.0: {}
 
   pirates@4.0.6: {}
+
+  pnpm@9.10.0: {}
 
   postcss-import@15.1.0(postcss@8.4.45):
     dependencies:
