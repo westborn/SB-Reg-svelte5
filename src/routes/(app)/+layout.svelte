@@ -20,10 +20,25 @@
 		</a>
 	</div>
 	<div class="flex items-center gap-2">
-		{#if $page.route.id === '/(app)/view'}
+		<!-- {#if $page.route.id === '/(app)/view'}
 			<Button class="font-semibold text-primary-300" href={'/register'} variant="ghost">Register</Button>
 		{:else}
 			<Button class="font-semibold text-primary-300" href={'/view'} variant="ghost">View</Button>
+		{/if} -->
+		{#if $page.url.pathname === '/view'}
+			<Button class="bg-transparent font-semibold text-primary-300 " disabled>View</Button>
+		{:else}
+			<Button class="font-semibold text-primary-300" href={'/view'} variant="ghost">View</Button>
+		{/if}
+		{#if $page.url.pathname === '/register'}
+			<Button class="bg-transparent font-semibold text-primary-300 " disabled>Register</Button>
+		{:else}
+			<Button class="font-semibold text-primary-300" href={'/register'} variant="ghost">Register</Button>
+		{/if}
+		{#if $page.url.pathname === '/gallery'}
+			<Button class="bg-transparent font-semibold text-primary-300 " disabled>Gallery</Button>
+		{:else}
+			<Button class="font-semibold text-primary-300" href={'/gallery'} variant="ghost">Gallery</Button>
 		{/if}
 		<Tooltip.Root openDelay={0}>
 			<Tooltip.Trigger>
