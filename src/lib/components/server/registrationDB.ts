@@ -317,44 +317,46 @@ export const createImage = async (workingImage: CurrentImage) => {
 	return image;
 };
 
-export const findAccepted = async (emailToFind: string) => {
-	return await prisma.artistTable.findMany({
-		where: {
-			email: emailToFind,
-			entries: {
-				some: {
-					accepted: true
-				}
-			}
-		},
-		select: {
-			email: true,
-			lastName: true, // Assuming `lastName` maps to `last_name` in your database
-			registrations: {
-				select: {
-					registrationYear: true, // Assuming `registrationYear` maps to `registration_year` in your database
-					entries: {
-						select: {
-							id: true, // This will be returned as `entryId`
-							accepted: true,
-							images: {
-								select: {
-									id: true, // This will be returned as `imageId`
-									cloudURL: true
-								}
-							},
-							locationTable: {
-								select: {
-									exhibitNumber: true
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	});
-};
+// TODO - is this type of select still required?
+
+// export const findAccepted = async (emailToFind: string) => {
+// 	return await prisma.artistTable.findMany({
+// 		where: {
+// 			email: emailToFind,
+// 			entries: {
+// 				some: {
+// 					accepted: true
+// 				}
+// 			}
+// 		},
+// 		select: {
+// 			email: true,
+// 			lastName: true, // Assuming `lastName` maps to `last_name` in your database
+// 			registrations: {
+// 				select: {
+// 					registrationYear: true, // Assuming `registrationYear` maps to `registration_year` in your database
+// 					entries: {
+// 						select: {
+// 							id: true, // This will be returned as `entryId`
+// 							accepted: true,
+// 							images: {
+// 								select: {
+// 									id: true, // This will be returned as `imageId`
+// 									cloudURL: true
+// 								}
+// 							},
+// 							locationTable: {
+// 								select: {
+// 									exhibitNumber: true
+// 								}
+// 							}
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+// 	});
+// };
 
 export type Exhibit = {
 	artistId: number;

@@ -13,7 +13,8 @@
 		getPaginationRowModel,
 		getSortedRowModel,
 		createTable,
-		FlexRender
+		FlexRender,
+		renderComponent
 	} from '@tanstack/svelte-table';
 	import * as Table from '$lib/components/ui/table';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -28,27 +29,50 @@
 	import { createTableState } from './state.svelte';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
+	import tableImage from './tableImage.svelte';
 
 	const { data } = $props();
 
-	let exhibits: Exhibit[] = $state(data.exhibits.slice(0, 999));
+	let exhibits: Exhibit[] = $state(data.exhibits?.slice(0, 999) ?? []);
 
 	const columnHelper = createColumnHelper<Exhibit>();
 	const columns = [
 		columnHelper.accessor('exhibitNumber', {
 			header: 'Placement',
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false,
 			cell: (info) => `${determinePlacement(info.getValue(), '2024', info.row.original.inOrOut)}_${info.getValue()}`
 		}),
+
+		columnHelper.display({
+			header: 'Thumbnail',
+			id: 'thumbnail',
+			cell: (info) => renderComponent(tableImage, { path: info.row.original.cloudURL })
+		}),
+
 		columnHelper.accessor('artistName', { header: 'Name' }),
 		columnHelper.accessor('title', { header: 'Title' }),
 		columnHelper.accessor('description', { header: 'Description' }),
-		columnHelper.accessor('dimensions', { header: 'Dimensions' }),
 		columnHelper.accessor('material', { header: 'Material' }),
-		columnHelper.accessor('price', { header: 'Price', cell: (info) => convertToDollars(info.getValue()) })
+
+		columnHelper.accessor('dimensions', {
+			header: 'Dimensions',
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
+
+		columnHelper.accessor('price', {
+			header: 'Price',
+			cell: (info) => convertToDollars(info.getValue(), 0),
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		})
 	];
 
 	const [pagination, setPagination] = createTableState<PaginationState>({
-		pageSize: 15,
+		pageSize: 8,
 		pageIndex: 0
 	});
 	const [sorting, setSorting] = createTableState<SortingState>([]);
@@ -102,6 +126,7 @@
 
 <div class="grid place-items-center">
 	<div class="inline-grid w-full max-w-screen-lg gap-2 p-2">
+		<!-- TODO code for implementing a select option if ever needed -->
 		<!-- <div class="grid gap-2">
 			<label
 				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -118,8 +143,9 @@
 				{/each}
 			</select>
 		</div> -->
+
 		<div class="flex items-center justify-between">
-			<p class="text-md font-bold">{table.getRowCount()} rows</p>
+			<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="outline" size="sm" class="ml-auto flex h-8" builders={[builder]}>Columns?</Button>
@@ -143,24 +169,22 @@
 		</div>
 
 		<div class="px-4">
-			<h1 class="is-size-1">Exhbits</h1>
 			<Table.Root>
 				<Table.Header>
 					{#each table.getHeaderGroups() as headerGroup}
 						<Table.Row>
 							{#each headerGroup.headers as header}
 								<Table.Head class="px-1">
-									<Button variant="ghost" class="p-1" onclick={header.column.getToggleSortingHandler()}>
+									<Button variant="ghost" size="sm" class="h-6 p-1" onclick={header.column.getToggleSortingHandler()}>
 										<FlexRender content={header.column.columnDef.header} context={header.getContext()} />
 									</Button>
 									{#if header.column.getCanFilter()}
 										<div>
 											<Input
 												type="text"
-												class="h-7 p-1"
+												class="h-6 w-20 p-1"
 												placeholder="Search..."
 												onchange={(e) => {
-													console.log(e.currentTarget.value);
 													header.column.setFilterValue(e.currentTarget.value);
 												}}
 											/>

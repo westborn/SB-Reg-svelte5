@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 
 	let { data } = $props();
-	const { form, artists: artistsFromServer } = data;
+	const { emailForm, artists: artistsFromServer } = data;
 	//don't mutate the original array
 	const artists = [...artistsFromServer].sort((a, b) => a.email.localeCompare(b.email));
 
@@ -19,7 +19,7 @@
 		})
 	);
 
-	const { message, enhance, formId } = superForm(form, {
+	const { message, enhance, formId } = superForm(emailForm, {
 		clearOnSubmit: 'errors'
 	});
 </script>
@@ -39,7 +39,7 @@
 		</div>
 	</div>
 
-	<form method="POST" use:enhance>
+	<form method="POST" action="?/setArtistEmail" use:enhance>
 		{#each filteredArtists as artist}
 			<div class="flex flex-row items-center justify-between pl-6">
 				<button

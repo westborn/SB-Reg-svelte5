@@ -164,10 +164,11 @@ export function determinePlacement(exhibitNumberString: string, exhibitionYear: 
 	}
 }
 
-export const convertToDollars = (price: number | null | undefined) => {
+export const convertToDollars = (price: number | null | undefined, decimals?: number) => {
 	if (!price) return '';
 	return (price / 100).toLocaleString('en-AU', {
 		style: 'currency',
+		maximumFractionDigits: decimals ?? 2,
 		currency: 'AUD'
 	});
 };

@@ -6,24 +6,22 @@ import { artistTableSchema } from '$lib/zod-schemas';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-const schema = z.object({
-	email: artistTableSchema.shape.email
-});
+const emailSchema = z.object({ email: artistTableSchema.shape.email });
 
 export const load: PageServerLoad = async (event) => {
 	console.log(`${event.route.id} - LOAD - START`);
 
-	const form = await superValidate(zod(schema));
+	const emailForm = await superValidate(zod(emailSchema), { id: 'emailForm' });
 	const artists = await getArtists();
-	return { form, artists };
+	return { emailForm, artists };
 };
 
 export const actions: Actions = {
-	default: async (event: RequestEvent) => {
+	setArtistEmail: async (event: RequestEvent) => {
 		const { request, cookies, locals } = event;
 		const { user } = await locals.V1safeGetSession();
 
-		const form = await superValidate(request, zod(schema));
+		const form = await superValidate(request, zod(emailSchema));
 		if (!form.valid) {
 			return message(form, 'Invalid email for artist.');
 		}
