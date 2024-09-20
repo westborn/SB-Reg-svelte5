@@ -1,13 +1,10 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	import type { FormPath, SuperForm } from 'sveltekit-superforms';
 	type T = Record<string, unknown>;
 	type U = FormPath<T>;
 </script>
 
-<script
-	lang="ts"
-	generics="T extends Record<string, unknown>, U extends FormPath<T>"
->
+<script lang="ts" generics="T extends Record<string, unknown>, U extends FormPath<T>">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import * as FormPrimitive from 'formsnap';
 	import { cn } from '$lib/utils.js';
@@ -21,14 +18,7 @@
 	export { className as class };
 </script>
 
-<FormPrimitive.Field
-	{form}
-	{name}
-	let:constraints
-	let:errors
-	let:tainted
-	let:value
->
+<FormPrimitive.Field {form} {name} let:constraints let:errors let:tainted let:value>
 	<div class={cn('space-y-0', className)}>
 		<slot {constraints} {errors} {tainted} {value} />
 	</div>
