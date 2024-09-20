@@ -19,41 +19,47 @@
 		})
 	);
 
-	const { message, enhance, formId } = superForm(emailForm, {
-		clearOnSubmit: 'errors'
-	});
+	const { message } = superForm(emailForm, {});
 </script>
 
-<div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
-	<p>Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail}</span></p>
-	<!-- Search Box -->
-	<div>
-		<div class="w-80 rounded p-4">
-			<input
-				bind:value={searchTerm}
-				type="search"
-				class="w-full rounded border border-solid border-gray-300 bg-white px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
-				placeholder="First Name, Last Name or Email"
-				aria-label="Search"
-			/>
-		</div>
-	</div>
+<section class="mx-auto mt-2 px-3">
+	<h4 class="text-xl font-bold text-primary">Admin Page</h4>
+	<p class="mt-4">This page contains functions that you can use to get different views of the SB database</p>
+	<p>It is a work in progress and will be updated as new features are added</p>
+	<p class="mt-4">Currently you can:</p>
+	<ul class="mx-12">
+		<li class="w-full list-disc">Set the email address of the artist you would like to act on behalf of</li>
+		<li class="w-full list-disc">View the list of artists in the database</li>
+	</ul>
+	<p class="mt-4">More features will be added soon</p>
 
-	<form method="POST" action="?/setArtistEmail" use:enhance>
-		{#each filteredArtists as artist}
-			<div class="flex flex-row items-center justify-between pl-6">
-				<button
-					class="cursor-pointer text-sm font-semibold"
-					name="email"
-					value={artist.email}
-					onclick={() => ($formId = artist.email)}
-				>
+	<hr class="mt-4" />
+	<p>Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail}</span></p>
+	<p class="mt-4">Search for the artist email you'd like to use</p>
+	<!-- Search Box -->
+	<form method="POST" action="?/setArtistEmail">
+		<div>
+			<div class="w-80 rounded p-4">
+				<input
+					bind:value={searchTerm}
+					type="search"
+					class="w-full rounded border border-solid border-gray-300 bg-white px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+					placeholder="Email"
+					aria-label="Search"
+				/>
+			</div>
+		</div>
+
+		<div class="grid w-full grid-cols-1 justify-between md:grid-cols-2 lg:grid-cols-3">
+			{#each filteredArtists as artist}
+				<button class="cursor-pointer text-left text-sm font-semibold" name="email" value={artist.email}>
 					{artist.email} - {artist.firstName} {artist.lastName}</button
 				>
-			</div>
-		{/each}
+			{/each}
+		</div>
 	</form>
 	{#if $message}
 		<div class="text-red-500">{$message}</div>
 	{/if}
-</div>
+	<hr class="mt-4" />
+</section>

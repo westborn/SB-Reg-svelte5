@@ -9,8 +9,8 @@ import {
 	fileUploadSchema
 } from '$lib/zod-schemas';
 
-export const load: LayoutServerLoad = async ({ cookies }) => {
-	console.log('+layout.server.ts LOAD - DONE');
+export const load: LayoutServerLoad = async (event) => {
+	console.log(`${event.route.id} - LAYOUTLOAD - START`);
 
 	const [artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm] = await Promise.all([
 		superValidate(zod(artistSchemaUI)),
@@ -21,7 +21,7 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
 	]);
 
 	return {
-		cookies: cookies.getAll(),
+		cookies: event.cookies.getAll(),
 		artistForm,
 		entryForm,
 		entryDeleteForm,
