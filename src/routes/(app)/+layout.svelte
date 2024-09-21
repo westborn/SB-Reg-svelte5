@@ -8,6 +8,12 @@
 	const { user } = data;
 	const loggedInEmail = user ? user.email : 'full@example.com';
 	const avatar = loggedInEmail.slice(0, 2);
+
+	const navItems = [
+		{ label: 'View', href: '/view' },
+		{ label: 'Register', href: '/register' },
+		{ label: 'Gallery', href: '/gallery' }
+	];
 </script>
 
 <section class="flex flex-row items-center justify-between sm:container">
@@ -25,21 +31,13 @@
 		{:else}
 			<Button class="font-semibold text-primary-300" href={'/view'} variant="ghost">View</Button>
 		{/if} -->
-		{#if $page.url.pathname === '/view'}
-			<Button class="bg-transparent font-semibold text-primary-300 " disabled>View</Button>
-		{:else}
-			<Button class="font-semibold text-primary-300" href={'/view'} variant="ghost">View</Button>
-		{/if}
-		{#if $page.url.pathname === '/register'}
-			<Button class="bg-transparent font-semibold text-primary-300 " disabled>Register</Button>
-		{:else}
-			<Button class="font-semibold text-primary-300" href={'/register'} variant="ghost">Register</Button>
-		{/if}
-		{#if $page.url.pathname === '/gallery'}
-			<Button class="bg-transparent font-semibold text-primary-300 " disabled>Gallery</Button>
-		{:else}
-			<Button class="font-semibold text-primary-300" href={'/gallery'} variant="ghost">Gallery</Button>
-		{/if}
+		{#each navItems as { label, href }, i}
+			{#if $page.url.pathname.startsWith(href)}
+				<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
+			{:else}
+				<Button class="font-semibold text-primary-300" {href} variant="ghost">{label}</Button>
+			{/if}
+		{/each}
 		<Tooltip.Root openDelay={0}>
 			<Tooltip.Trigger>
 				<Avatar.Root>

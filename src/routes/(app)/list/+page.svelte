@@ -62,8 +62,18 @@
 			enableSorting: false,
 			enableColumnFilter: false,
 			enableGlobalFilter: false,
-			cell: (info) =>
-				`${determinePlacement(info.getValue(), info.row.original.registrationYear, info.row.original.inOrOut)}${info.getValue() ?? ''}`
+			cell: (info) => {
+				const placement = determinePlacement(
+					info.getValue(),
+					info.row.original.registrationYear,
+					info.row.original.inOrOut
+				);
+				const location = info.getValue();
+				if (location) {
+					return placement + ' - ' + location;
+				}
+				return placement;
+			}
 		}),
 
 		columnHelper.display({
