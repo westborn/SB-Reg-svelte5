@@ -85,7 +85,7 @@ export const getSubmission = async ({ isAdmin, proxyEmail, email }: User) => {
 			bankBSB: true,
 			bankAccount: true,
 			registrations: {
-				where: { registrationYear: ExhibitionYear.toString() },
+				where: { registrationYear: ExhibitionYear },
 				select: {
 					id: true,
 					artistId: true,
@@ -154,7 +154,7 @@ export const getEntries = async (artistEmail: string) => {
 		where: { email: artistEmail },
 		select: {
 			registrations: {
-				where: { registrationYear: ExhibitionYear.toString() },
+				where: { registrationYear: ExhibitionYear },
 				select: {
 					entries: {
 						select: {
@@ -191,7 +191,7 @@ export const createNewRegistration = async (artistId: number) => {
 	const registration = await prisma.registrationTable.create({
 		data: {
 			artistId,
-			registrationYear: ExhibitionYear.toString(),
+			registrationYear: ExhibitionYear,
 			closed: false,
 			bumpIn: '',
 			bumpOut: '',

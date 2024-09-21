@@ -150,16 +150,16 @@ export async function processResponse(response: Response) {
 }
 
 export function determinePlacement(exhibitNumberString: string, entryYear: string, inOrOut: string) {
-	// console.log(`exhibitNumberString: ${exhibitNumberString}, entryYear: ${entryYear}, inOrOut: ${inOrOut}`);
+	console.log(`exhibitNumberString: ${exhibitNumberString}, entryYear: ${entryYear}, inOrOut: ${inOrOut}`);
 
 	// prior to 2024 just use "indoor" or "outdoor"
-	if (entryYear.localeCompare('2024') < 1) {
+	if (entryYear.localeCompare('2024') < 0) {
 		return inOrOut;
 	}
 	//no location determined yet
 	if (!exhibitNumberString) {
 		// but is this year's exhibition?
-		if (entryYear.localeCompare(ExhibitionYear.toString()) === 0) {
+		if (entryYear.localeCompare(ExhibitionYear) === 0) {
 			return inOrOut;
 		} else {
 			// not this year's exhibition
