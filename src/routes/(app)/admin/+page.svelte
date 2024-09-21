@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
+
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+
+	import * as Select from '$lib/components/ui/select/index.js';
 
 	let { data } = $props();
 	const { emailForm, artists: artistsFromServer } = data;
@@ -26,16 +30,23 @@
 	<h4 class="text-xl font-bold text-primary">Admin Page</h4>
 	<p class="mt-4">This page contains functions that you can use to get different views of the SB database</p>
 	<p>It is a work in progress and will be updated as new features are added</p>
-	<p class="mt-4">Currently you can:</p>
+	<p class="mt-4 font-semibold">Currently you can:</p>
 	<ul class="mx-12">
 		<li class="w-full list-disc">Set the email address of the artist you would like to act on behalf of</li>
 		<li class="w-full list-disc">View the list of artists in the database</li>
 	</ul>
 	<p class="mt-4">More features will be added soon</p>
+</section>
 
+<section class="mx-auto mt-2 px-3">
 	<hr class="mt-4" />
-	<p>Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail}</span></p>
-	<p class="mt-4">Search for the artist email you'd like to use</p>
+	<h4 class="text-lg font-semibold">
+		Set Artist Email
+		<span class="text-sm">
+			- (Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail})</span></span
+		>
+	</h4>
+	<p class="mt-4">Search for the artist email you'd like to impersonate</p>
 	<!-- Search Box -->
 	<form method="POST" action="?/setArtistEmail">
 		<div>
@@ -61,5 +72,4 @@
 	{#if $message}
 		<div class="text-red-500">{$message}</div>
 	{/if}
-	<hr class="mt-4" />
 </section>

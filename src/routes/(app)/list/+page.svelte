@@ -21,9 +21,12 @@
 	import * as Pagination from '$lib/components/ui/pagination';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
+	import * as Select from '$lib/components/ui/select';
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
 	import { createTableState } from './state.svelte';
@@ -33,7 +36,24 @@
 
 	const { data } = $props();
 
-	let exhibits: Exhibit[] = $state(data.exhibits?.slice(0, 999) ?? []);
+	let exhibits: Exhibit[] = $derived($page.data.exhibits?.slice(0, 999) ?? []);
+
+	const years = [
+		{ value: '2025', label: '2025' },
+		{ value: '2024', label: '2024' },
+		{ value: '2023', label: '2023' },
+		{ value: '2022', label: '2022' }
+	];
+
+	let selectedYear = $state({ value: '2025', label: '2025' });
+
+	function handleSelectYear(event: any) {
+		selectedYear = { ...event };
+		const newURL = new URL($page.url);
+		newURL.searchParams?.set('year', selectedYear.value);
+		console.log(newURL.toString());
+		goto(newURL);
+	}
 
 	const columnHelper = createColumnHelper<Exhibit>();
 	const columns = [
@@ -42,7 +62,8 @@
 			enableSorting: false,
 			enableColumnFilter: false,
 			enableGlobalFilter: false,
-			cell: (info) => `${determinePlacement(info.getValue(), '2024', info.row.original.inOrOut)}_${info.getValue()}`
+			cell: (info) =>
+				`${determinePlacement(info.getValue(), info.row.original.registrationYear, info.row.original.inOrOut)}${info.getValue() ?? ''}`
 		}),
 
 		columnHelper.display({
@@ -114,15 +135,39 @@
 
 	const table = createTable(options);
 	let currentPage = $state(1);
-	let selected = $state($page.params.artist);
 
 	type SelectChangeEvent = Event & {
 		currentTarget: EventTarget & HTMLSelectElement;
 	};
+
+	// TODO - this is a placeholder for the artist select dropdown
+	let selected = $state($page.params.artist);
 	const navigate = (e: SelectChangeEvent) => {
-		goto(`\list?exhibit=${e.currentTarget.value}`);
+		goto(`/list?exhibit=${e.currentTarget.value}`);
 	};
+	// TODO - END
 </script>
+
+<section class="mx-auto mt-2">
+	<div class="flex items-center justify-start gap-3">
+		<h4 class="text-xl font-bold text-primary">Year</h4>
+		<Select.Root onSelectedChange={handleSelectYear} selected={selectedYear}>
+			<Select.Trigger class="w-[120px]">
+				<Select.Value placeholder="Select a year" />
+			</Select.Trigger>
+			<Select.Content>
+				<Select.Group>
+					<Select.Label>Registration Year</Select.Label>
+					{#each years as year}
+						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
+					{/each}
+				</Select.Group>
+			</Select.Content>
+			<Select.Input name="registrationYear" />
+		</Select.Root>
+		<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
+	</div>
+</section>
 
 <div class="grid place-items-center">
 	<div class="inline-grid w-full max-w-screen-lg gap-2 p-2">
@@ -145,7 +190,6 @@
 		</div> -->
 
 		<div class="flex items-center justify-between">
-			<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="outline" size="sm" class="ml-auto flex h-8" builders={[builder]}>Columns?</Button>

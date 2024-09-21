@@ -378,7 +378,15 @@ export type Exhibit = {
 	exhibitNumber: string;
 };
 
-export const getExhibits = async ({ rows, offset }: { rows: number; offset: number }): Promise<Exhibit[]> => {
+export const getExhibits = async ({
+	rows,
+	offset,
+	entryYear
+}: {
+	rows: number;
+	offset: number;
+	entryYear: string;
+}): Promise<Exhibit[]> => {
 	const exhibits: Exhibit[] = await prisma.$queryRaw`select
 		artist.id as "artistId",
 		artist.email,
@@ -396,16 +404,16 @@ export const getExhibits = async ({ rows, offset }: { rows: number; offset: numb
 		entry.price_in_cents as "price",
 		image.id as "imageId",
 		image.cloud_url as "cloudURL",
-		location."exhibitNumber"
+		CASE WHEN location."exhibitNumber" is NULL THEN NULL ELSE location."exhibitNumber" END as "exhibitNumber"
 		from
 		artist
 		join registration on artist.id = registration.artist_id
 		join entry on registration.id = entry.registration_id
-		join location on entry.id = location."entryId"
+		LEFT OUTER join location on entry.id = location."entryId"
 		join image on entry.id = image.entry_id
 		where
-		-- artist.email = 'epsilonartist@gmail.com' AND
-		entry.accepted = true
+		-- -- artist.email = 'epsilonartist@gmail.com' AND
+		registration.registration_year = ${entryYear}
 		order by location."exhibitNumber" asc
 		OFFSET ${offset} ROWS
 		LIMIT ${rows}

@@ -10,7 +10,6 @@ const emailSchema = z.object({ email: artistTableSchema.shape.email });
 
 export const load: PageServerLoad = async (event) => {
 	console.log(`${event.route.id} - LOAD - START`);
-
 	const emailForm = await superValidate(zod(emailSchema), { id: 'emailForm' });
 	const artists = await getArtists();
 	return { emailForm, artists };

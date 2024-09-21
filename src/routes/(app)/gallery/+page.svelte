@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { CatalogueCard } from '$lib/components';
+	import * as Select from '$lib/components/ui/select';
+	import type { Exhibit } from '$lib/components/server/registrationDB.js';
 
 	$effect(() => {
 		infiniteScroll({ getData, element });
@@ -9,11 +13,15 @@
 	});
 
 	const { data } = $props();
-	const allExhibits = data.exhibits.slice(0, 25);
-	let exhibits = $state(allExhibits.slice(0, 15)); // initial page load to be greater than "body" so user can scroll
-	// let exhibits = $state(allExhibits); // initial page load to be greater than "body" so user can scroll
+
+	let allExhibits: Exhibit[] = $derived($page.data.exhibits?.slice(0, 999) ?? []);
 
 	const pageSize = 3; // Number of items to scroll at a time
+	let numToDisplay = $state(10);
+
+	let exhibits = $derived(allExhibits.slice(0, numToDisplay)); // initial page load to be greater than "body" so user can scroll
+	// let exhibits = $state(allExhibits); // initial page load to be greater than "body" so user can scroll
+
 	let element = $state();
 
 	const infiniteScroll = ({ getData, element }: { getData: any; element: HTMLElement }) => {
@@ -31,14 +39,49 @@
 
 	const getData = () => {
 		if (exhibits.length < allExhibits.length) {
-			const end = exhibits.length + pageSize;
-			exhibits = [...allExhibits.slice(0, end)];
+			numToDisplay = exhibits.length + pageSize;
 		}
 	};
+
+	const years = [
+		{ value: '2025', label: '2025' },
+		{ value: '2024', label: '2024' },
+		{ value: '2023', label: '2023' },
+		{ value: '2022', label: '2022' }
+	];
+
+	let selectedYear = $state({ value: '2025', label: '2025' });
+
+	function handleSelectYear(event: any) {
+		selectedYear = { ...event };
+		const newURL = new URL($page.url);
+		newURL.searchParams?.set('year', selectedYear.value);
+		console.log(newURL.toString());
+		goto(newURL);
+	}
 </script>
 
-<section class="mx-auto mt-2 px-3">
-	<h4 class="text-xl font-bold text-primary">Exhibit Information</h4>
+<section class="mx-auto mt-2">
+	<div class="flex items-center justify-center gap-3">
+		<h4 class="text-xl font-bold text-primary">Exhibit Information</h4>
+		<Select.Root onSelectedChange={handleSelectYear} selected={selectedYear}>
+			<Select.Trigger class="w-[120px]">
+				<Select.Value placeholder="Select a year" />
+			</Select.Trigger>
+			<Select.Content>
+				<Select.Group>
+					<Select.Label>Year</Select.Label>
+					{#each years as year}
+						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
+					{/each}
+				</Select.Group>
+			</Select.Content>
+			<Select.Input name="entryYear" />
+		</Select.Root>
+	</div>
+</section>
+
+<section class="mx-auto mt-2">
 	{#if !exhibits}
 		<p>None Found...</p>
 	{:else}

@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
+import { ExhibitionYear } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -148,10 +149,24 @@ export async function processResponse(response: Response) {
 	}
 }
 
-export function determinePlacement(exhibitNumberString: string, exhibitionYear: string, inOrOut: string) {
-	if (parseInt(exhibitionYear) < 2024) {
+export function determinePlacement(exhibitNumberString: string, entryYear: string, inOrOut: string) {
+	// console.log(`exhibitNumberString: ${exhibitNumberString}, entryYear: ${entryYear}, inOrOut: ${inOrOut}`);
+
+	// prior to 2024 just use "indoor" or "outdoor"
+	if (entryYear.localeCompare('2024') < 1) {
 		return inOrOut;
 	}
+	//no location determined yet
+	if (!exhibitNumberString) {
+		// but is this year's exhibition?
+		if (entryYear.localeCompare(ExhibitionYear.toString()) === 0) {
+			return inOrOut;
+		} else {
+			// not this year's exhibition
+			return '??';
+		}
+	}
+
 	const exhibitNumber = parseInt(exhibitNumberString);
 	if (exhibitNumber >= 100 && exhibitNumber < 400) {
 		return 'Headland';
