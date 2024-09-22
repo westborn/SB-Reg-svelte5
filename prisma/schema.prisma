@@ -3,29 +3,9 @@ generator client {
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
-// generator zod {
-//   provider = "zod-prisma-types"
-//   output   = "../src/lib/generated/zod"
-// }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-enum Indigenous {
-  Yes
-  No
-  Declined
-
-  @@map("indigenous")
-}
-
-enum EntryType {
-  Indoor
-  Outdoor
-
-  @@map("entry_type")
 }
 
 model artistTable {
@@ -41,9 +21,9 @@ model artistTable {
   bankAccount     String?             @map("bank_account")
   createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt       DateTime            @updatedAt @map("updated_at")
-  registrations   registrationTable[]
-  images          imageTable[]
   entries         entryTable[]
+  images          imageTable[]
+  registrations   registrationTable[]
 
   @@map("artist")
 }
@@ -61,9 +41,9 @@ model registrationTable {
   transport           Boolean      @default(false)
   createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime     @updatedAt @map("updated_at")
-  artist              artistTable  @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   entries             entryTable[]
   images              imageTable[]
+  artist              artistTable  @relation(fields: [artistId], references: [id], onDelete: Cascade)
 
   @@map("registration")
 }
@@ -83,10 +63,10 @@ model entryTable {
   title               String
   createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime          @updatedAt @map("updated_at")
+  artist              artistTable       @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  registration        registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade)
   images              imageTable[]
-  artist              artistTable       @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  registration        registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  locationTable       locationTable?
+  location            locationTable?
 
   @@map("entry")
 }
@@ -101,20 +81,35 @@ model imageTable {
   originalFileName String             @map("original_file_name")
   createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt        DateTime           @updatedAt @map("updated_at")
-  artist           artistTable        @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  registration     registrationTable? @relation(fields: [registrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  entry            entryTable?        @relation(fields: [entryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  artist           artistTable        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  entry            entryTable?        @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  registration     registrationTable? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
 
   @@map("image")
 }
 
 model locationTable {
   id            Int         @id @default(autoincrement())
-  exhibitNumber String      @unique
-  entryId       Int         @unique
+  exhibitNumber String      @unique @map("exhibit_number")
+  entryId       Int         @unique @map("entry_id")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt     DateTime    @updatedAt @map("updated_at")
   entry         entryTable? @relation(fields: [entryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("location")
+}
+
+enum Indigenous {
+  Yes
+  No
+  Declined
+
+  @@map("indigenous")
+}
+
+enum EntryType {
+  Indoor
+  Outdoor
+
+  @@map("entry_type")
 }

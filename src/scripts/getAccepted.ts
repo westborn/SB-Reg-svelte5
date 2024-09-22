@@ -85,6 +85,7 @@ type Exhibits = {
 	exhibitNumber: string;
 };
 
+//TODO fix issue with non accepted entries in prior years not being filtered out
 export const getExhibits = async ({ rows, offset }: { rows: number; offset: number }): Promise<Exhibits[]> => {
 	const exhibits: Exhibits[] = await prisma.$queryRaw`select
 		artist.id as "artistId",
