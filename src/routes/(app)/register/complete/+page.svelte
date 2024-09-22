@@ -26,7 +26,6 @@
 		['BSB:', myState?.submission?.bankBSB ?? ''],
 		['Account:', myState?.submission?.bankAccount ?? '']
 	]);
-	//TODO  get the layput and wording better for the complete page
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">

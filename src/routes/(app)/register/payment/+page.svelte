@@ -103,6 +103,7 @@
 
 	let sendCompleteToServer = async (data: { registrationId: number | undefined; email: string | undefined }) => {
 		errorMessage = '';
+		// TODO send an email to the artist with the receipt
 		console.log('sending to backend? TODO');
 		console.log(data);
 		return { result: 'success', data: null };

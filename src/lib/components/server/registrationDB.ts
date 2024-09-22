@@ -378,6 +378,7 @@ export type Exhibit = {
 	exhibitNumber: string;
 };
 
+//TODO fix issue with non accepted entries in prior years not being filtered out
 export const getExhibits = async ({
 	rows,
 	offset,

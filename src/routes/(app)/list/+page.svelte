@@ -149,13 +149,6 @@
 	type SelectChangeEvent = Event & {
 		currentTarget: EventTarget & HTMLSelectElement;
 	};
-
-	// TODO - this is a placeholder for the artist select dropdown
-	let selected = $state($page.params.artist);
-	const navigate = (e: SelectChangeEvent) => {
-		goto(`/list?exhibit=${e.currentTarget.value}`);
-	};
-	// TODO - END
 </script>
 
 <section class="mx-auto mt-2">
@@ -181,24 +174,6 @@
 
 <div class="grid place-items-center">
 	<div class="inline-grid w-full max-w-screen-lg gap-2 p-2">
-		<!-- TODO code for implementing a select option if ever needed -->
-		<!-- <div class="grid gap-2">
-			<label
-				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-				for="exhibits">Artist Name</label
-			>
-			<select
-				class="flex h-10 w-[180px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
-				name="exhibits"
-				onchange={navigate}
-				bind:value={selected}
-			>
-				{#each exhibits as artist}
-					<option value={artist.exhibitNumber}>{artist.artistName}</option>
-				{/each}
-			</select>
-		</div> -->
-
 		<div class="flex items-center justify-between">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
