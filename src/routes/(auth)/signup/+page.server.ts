@@ -43,6 +43,6 @@ export const actions = {
 			});
 		}
 		console.log('signup:', data);
-		redirect(302, '/verify-email');
+		redirect(302, `/verify-email?email=${encodeURIComponent(form.data.email)}`);
 	}
 };

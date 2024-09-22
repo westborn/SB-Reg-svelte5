@@ -76,6 +76,8 @@
 				</Card.Root>
 			{/each}
 		{/if}
+	{:else}
+		<p class="mt-6 text-red-500">No registration found - please Register</p>
 	{/if}
 </section>
 {#snippet TextList(textItem: string, textValue: string)}
