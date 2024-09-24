@@ -4,6 +4,7 @@
 		PaginationState,
 		SortingState,
 		TableOptions,
+		SortDirection,
 		VisibilityState
 	} from '@tanstack/svelte-table';
 	import {
@@ -106,7 +107,12 @@
 		pageSize: 8,
 		pageIndex: 0
 	});
+
 	const [sorting, setSorting] = createTableState<SortingState>([]);
+	function getSortSymbol(isSorted: boolean | SortDirection) {
+		return isSorted ? (isSorted === 'asc' ? '🔼' : '🔽') : '';
+	}
+
 	const [columnVisibility, setColumnVisibility] = createTableState<VisibilityState>({
 		description: false,
 		material: false
@@ -204,8 +210,17 @@
 						<Table.Row>
 							{#each headerGroup.headers as header}
 								<Table.Head class="px-1">
-									<Button variant="ghost" size="sm" class="h-6 p-1" onclick={header.column.getToggleSortingHandler()}>
+									<Button
+										variant="ghost"
+										size="sm"
+										class="h-6 p-1"
+										onclick={header.column.getToggleSortingHandler()}
+										disabled={!header.column.getCanSort()}
+									>
 										<FlexRender content={header.column.columnDef.header} context={header.getContext()} />
+										<span class="pl-1">
+											{getSortSymbol(header.column.getIsSorted())}
+										</span>
 									</Button>
 									{#if header.column.getCanFilter()}
 										<div>
@@ -213,7 +228,7 @@
 												type="text"
 												class="h-6 w-20 p-1"
 												placeholder="Search..."
-												onchange={(e) => {
+												oninput={(e) => {
 													header.column.setFilterValue(e.currentTarget.value);
 												}}
 											/>
