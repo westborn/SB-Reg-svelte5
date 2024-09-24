@@ -90,7 +90,7 @@ model imageTable {
 
 model locationTable {
   id            Int         @id @default(autoincrement())
-  exhibitNumber String      @unique @map("exhibit_number")
+  exhibitNumber String      @map("exhibit_number")
   entryId       Int         @unique @map("entry_id")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt     DateTime    @updatedAt @map("updated_at")
