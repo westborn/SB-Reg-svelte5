@@ -5,7 +5,6 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { Input } from '$lib/components/ui/input';
-	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Loader2 } from 'lucide-svelte';
@@ -45,7 +44,7 @@
 		}
 	});
 
-	const { form: formData, enhance, message, errors } = form;
+	const { form: formData, enhance, delayed, errors } = form;
 
 	// get the form field values from the submission object using the id that was passed in
 	const entry = myState?.submission?.registrations[0].entries.find((entry) => entry.id === currentEntryId);
@@ -205,15 +204,10 @@
 	</Form.Field>
 
 	<Form.Errors errors={$errors._errors} />
-	{#if !$message}
-		<div>
-			<Form.Button>Save New Entry?</Form.Button>
-		</div>
-	{:else}
-		<div class="font-semibold text-red-700">{$message}</div>
-		<Button disabled>
-			<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-			We can't do anything now...
-		</Button>
-	{/if}
+	<Form.Button disabled={$delayed}>
+		Save Updated Entry?
+		{#if $delayed}
+			<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+		{/if}
+	</Form.Button>
 </form>

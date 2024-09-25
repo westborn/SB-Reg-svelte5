@@ -5,7 +5,6 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { Input } from '$lib/components/ui/input';
-	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
 	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
@@ -32,7 +31,7 @@
 		}
 	});
 
-	const { form: formData, enhance, errors, message } = form;
+	const { form: formData, enhance, errors, message, delayed } = form;
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -118,16 +117,10 @@
 	</Form.Field>
 
 	<Form.Errors errors={$errors._errors} />
-	{#if !$message}
-		<div>
-			<Form.Button>Create Registration?</Form.Button>
-			<span class="text-sm text-muted-foreground"> Just a little note</span>
-		</div>
-	{:else}
-		<div class="font-semibold text-red-700">{$message}</div>
-		<Button disabled>
-			<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-			We can't do anything now...
-		</Button>
-	{/if}
+	<Form.Button disabled={$delayed}>
+		Create Registration?
+		{#if $delayed}
+			<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+		{/if}
+	</Form.Button>
 </form>
