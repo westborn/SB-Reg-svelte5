@@ -52,7 +52,6 @@
 		selectedYear = { ...event };
 		const newURL = new URL($page.url);
 		newURL.searchParams?.set('year', selectedYear.value);
-		console.log(newURL.toString());
 		goto(newURL);
 	}
 
