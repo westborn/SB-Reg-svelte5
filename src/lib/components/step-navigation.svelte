@@ -39,14 +39,21 @@
 			</a>
 			<!-- Line between circles-->
 			{#if index < STEPS.length - 1}
-				<div class="flex-auto border-t-4 {index < currentStep.step ? 'border-primary-400' : 'border-gray-300'}"></div>
+				<div class="flex-auto border-t-4 {index <= currentStep.step ? 'border-primary-400' : 'border-gray-300'}"></div>
+				{#if index == currentStep.step}
+					<div class="border-y-8 border-l-8 border-r-0 border-solid border-primary-400 border-y-transparent"></div>
+				{/if}
 			{/if}
 		</div>
 	{/each}
 
 	<!-- back button -->
 	<div class="min-w-10">
-		{#if currentStep.step > 0}
+		{#if currentStep.step == 0}
+			<a href={STEPS[currentStep.step + 1]?.link ?? STEPS[0].link}>
+				<Button variant="ghost" class="bg-primary-50 text-white">Next</Button>
+			</a>
+		{:else}
 			<a href={STEPS[currentStep.step - 1]?.link ?? STEPS[0].link}>
 				<Button variant="ghost" class="bg-primary-50 text-white">Back</Button>
 			</a>
