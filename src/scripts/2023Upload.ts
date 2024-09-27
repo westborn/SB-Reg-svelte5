@@ -6,7 +6,6 @@ import registrations from '$lib/data/2023 Registrations.json';
 import entries from '$lib/data/2023 Entries.json';
 import images from '$lib/data/2023 Images.json';
 import imageMap from '$lib/data/2023 ImageMapping.json';
-import { Extensions } from '@prisma/client/runtime/library';
 
 async function makeMaps() {
 	const artists = await prisma.artistTable.findMany({
@@ -177,7 +176,7 @@ async function makeSubmission() {
 			//create a new locationTable record
 			const newLocation = {
 				entryId: entryDB.id,
-				exhibitNumber: exhibit.locationId.toString()
+				exhibitNumber: exhibit.locationId.toString().padStart(3, '0')
 			};
 			const locationDB = await prisma.locationTable.create({
 				data: newLocation

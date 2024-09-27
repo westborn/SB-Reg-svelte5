@@ -73,7 +73,7 @@ const searchTerm = {
 // }
 // console.log(exhibits);
 
-type Exhibits = {
+type Exhibit = {
 	artistId: number;
 	email: string;
 	lastName: string;
@@ -86,8 +86,8 @@ type Exhibits = {
 };
 
 //TODO fix issue with non accepted entries in prior years not being filtered out
-export const getExhibits = async ({ rows, offset }: { rows: number; offset: number }): Promise<Exhibits[]> => {
-	const exhibits: Exhibits[] = await prisma.$queryRaw`select
+export const getExhibits = async ({ rows, offset }: { rows: number; offset: number }): Promise<Exhibit[]> => {
+	const exhibits: Exhibit[] = await prisma.$queryRaw`select
 		artist.id as "artistId",
 		artist.email,
 		artist.last_name as "lastName",
@@ -104,17 +104,17 @@ export const getExhibits = async ({ rows, offset }: { rows: number; offset: numb
 		entry.price_in_cents as "price",
 		image.id as "imageId",
 		image.cloud_url as "cloudURL",
-		location."exhibitNumber"
+		CASE WHEN location.exhibit_number is NULL THEN NULL ELSE location.exhibit_number END as "exhibitNumber"
 		from
 		artist
 		join registration on artist.id = registration.artist_id
 		join entry on registration.id = entry.registration_id
-		join location on entry.id = location."entryId"
+		LEFT OUTER join location on entry.id = location.entry_id
 		join image on entry.id = image.entry_id
 		where
-		-- artist.email = 'epsilonartist@gmail.com' AND
-		entry.accepted = true
-		order by location."exhibitNumber" asc
+		-- -- artist.email = 'epsilonartist@gmail.com' AND
+		registration.registration_year = ${entryYear}
+		order by location.exhibit_number asc
 		OFFSET ${offset} ROWS
 		LIMIT ${rows}
 		`;
@@ -131,8 +131,9 @@ const exhibitParams = {
 };
 
 pageToFetch = 0;
-const exhibits1 = await getExhibits(exhibitParams);
-console.log(exhibits1);
-console.log('# Exhibits1: ', exhibits1.length);
+const entryYear = '2024';
+const exhibits = await getExhibits(exhibitParams);
+console.log(exhibits.map((item) => item.exhibitNumber));
+console.log('# Exhibits: ', exhibits.length);
 
 await prisma.$disconnect();
