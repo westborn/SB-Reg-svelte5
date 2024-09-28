@@ -1,5 +1,5 @@
 import { prisma } from '$lib/components/server/prisma';
-import { ExhibitionYear } from '$lib/constants';
+import { EXHIBITION_YEAR } from '$lib/constants';
 
 import { EntryType } from '$lib/constants';
 import type { EntryTable, ImageTable } from '$lib/zod-schemas';
@@ -85,7 +85,7 @@ export const getSubmission = async ({ isAdmin, proxyEmail, email }: User) => {
 			bankBSB: true,
 			bankAccount: true,
 			registrations: {
-				where: { registrationYear: ExhibitionYear },
+				where: { registrationYear: EXHIBITION_YEAR },
 				select: {
 					id: true,
 					artistId: true,
@@ -154,7 +154,7 @@ export const getEntries = async (artistEmail: string) => {
 		where: { email: artistEmail },
 		select: {
 			registrations: {
-				where: { registrationYear: ExhibitionYear },
+				where: { registrationYear: EXHIBITION_YEAR },
 				select: {
 					entries: {
 						select: {
@@ -191,7 +191,7 @@ export const createNewRegistration = async (artistId: number) => {
 	const registration = await prisma.registrationTable.create({
 		data: {
 			artistId,
-			registrationYear: ExhibitionYear,
+			registrationYear: EXHIBITION_YEAR,
 			closed: false,
 			bumpIn: '',
 			bumpOut: '',

@@ -2,7 +2,7 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createServerClient } from '@supabase/ssr';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { stillTakingRegistrations } from '$lib/constants';
+import { REGISTRATIONS_OPEN } from '$lib/constants';
 
 // https://khromov.se/the-comprehensive-guide-to-locals-in-sveltekit/
 // https://joyofcode.xyz/sveltekit-hooks#creating-routes
@@ -87,7 +87,7 @@ const routeGuards: Handle = async ({ event, resolve }) => {
 		throw redirect(303, '/');
 	}
 	// only allow /view if registrations are closed - admin is exempt
-	if (event.url.pathname.startsWith('/register') && !user.isAdmin && !stillTakingRegistrations) {
+	if (event.url.pathname.startsWith('/register') && !user.isAdmin && !REGISTRATIONS_OPEN) {
 		// console.log('/register and not taking registrations - redirecting to /view');
 		throw redirect(303, '/view');
 	}

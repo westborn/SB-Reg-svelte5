@@ -25,7 +25,7 @@ function getNextExhibitionYear(): string {
 	}
 }
 
-export const ExhibitionYear = getNextExhibitionYear();
+export const EXHIBITION_YEAR = getNextExhibitionYear();
 export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again later.';
 export const GENERIC_ERROR_UNEXPECTED = "Something went wrong. Sorry, we're broken!";
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -60,4 +60,4 @@ export const STEPS = [
 	}
 ];
 import { PUBLIC_REGISTRATIONS_OPEN } from '$env/static/public';
-export const stillTakingRegistrations = PUBLIC_REGISTRATIONS_OPEN === 'YES' ? true : false;
+export const REGISTRATIONS_OPEN = PUBLIC_REGISTRATIONS_OPEN === 'YES' ? true : false;

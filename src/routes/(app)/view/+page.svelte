@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
 
-	import { stillTakingRegistrations } from '$lib/constants';
+	import { REGISTRATIONS_OPEN } from '$lib/constants';
 	import { getRegisterState, updateSubmission } from '$lib/context.svelte.js';
 	import { OptimisedImage } from '$lib/components';
 	import { convertToDollars } from '$lib/utils.js';
@@ -31,7 +31,7 @@
 <section class="mx-auto mt-2 max-w-[500px] px-3">
 	<h4 class="text-xl font-bold text-primary">
 		Registration Information
-		{#if !stillTakingRegistrations}
+		{#if !REGISTRATIONS_OPEN}
 			<br /><span class="text-red-500">Registrations are not open at the moment</span>
 		{/if}
 	</h4>

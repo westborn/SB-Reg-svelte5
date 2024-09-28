@@ -28,10 +28,9 @@
 	const { form, enhance, errors, delayed } = superForm(myState.imageUploadForm, {
 		validators: zodClient(fileUploadSchema),
 		resetForm: true,
-		onResult({ result, cancel }) {
+		onResult({ result }) {
 			if (result.type != 'success') {
 				toast.error('Failed to upload image');
-				cancel();
 				return;
 			}
 			myState.workingImage = { ...result?.data?.image };

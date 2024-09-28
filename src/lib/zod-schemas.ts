@@ -138,8 +138,10 @@ export const entrySchemaUI = z.object({
 	title: z.string({ required_error: 'Title is required' }),
 	inOrOut: z.lazy(() => EntryTypeSchema).default('Outdoor'),
 	price: z.coerce
-		.number()
-		.int()
+		.number({ message: 'Just enter numbers please' })
+		.int({ message: 'Whole dollars please' })
+		.gt(0, { message: 'You MUST enter a price' })
+		.nullable()
 		.refine((val) => val > 0, { message: 'Number is required.' }),
 	material: z.string().nullish(),
 	dimLength: z.string().nullish(),

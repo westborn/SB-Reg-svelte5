@@ -9,7 +9,7 @@
 
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { stillTakingRegistrations } from '$lib/constants.js';
+	import { REGISTRATIONS_OPEN } from '$lib/constants.js';
 
 	let { children, data } = $props();
 	let { artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm, supabase, session, user } = data;
@@ -22,7 +22,7 @@
 		});
 		console.info(`Environment: dev:${dev} meta.env.MODE:${import.meta.env.MODE}`);
 		console.info(`Running in "${PUBLIC_SQUARE_ENVIRONMENT}" mode`);
-		console.info(`Registrations are ${stillTakingRegistrations ? 'open' : 'closed'}`);
+		console.info(`Registrations are ${REGISTRATIONS_OPEN ? 'open' : 'closed'}`);
 		return () => data.subscription.unsubscribe();
 	});
 

@@ -30,11 +30,10 @@
 			// pass the image that we accepted, into this form's data when they save the new entry
 			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage), idToUpdate: currentEntryId });
 		},
-		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+		onResult({ result }: { result: any }) {
 			console.log('Action result', result);
 			if (result.type != 'success') {
 				toast.error('Failed to update entry');
-				myState.entryUpdateDialogOpen = false; //TODO: is this working??
 				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;

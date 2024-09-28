@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
-import { ExhibitionYear } from './constants';
+import { EXHIBITION_YEAR } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -158,7 +158,7 @@ export function determinePlacement(exhibitNumberString: string, entryYear: strin
 	//no location determined yet
 	if (!exhibitNumberString) {
 		// but is this year's exhibition?
-		if (entryYear.localeCompare(ExhibitionYear) === 0) {
+		if (entryYear.localeCompare(EXHIBITION_YEAR) === 0) {
 			return inOrOut;
 		} else {
 			// not this year's exhibition

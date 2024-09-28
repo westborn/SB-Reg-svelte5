@@ -18,11 +18,9 @@
 	let form = superForm(myState.confirmForm, {
 		id: 'confirmUpdate',
 		validators: zodClient(confirmSchemaUI),
-		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
 				toast.error('Failed to Update the Registration');
-				myState.confirmDialogOpen = false; //TODO: is this working??
-				cancel();
 				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;

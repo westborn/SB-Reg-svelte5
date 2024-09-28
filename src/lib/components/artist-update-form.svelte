@@ -19,11 +19,9 @@
 	let form = superForm(myState.artistForm, {
 		id: `artistUpdateForm-${myState?.submission?.id}`,
 		validators: zodClient(artistSchemaUI),
-		onResult({ result, cancel }: { result: any; cancel: () => void }) {
+		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
 				toast.error('Failed to Update the Registration');
-				cancel();
-				myState.artistUpdateDialogOpen = false; //TODO: this is not working
 				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;
