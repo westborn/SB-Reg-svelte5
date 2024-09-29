@@ -4,14 +4,10 @@
 	};
 
 	import OptimisedImage from '$lib/components/optimised-image.svelte';
+	import * as Dialog from '$lib/components/ui/dialog';
 	let { path }: Props = $props();
 
 	let showLargeImage = $state(false);
-
-	const handleClick = () => {
-		console.log('clicked on ', path);
-		showLargeImage = true;
-	};
 </script>
 
 <!-- all cell contents need to be wrapped in <span> tags -->
@@ -28,13 +24,10 @@
 </span>
 
 {#if showLargeImage}
-	<button onclick={() => (showLargeImage = false)}>
-		<OptimisedImage
-			{path}
-			alt="alt"
-			width={0}
-			height={0}
-			class="absolute left-0 top-0 h-3/5 w-3/5 rounded object-contain"
-		/></button
-	>
+	<Dialog.Root bind:open={showLargeImage}>
+		<Dialog.Trigger>Open</Dialog.Trigger>
+		<Dialog.Content class="overflow-auto sm:max-h-[1000px] sm:max-w-[460px]">
+			<OptimisedImage {path} alt="alt" width={460} height={0} class="rounded" />
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}
