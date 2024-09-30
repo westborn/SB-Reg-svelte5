@@ -10,6 +10,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { REGISTRATIONS_OPEN } from '$lib/constants.js';
+	import { TailwindIndicator } from '$lib/components';
 
 	let { children, data } = $props();
 	let { artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm, supabase, session, user } = data;
@@ -62,4 +63,8 @@
 			info: 'bg-blue-400'
 		}
 	}}
-/>{@render children()}
+/>
+{@render children()}
+{#if dev}
+	<TailwindIndicator />
+{/if}
