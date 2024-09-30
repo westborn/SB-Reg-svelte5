@@ -31,13 +31,13 @@
 			<ThemeToggle />
 		</div>
 	</div>
-	<div class="mx-auto mt-20 w-full max-w-xl">
+	<div class="mx-auto mt-20 w-full max-w-sm">
 		{@render children()}
+		<p class="p-4 text-sm text-muted-foreground">
+			By clicking continue, you agree to our{' '}
+			<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service</a>
+			{' '}and{' '}
+			<a href="/privacy" class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a>
+		</p>
 	</div>
-	<p class="py-4 text-sm text-muted-foreground">
-		By clicking continue, you agree to our{' '}
-		<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service</a>
-		{' '}and{' '}
-		<a href="/privacy" class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a>
-	</p>
 </div>

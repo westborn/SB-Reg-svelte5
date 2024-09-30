@@ -34,9 +34,11 @@
 			<Form.FieldErrors />
 		</Form.Field>
 		<Form.Errors errors={$errors._errors} />
-		<div>
+		<div class="flex">
 			<Form.Button>Login</Form.Button>
-			<span class="text-sm text-muted-foreground"> We will send a token to your email address for verification</span>
+			<span class="px-4 text-sm text-muted-foreground">
+				We will send a token to your email address for verification - check for spam</span
+			>
 		</div>
 	</form>
 </AuthPage>

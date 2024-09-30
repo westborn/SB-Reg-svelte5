@@ -18,7 +18,7 @@
 <AuthPage type="signup" {session} {user}>
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Create an account</h1>
-		<p class="text-sm text-muted-foreground">Start building your digital community today.</p>
+		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<form method="POST" use:enhance class="w-full space-y-4">
@@ -33,9 +33,11 @@
 			<Form.FieldErrors />
 		</Form.Field>
 		<Form.Errors errors={$errors._errors} />
-		<div>
+		<div class="flex">
 			<Form.Button>Register</Form.Button>
-			<span class="text-sm text-muted-foreground"> We will send a token to your email address for verification</span>
+			<span class="px-4 text-sm text-muted-foreground">
+				We will send a token to your email address for verification - check for spam</span
+			>
 		</div>
 	</form>
 </AuthPage>
