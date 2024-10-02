@@ -51,5 +51,5 @@
 
 {#snippet TextList(textItem: string, textValue: string)}
 	<p class="text-sm">{textItem}</p>
-	<p>{textValue}&nbsp</p>
+	<p class="text-sm font-semibold">{textValue}&nbsp</p>
 {/snippet}
