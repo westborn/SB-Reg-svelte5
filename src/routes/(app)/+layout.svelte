@@ -4,8 +4,9 @@
 	const { user } = data;
 
 	const navItems = [
-		{ label: 'View', href: '/view' },
-		{ label: 'Register', href: '/register' },
+		// { label: 'View Registration and a very long senetence that nwont let anything', href: '/view' },
+		{ label: 'View Registration', href: '/view' },
+		{ label: 'Update Registration', href: '/register' },
 		{ label: 'Gallery', href: '/gallery' }
 	];
 </script>

@@ -14,16 +14,21 @@
 	const avatar = loggedInEmail.slice(0, 2);
 </script>
 
-<header class="sticky top-0 w-full border-b">
-	<div class="container flex h-12 items-center justify-between">
+<header class="w-full border-b">
+	{#if user.isAdmin}
+		<AdminMenu />
+	{/if}
+
+	<div class="container grid h-14 grid-cols-[200px_2fr_120px] items-center">
+		<h1 class="hidden text-center text-lg text-primary-400 md:block">Sculpture Bermagui Exhibition Registration</h1>
 		<!-- Desktop -->
-		<nav class="hidden w-full justify-between md:flex">
-			<div>
+		<nav class="hidden md:block">
+			<div class="grid grid-cols-3">
 				{#each navItems as { label, href }, i}
 					{#if $page.url.pathname.startsWith(href)}
-						<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
+						<Button class="bg-transparent font-semibold text-primary-300" disabled><p>{label}</p></Button>
 					{:else}
-						<Button class="font-semibold text-primary-300" {href} variant="ghost">{label}</Button>
+						<Button class="font-semibold text-primary-300" {href} variant="ghost"><p>{label}</p></Button>
 					{/if}
 				{/each}
 			</div>
@@ -34,8 +39,11 @@
 				<Sheet.Trigger class={buttonVariants({ variant: 'ghost' })}
 					><AlignJustify class="text-primary-300" /></Sheet.Trigger
 				>
-				<Sheet.Content side="left" class="w-1/4">
-					<nav class="flex flex-col items-start justify-between text-primary-300">
+				<Sheet.Content side="left" class="w-1/3">
+					<h1 class="mt-4 text-center text-sm text-primary-400 md:hidden">
+						Sculpture Bermagui Exhibition Registration
+					</h1>
+					<nav class="mt-10 flex flex-col items-start justify-between text-primary-300">
 						{#each navItems as { label, href }, i}
 							{#if $page.url.pathname.startsWith(href)}
 								<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
@@ -47,11 +55,10 @@
 				</Sheet.Content>
 			</Sheet.Root>
 		</div>
+		<div class="md:hidden"></div>
 		<!-- Desktop & mobile -->
-		{#if user.isAdmin}
-			<AdminMenu />
-		{/if}
-		<div class="flex">
+		<div class="flex items-center">
+			<Button href={'/logout'} variant="ghost">Logout</Button>
 			<Tooltip.Root openDelay={0}>
 				<Tooltip.Trigger>
 					<Avatar.Root>
@@ -67,7 +74,6 @@
 					{/if}
 				</Tooltip.Content>
 			</Tooltip.Root>
-			<Button href={'/logout'} variant="ghost">Logout</Button>
 			<!-- TODO - do we need a theme toggle? -->
 			<!-- <ThemeToggle></ThemeToggle> -->
 		</div>

@@ -71,16 +71,16 @@
 		<Form.Legend class="mb-2">When/if you require Bump In assistance?</Form.Legend>
 		<RadioGroup.Root class="ml-6" bind:value={$formData.bumpIn as string}>
 			<div class="flex">
-				<RadioGroup.Item value="Thursday morning 7 March" id="bi1" />
-				<Label for="bi1">Thursday morning 7 March</Label>
+				<RadioGroup.Item value="Thursday morning 6 March" id="bi1" />
+				<Label for="bi1">Thursday morning 6 March</Label>
 			</div>
 			<div class="flex">
-				<RadioGroup.Item value="Thursday afternoon 7 March" id="bi2" />
-				<Label for="bi2">Thursday afternoon 7 March</Label>
+				<RadioGroup.Item value="Thursday afternoon 6 March" id="bi2" />
+				<Label for="bi2">Thursday afternoon 6 March</Label>
 			</div>
 			<div class="flex">
-				<RadioGroup.Item value="Friday morning - until 12.00 pm 8 March" id="bi3" />
-				<Label for="bi3">Friday morning - until 12.00 pm 8 March</Label>
+				<RadioGroup.Item value="Friday morning 7 March (until noon)" id="bi3" />
+				<Label for="bi3">Friday morning 7 March (until noon)</Label>
 			</div>
 			<RadioGroup.Input name="bumpIn" />
 		</RadioGroup.Root>
@@ -90,12 +90,12 @@
 		<Form.Legend class="mb-2">When/if you require Bump Out assistance?</Form.Legend>
 		<RadioGroup.Root class="ml-6" bind:value={$formData.bumpOut as string}>
 			<div class="flex">
-				<RadioGroup.Item value="Sunday afternoon from 3.00 pm 17 March" id="bo1" />
-				<Label for="bo1">Sunday afternoon from 3.00 pm 17 March</Label>
+				<RadioGroup.Item value="Sunday afternoon 16 March (after 3pm)" id="bo1" />
+				<Label for="bo1">Sunday afternoon 16 March (after 3pm)</Label>
 			</div>
 			<div class="flex">
-				<RadioGroup.Item value="Monday morning 18 March" id="bo2" />
-				<Label for="bo2">Monday morning 18 March</Label>
+				<RadioGroup.Item value="Monday morning 17 March (9am to noon)" id="bo2" />
+				<Label for="bo2">Monday morning 17 March (9am to noon)</Label>
 			</div>
 			<RadioGroup.Input name="bumpOut" />
 		</RadioGroup.Root>

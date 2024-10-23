@@ -35,9 +35,17 @@
 		{@render children()}
 		<p class="p-4 text-sm text-muted-foreground">
 			By clicking continue, you agree to our{' '}
-			<a href="/terms" class="underline underline-offset-4 hover:text-primary"> Terms of Service</a>
+			<a
+				href="https://sculpturebermagui.org.au/wp-content/uploads/2024/10/Exhibiting-at-Sculpture-Bermagui-2025.pdf"
+				class="underline underline-offset-4 hover:text-primary"
+			>
+				Terms of Service</a
+			>
 			{' '}and{' '}
-			<a href="/privacy" class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a>
+			<a
+				href="https://sculpturebermagui.org.au/wp-content/uploads/2024/02/Edgy-Art-Privacy-Policy-Sep-2022.pdf"
+				class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a
+			>
 		</p>
 	</div>
 </div>

@@ -2,16 +2,25 @@ import { boolean, z } from 'zod';
 import { MAX_IMAGE_SIZE } from '$lib/constants';
 
 export const signupSchema = z.object({
-	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
+	email: z
+		.string({ required_error: 'Email is required' })
+		.email({ message: 'Email must be a valid email' })
+		.toLowerCase()
 });
 
 export const tokenSchema = z.object({
-	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
+	email: z
+		.string({ required_error: 'Email is required' })
+		.email({ message: 'Email must be a valid email' })
+		.toLowerCase(),
 	token: z.string().min(6, 'Please enter the token you received in your email.')
 });
 
 export const loginSchema = z.object({
-	email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' })
+	email: z
+		.string({ required_error: 'Email is required' })
+		.email({ message: 'Email must be a valid email' })
+		.toLowerCase()
 });
 
 export const IndigenousSchema = z.enum(['Yes', 'No', 'Declined']);
