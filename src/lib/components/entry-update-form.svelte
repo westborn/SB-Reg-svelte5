@@ -60,8 +60,6 @@
 		//split the dimensions string into the three fields
 		const dimensions = entry?.dimensions?.split('x') || [];
 		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
-		// set the radio button values
-		$formData.enterMajorPrize = entry?.enterMajorPrize ? 'Yes' : 'No';
 		//set the working image to the current image if there is one
 		if (entry.images[0]) {
 			updateWorkingImage({ ...entry.images[0], artistId: myState.submission?.registrations[0].artistId as number });
@@ -161,37 +159,6 @@
 			<Input type="text" {...attrs} bind:value={$formData.specialRequirements} />
 		</Form.Control>
 		<Form.FieldErrors />
-	</Form.Field>
-
-	<div class="relative mt-8 w-full px-2">
-		<details class="text-gray-600">
-			<summary>Requirements for Major Prize Entries? </summary>
-			You will need to supply a "Supporting Portfolio" containing:<br />
-			<ul class="list-outside list-disc">
-				<li class="mx-8">Artist statement of intent up to A4</li>
-				<li class="mx-8">
-					Up to 4 high quality images of recent exhibition quality works, thus showing the scope of your work. Not more
-					than 5 years previous.
-				</li>
-				<li class="mx-8">An Artist CV, Maximum A4</li>
-				<li class="mx-8">Prior to final judging a publishable image of the 2024 entry.</li>
-			</ul>
-		</details>
-	</div>
-
-	<Form.Field class="px-2" {form} name="enterMajorPrize">
-		<Form.Legend class="mb-2">Submit this entry to the Major Prize program?</Form.Legend>
-		<RadioGroup.Root class="flex flex-row" bind:value={$formData.enterMajorPrize as string}>
-			<div class="flex items-center space-x-2">
-				<RadioGroup.Item value="Yes" id="r1" />
-				<Label for="r1">Yes</Label>
-			</div>
-			<div class="flex items-center space-x-2">
-				<RadioGroup.Item value="No" id="r2" />
-				<Label for="r2">No</Label>
-			</div>
-			<RadioGroup.Input name="enterMajorPrize" />
-		</RadioGroup.Root>
 	</Form.Field>
 
 	<Form.Field {form} name="description">

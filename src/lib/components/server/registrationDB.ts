@@ -109,7 +109,6 @@ export const getSubmission = async ({ isAdmin, proxyEmail, email }: User) => {
 							dimensions: true,
 							description: true,
 							specialRequirements: true,
-							enterMajorPrize: true,
 							price: true,
 							images: {
 								select: {
@@ -168,7 +167,6 @@ export const getEntries = async (artistEmail: string) => {
 							dimensions: true,
 							description: true,
 							specialRequirements: true,
-							enterMajorPrize: true,
 							price: true,
 							images: {
 								select: {
@@ -215,7 +213,6 @@ export const entryCreate = async (workingEntry: EntryTable) => {
 		dimensions,
 		description,
 		specialRequirements,
-		enterMajorPrize,
 		price
 	} = workingEntry;
 
@@ -230,7 +227,7 @@ export const entryCreate = async (workingEntry: EntryTable) => {
 			dimensions,
 			description,
 			specialRequirements,
-			enterMajorPrize,
+			enterMajorPrize: true,
 			price: price ?? 0
 		}
 	});
@@ -252,7 +249,6 @@ export const getEntry = async (id: number) => {
 			dimensions: true,
 			description: true,
 			specialRequirements: true,
-			enterMajorPrize: true,
 			price: true
 		}
 	});
@@ -369,7 +365,6 @@ export type Exhibit = {
 	description: string;
 	dimensions: string;
 	inOrOut: string;
-	majorPrize?: boolean;
 	material: string;
 	title: string;
 	price: number;
@@ -399,7 +394,6 @@ export const getExhibits = async ({
 		entry.description,
 		entry.dimensions,
 		entry.in_or_out as "inOrOut",
-		entry.enter_major_prize as "majorPrize",
 		entry.material,
 		entry.title,
 		entry.price_in_cents as "price",

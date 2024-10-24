@@ -48,7 +48,7 @@ function makeEntry(artistId: number, registrationId: number) {
 		artistId,
 		registrationId,
 		accepted: false,
-		enterMajorPrize: faker.datatype.boolean(),
+		enterMajorPrize: true,
 		inOrOut: faker.helpers.enumValue(EntryType),
 		title: faker.lorem.words(3),
 		material: faker.lorem.words(3),

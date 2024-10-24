@@ -157,7 +157,6 @@ export const entrySchemaUI = z.object({
 	dimWidth: z.string().nullish(),
 	dimHeight: z.string().nullish(),
 	specialRequirements: z.string().nullish(),
-	enterMajorPrize: z.string().default('No'),
 	description: z.string().nullish()
 });
 export type EntryUI = z.infer<typeof entrySchemaUI>;

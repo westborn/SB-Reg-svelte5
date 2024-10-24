@@ -51,7 +51,7 @@
 				<Card.Root class="mb-4">
 					<Card.Title class="pl-4 pt-4 capitalize">{entryItem.title}</Card.Title>
 					<Card.Content class="p-0 pl-4 text-sm">
-						<p class="text-xs">({entryItem.inOrOut}){entryItem?.enterMajorPrize ? ' +Major Prize Entry' : ''}</p>
+						<p class="text-xs">({entryItem.inOrOut})</p>
 						<p>{entryItem.description}</p>
 						<div class="grid grid-cols-2">
 							<div class="flex items-center justify-around py-2">
