@@ -1,24 +1,8 @@
 <script lang="ts">
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
-	import { OptimisedImage } from '.';
-
-	type Exhibit = {
-		artistName: string;
-		cloudURL: string;
-		description: string;
-		registrationYear: string;
-		exhibitNumber: string;
-		inOrOut: string;
-		majorPrize?: string;
-		material: string;
-		price: string;
-		dimensions: string;
-		title: string;
-		email: string;
-		artistId: number;
-		entryId: number;
-		imageId: number;
-	};
+	import { OptimisedImage } from '$lib/components/index.js';
+	import * as Card from '$lib/components/ui/card/index.js';
+	import type { Exhibit } from '$lib/components/server/registrationDB';
 
 	const {
 		exhibitNumber,
@@ -30,13 +14,12 @@
 		material,
 		price,
 		dimensions,
-		title,
-		majorPrize
+		title
 	} = $props() as Exhibit;
 </script>
 
 <!-- card -->
-<div class="flex max-w-[400px] flex-col items-center justify-between rounded-xl border-2 bg-blue-50">
+<Card.Root class="flex max-w-[400px] flex-col items-center justify-between rounded-xl border-2 ">
 	<div class="flex w-full items-center px-2 py-3">
 		<div class="flex items-center justify-center rounded-full bg-blue-500 p-4 font-bold text-white">
 			<p>{exhibitNumber}</p>
@@ -59,7 +42,7 @@
 			<p class="text-xs">{dimensions}</p>
 			<p class="text-xs">{determinePlacement(exhibitNumber, registrationYear, inOrOut)}</p>
 		</div>
-		<p class="w-full text-center text-base font-medium text-gray-700">{convertToDollars(parseInt(price))}</p>
+		<p class="w-full text-center text-base font-medium">{convertToDollars(parseInt(price))}</p>
 	</div>
-</div>
+</Card.Root>
 <!-- card -->

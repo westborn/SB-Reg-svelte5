@@ -49,7 +49,7 @@
 	></script>
 </svelte:head>
 
-<ModeWatcher />
+<!-- <ModeWatcher /> -->
 <Toaster
 	position="top-left"
 	duration={4000}
