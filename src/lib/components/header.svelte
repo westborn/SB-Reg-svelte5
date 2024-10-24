@@ -19,10 +19,13 @@
 		<AdminMenu />
 	{/if}
 
-	<div class="container grid h-14 grid-cols-[200px_2fr_120px] items-center">
-		<h1 class="hidden text-center text-lg text-primary-400 md:block">Sculpture Bermagui Exhibition Registration</h1>
+	<nav class="container grid h-14 grid-cols-[1fr_120px] items-center">
 		<!-- Desktop -->
-		<nav class="hidden md:block">
+		<div class="hidden h-14 grid-cols-[200px_2fr] items-center md:grid">
+			<div class=" flex">
+				<img src="/favicon-32x32.png" alt="Sculpture Bermagui Logo" class="mt-2 h-10" />
+				<h1 class=" text-center text-lg text-primary-400">Exhibition Registration</h1>
+			</div>
 			<div class="grid grid-cols-3">
 				{#each navItems as { label, href }, i}
 					{#if $page.url.pathname.startsWith(href)}
@@ -32,31 +35,37 @@
 					{/if}
 				{/each}
 			</div>
-		</nav>
-		<!-- Mobile -->
-		<div class="md:hidden">
-			<Sheet.Root>
-				<Sheet.Trigger class={buttonVariants({ variant: 'ghost' })}
-					><AlignJustify class="text-primary-300" /></Sheet.Trigger
-				>
-				<Sheet.Content side="left" class="w-1/3">
-					<h1 class="mt-4 text-center text-sm text-primary-400 md:hidden">
-						Sculpture Bermagui Exhibition Registration
-					</h1>
-					<nav class="mt-10 flex flex-col items-start justify-between text-primary-300">
-						{#each navItems as { label, href }, i}
-							{#if $page.url.pathname.startsWith(href)}
-								<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
-							{:else}
-								<Button class="font-semibold text-primary-300" {href} variant="ghost">{label}</Button>
-							{/if}
-						{/each}
-					</nav>
-				</Sheet.Content>
-			</Sheet.Root>
 		</div>
-		<div class="md:hidden"></div>
-		<!-- Desktop & mobile -->
+
+		<!-- Mobile -->
+		<div class=" grid h-14 grid-cols-[120px_1fr] items-center md:hidden">
+			<div>
+				<Sheet.Root>
+					<Sheet.Trigger class={buttonVariants({ variant: 'ghost' })}
+						><AlignJustify class="text-primary-300" /></Sheet.Trigger
+					>
+					<Sheet.Content side="left" class="w-1/3">
+						<h1 class="mt-4 text-center text-sm text-primary-400 md:hidden">
+							Sculpture Bermagui Exhibition Registration
+						</h1>
+						<div class="mt-10 flex flex-col items-start justify-between text-primary-300">
+							{#each navItems as { label, href }, i}
+								{#if $page.url.pathname.startsWith(href)}
+									<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
+								{:else}
+									<Button class="font-semibold text-primary-300" {href} variant="ghost">{label}</Button>
+								{/if}
+							{/each}
+						</div>
+					</Sheet.Content>
+				</Sheet.Root>
+			</div>
+			<div class="flex items-center">
+				<img src="/favicon-32x32.png" alt="Sculpture Bermagui Logo" class="mt-2 h-10" />
+				<h1 class=" text-center text-lg text-primary-400">Exhibition Registration</h1>
+			</div>
+		</div>
+
 		<div class="flex items-center">
 			<Button href={'/logout'} variant="ghost">Logout</Button>
 			<Tooltip.Root openDelay={0}>
@@ -77,5 +86,5 @@
 			<!-- TODO - do we need a theme toggle? -->
 			<!-- <ThemeToggle></ThemeToggle> -->
 		</div>
-	</div>
+	</nav>
 </header>
