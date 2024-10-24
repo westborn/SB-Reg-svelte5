@@ -133,9 +133,7 @@ export const confirmSchemaUI = z.object({
 	bumpIn: z.string().nullish(),
 	bumpOut: z.string().nullish(),
 	displayRequirements: z.string().nullish(),
-	accommodation: z.string().default('No'),
 	crane: z.string().default('No'),
-	transport: z.string().default('No'),
 	bankAccountName: z.string().nullish(),
 	bankBSB: z.coerce.string().nullish(),
 	bankAccount: z.coerce.string().nullish()

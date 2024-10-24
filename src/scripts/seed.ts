@@ -37,8 +37,8 @@ function makeRegistration(artistId: number, year: string = '2025') {
 		bumpOut: faker.date.future().toString(),
 		crane: faker.datatype.boolean(),
 		displayRequirements: faker.lorem.words(),
-		transport: faker.datatype.boolean(),
-		accommodation: faker.datatype.boolean(),
+		transport: false,
+		accommodation: false,
 		closed: false
 	};
 }

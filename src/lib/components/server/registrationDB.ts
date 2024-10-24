@@ -194,9 +194,7 @@ export const createNewRegistration = async (artistId: number) => {
 			bumpIn: '',
 			bumpOut: '',
 			displayRequirements: '',
-			accommodation: false,
-			crane: false,
-			transport: false
+			crane: false
 		}
 	});
 	return registration;

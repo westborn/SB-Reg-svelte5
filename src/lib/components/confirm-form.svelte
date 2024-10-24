@@ -37,8 +37,6 @@
 		const bumpOut = untrack(() => myState?.submission?.registrations[0].bumpOut);
 		const crane = untrack(() => myState?.submission?.registrations[0].crane);
 		const displayRequirements = untrack(() => myState?.submission?.registrations[0].displayRequirements ?? '');
-		const accommodation = untrack(() => myState?.submission?.registrations[0].accommodation);
-		const transport = untrack(() => myState?.submission?.registrations[0].transport);
 		const bankAccountName = untrack(() => myState?.submission?.bankAccountName ?? '');
 		const bankBSB = untrack(() => myState?.submission?.bankBSB ?? '');
 		const bankAccount = untrack(() => myState?.submission?.bankAccount ?? '');
@@ -46,8 +44,6 @@
 		$formData.bumpOut = bumpOut;
 		$formData.crane = crane ? 'Yes' : 'No';
 		$formData.displayRequirements = displayRequirements;
-		$formData.accommodation = accommodation ? 'Yes' : 'No';
-		$formData.transport = transport ? 'Yes' : 'No';
 		$formData.bankAccountName = bankAccountName;
 		$formData.bankBSB = bankBSB;
 		$formData.bankAccount = bankAccount;
@@ -113,36 +109,6 @@
 				<Label for="c2">No</Label>
 			</div>
 			<RadioGroup.Input name="crane" />
-		</RadioGroup.Root>
-	</Form.Field>
-
-	<Form.Field class="px-2" {form} name="transport">
-		<Form.Legend class="mb-2">Would you like to discuss a Transport subsidy?</Form.Legend>
-		<RadioGroup.Root class="ml-6 flex flex-row" bind:value={$formData.transport as string}>
-			<div class="flex">
-				<RadioGroup.Item value="Yes" id="t1" />
-				<Label for="t1">Yes</Label>
-			</div>
-			<div class="flex">
-				<RadioGroup.Item value="No" id="t2" />
-				<Label for="t2">No</Label>
-			</div>
-			<RadioGroup.Input name="transport" />
-		</RadioGroup.Root>
-	</Form.Field>
-
-	<Form.Field class="px-2" {form} name="accommodation">
-		<Form.Legend class="mb-2">Would you like to discuss an Accommodation subsidy?</Form.Legend>
-		<RadioGroup.Root class="ml-6 flex flex-row" bind:value={$formData.accommodation as string}>
-			<div class="flex">
-				<RadioGroup.Item value="Yes" id="a1" />
-				<Label for="a1">Yes</Label>
-			</div>
-			<div class="flex">
-				<RadioGroup.Item value="No" id="a2" />
-				<Label for="a2">No</Label>
-			</div>
-			<RadioGroup.Input name="accommodation" />
 		</RadioGroup.Root>
 	</Form.Field>
 
