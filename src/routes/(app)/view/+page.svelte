@@ -45,6 +45,7 @@
 		{#if myState.entriesExist}
 			<p class="mb-6 text-xl text-red-500">
 				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
+				{myState.registrationCompleted ? ' and is complete' : ''}
 			</p>
 
 			{#each myState.currentEntries as entryItem, entryKey}

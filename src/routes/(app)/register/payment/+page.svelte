@@ -101,16 +101,30 @@
 		}
 	}
 
-	let sendCompleteToServer = async (data: { registrationId: number | undefined; email: string | undefined }) => {
+	let sendCompleteToServer = async (receiptURL: string) => {
 		errorMessage = '';
-		// TODO send an email to the artist with the receipt
-		console.log('sending to backend? TODO');
-		console.log(data);
+		try {
+			const result = await fetch(`/api/registerComplete`, {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({ receiptURL })
+			});
+			if (result.status != 200) {
+				const error = await result.json();
+				console.log('response error', JSON.stringify(error));
+				errorMessage = error.message;
+			}
+		} catch (err) {
+			console.log('registerComplete-err' + err);
+			errorMessage = err.message;
+		}
+
 		return { result: 'success', data: null };
 	};
 
 	async function readyToPay() {
-		console.log('readyToPay: here');
 		//try to make the CC  payment
 		await handlePaymentSubmission();
 		//if not OK - show any errors and allow retry?
@@ -125,14 +139,9 @@
 	}
 
 	async function completeRegistration(squarePaymentResponse: { payment: { receiptUrl: any } }) {
-		console.log('completeRegistration: here');
-		console.log(squarePaymentResponse.payment.receiptUrl);
 		fetchingData = true;
 		errorMessage = '';
-		const response = await sendCompleteToServer({
-			registrationId: myState?.submission?.registrations[0].id,
-			email: myState?.submission?.email
-		});
+		const response = await sendCompleteToServer(squarePaymentResponse.payment.receiptUrl);
 		// console.log('completeRegistration' + response)
 		if (response.result === 'error') {
 			errorMessage = response.data;
@@ -147,14 +156,12 @@
 	}
 
 	async function finishRegistration() {
-		console.log('finishRegistration: here');
 		fetchingData = false;
 		currentState = validStates.FINISHED;
 		goto('/view');
 	}
 
 	async function handlePaymentSubmission() {
-		console.log('handlePaymentSubmission: here');
 		fetchingData = true;
 		errorMessage = 'Sending payment to Card Processor (Square)';
 		let token;
@@ -190,7 +197,6 @@
 				})
 			});
 			const data = await processResponse(paymentResponse);
-			console.log(`handlePaymentSubmission-data: ${JSON.stringify(data, null, 4)}`);
 			apiResponse.lastStatus.response = data;
 			if (!apiResponse.lastStatus.ok) {
 				errorMessage = `Payment Failed, try again later - ${handleError(apiResponse.lastStatus)}`;

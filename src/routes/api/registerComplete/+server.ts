@@ -1,77 +1,71 @@
-import { fail, message, setError, superValidate } from 'sveltekit-superforms';
-import type { Actions, PageServerLoad } from './$types';
-import type { RequestEvent } from './$types';
-import { z } from 'zod';
-import { zod } from 'sveltekit-superforms/adapters';
-import { sendGoogleEmail } from '$lib/components/server/mailer';
 import { getSubmission, type Submission, type User } from '$lib/components/server/registrationDB';
+import type { RequestEvent } from '../../$types';
 import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
-import type { Infer, SuperValidated } from 'sveltekit-superforms';
+import { sendGoogleEmail } from '$lib/components/server/mailer';
+import { prisma } from '$lib/components/server/prisma';
 
-const emailSchema = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
-		.toLowerCase()
-});
-
-export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
-	return {
-		form: await superValidate(zod(emailSchema))
-	};
-};
-
-const sendEmail = async (event: RequestEvent) => {
-	const { user } = await event.locals.V1safeGetSession();
-
-	const formValidationResult = await superValidate(event, zod(emailSchema));
-	if (!formValidationResult.valid) {
-		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
-			status: 400
-		});
+export async function POST(event: RequestEvent) {
+	const { request, locals } = event;
+	const { receiptURL } = await request.json();
+	if (!receiptURL) {
+		return new Response(JSON.stringify({ message: 'Error in registerComplete - no receipt' }), { status: 500 });
 	}
+
+	const { user } = await locals.V1safeGetSession();
 
 	try {
 		// Get the submission from the database
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
 			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+			return new Response(JSON.stringify({ message: 'Error in registerComplete - no submission' }), { status: 500 });
 		}
-
 		const result = await sendRegistrationConfirmationEmail({
 			submission: submissionFromDB,
-			user,
-			formValidationResult
+			user
 		});
 
-		// console.log('sento res: ', result);
-		return message(formValidationResult, 'Email sent successfully');
+		const registrationToUpdate = submissionFromDB?.registrations[0]?.id;
+		const updatedRegistration = await prisma.registrationTable.update({
+			where: { id: registrationToUpdate },
+			data: {
+				closed: true
+			}
+		});
+		if (!updatedRegistration) {
+			console.error('Error Updating Registration closed status');
+			return new Response(JSON.stringify({ message: 'Error in registerComplete - closed status' }), { status: 500 });
+		}
 	} catch (e) {
 		console.error(e);
-		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		return new Response(JSON.stringify({ message: 'Error in registerComplete - Unknown' }), { status: 500 });
 	}
-};
+	return new Response(JSON.stringify({ message: 'success' }), { status: 200 });
+}
+
+interface Entry {
+	inOrOut: string;
+	title: string;
+	description: string;
+	material: string;
+	dimensions: string;
+	specialRequirements: string;
+	price: number | string;
+	images: Image[];
+}
+
+interface Image {
+	cloudURL: string;
+}
 
 /* Sends a detailed registration confirmation email.
 Uses getFullRegistration and makeRegistrationHTML/makeEntriesHTML to construct email content. */
-async function sendRegistrationConfirmationEmail({
-	submission,
-	user,
-	formValidationResult
-}: {
-	submission: Submission;
-	user: User;
-	formValidationResult: SuperValidated<Infer<typeof emailSchema>>;
-}) {
+async function sendRegistrationConfirmationEmail({ submission, user }: { submission: Submission; user: User }) {
 	const registrationHTML = makeRegistrationHTML(submission);
 	const entriesData = submission?.registrations[0]?.entries;
 	if (!entriesData) {
 		console.error('Failed to get entries data');
-		return fail(500, {
-			formValidationResult
-		});
+		return new Response(JSON.stringify({ message: 'Error Getting Submission -Entries' }), { status: 500 });
 	}
 	const entriesHTML = makeEntriesHTML(entriesData);
 	const costOfRegistration = 20 + Number(entriesData.length) * 20;
@@ -95,27 +89,10 @@ async function sendRegistrationConfirmationEmail({
 		await sendGoogleEmail(mailoptions);
 	} catch (e) {
 		console.error(e);
-		setError(formValidationResult, '', 'Failed to send email');
-		return fail(500, {
-			formValidationResult
-		});
+		return new Response(JSON.stringify({ message: 'Error Getting Submission -Email' }), { status: 500 });
 	}
-	return formValidationResult;
-}
 
-interface Entry {
-	inOrOut: string;
-	title: string;
-	description: string;
-	material: string;
-	dimensions: string;
-	specialRequirements: string;
-	price: number | string;
-	images: Image[];
-}
-
-interface Image {
-	cloudURL: string;
+	return;
 }
 
 /* Generates HTML for displaying registration details in an email. */
@@ -210,5 +187,3 @@ function createTableRow(name: string, value: string | number): string {
 	</tr>
 	`;
 }
-
-export const actions: Actions = { sendEmail };

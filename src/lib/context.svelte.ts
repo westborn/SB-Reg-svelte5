@@ -23,6 +23,7 @@ export class RegisterState {
 	workingImage = $state() as CurrentImage;
 	artistExists = $derived(this.submission ? true : false);
 	registrationExists = $derived((this.submission?.registrations?.length ?? 0 > 0) ? true : false);
+	registrationCompleted = $derived((this.submission?.registrations?.[0]?.closed ?? false) ? true : false);
 	entriesExist = $derived((this.submission?.registrations?.[0]?.entries?.length ?? 0 > 0) ? true : false);
 	currentEntries = $derived(this.submission?.registrations?.[0]?.entries ?? []);
 	artistCreateDialogOpen = $state(false);
