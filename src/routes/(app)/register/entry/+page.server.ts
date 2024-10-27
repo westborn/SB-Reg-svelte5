@@ -94,18 +94,8 @@ const entryUpdate = async (event: RequestEvent) => {
 			// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
 		}
 
-		const {
-			title,
-			price,
-			inOrOut,
-			material,
-			specialRequirements,
-			enterMajorPrize,
-			description,
-			dimHeight,
-			dimLength,
-			dimWidth
-		} = formValidationResult.data;
+		const { title, price, inOrOut, material, specialRequirements, description, dimHeight, dimLength, dimWidth } =
+			formValidationResult.data;
 		// put the dimensions into a single string with 'x' separator
 		const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join('x') || '';
 
@@ -117,7 +107,6 @@ const entryUpdate = async (event: RequestEvent) => {
 				material: material ?? '',
 				description: description ?? '',
 				specialRequirements: specialRequirements ?? '',
-				enterMajorPrize: enterMajorPrize === 'Yes' ? true : false,
 				dimensions,
 				price: price * 100
 			}
@@ -187,18 +176,8 @@ const entryCreate = async (event: RequestEvent) => {
 	}
 
 	// Create the entry
-	const {
-		title,
-		price,
-		inOrOut,
-		material,
-		specialRequirements,
-		enterMajorPrize,
-		description,
-		dimHeight,
-		dimLength,
-		dimWidth
-	} = formValidationResult.data;
+	const { title, price, inOrOut, material, specialRequirements, description, dimHeight, dimLength, dimWidth } =
+		formValidationResult.data;
 
 	// put the dimensions into a single string with 'x' separator
 	const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join('x') || '';
@@ -215,7 +194,7 @@ const entryCreate = async (event: RequestEvent) => {
 				material: material ?? '',
 				description: description ?? '',
 				specialRequirements: specialRequirements ?? '',
-				enterMajorPrize: enterMajorPrize === 'Yes' ? true : false,
+				enterMajorPrize: true,
 				dimensions,
 				price: price * 100
 			}

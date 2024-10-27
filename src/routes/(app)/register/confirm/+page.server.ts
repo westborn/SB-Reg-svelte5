@@ -34,17 +34,8 @@ const confirmUpdate = async (event: RequestEvent) => {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 		idToUpdate = submissionFromDB.registrations[0].id;
-		const {
-			bumpIn,
-			bumpOut,
-			crane,
-			displayRequirements,
-			accommodation,
-			transport,
-			bankAccountName,
-			bankBSB,
-			bankAccount
-		} = formValidationResult.data;
+		const { bumpIn, bumpOut, crane, displayRequirements, bankAccountName, bankBSB, bankAccount } =
+			formValidationResult.data;
 
 		const updatedRegistration = await prisma.registrationTable.update({
 			where: { id: idToUpdate },
@@ -52,9 +43,7 @@ const confirmUpdate = async (event: RequestEvent) => {
 				bumpIn: bumpIn ?? '',
 				bumpOut: bumpOut ?? '',
 				crane: crane === 'Yes' ? true : false,
-				displayRequirements: displayRequirements ?? '',
-				accommodation: accommodation === 'Yes' ? true : false,
-				transport: transport === 'Yes' ? true : false
+				displayRequirements: displayRequirements ?? ''
 			}
 		});
 		if (!updatedRegistration) {

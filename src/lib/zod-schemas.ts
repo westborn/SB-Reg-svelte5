@@ -133,9 +133,7 @@ export const confirmSchemaUI = z.object({
 	bumpIn: z.string().nullish(),
 	bumpOut: z.string().nullish(),
 	displayRequirements: z.string().nullish(),
-	accommodation: z.string().default('No'),
 	crane: z.string().default('No'),
-	transport: z.string().default('No'),
 	bankAccountName: z.string().nullish(),
 	bankBSB: z.coerce.string().nullish(),
 	bankAccount: z.coerce.string().nullish()
@@ -157,7 +155,6 @@ export const entrySchemaUI = z.object({
 	dimWidth: z.string().nullish(),
 	dimHeight: z.string().nullish(),
 	specialRequirements: z.string().nullish(),
-	enterMajorPrize: z.string().default('No'),
 	description: z.string().nullish()
 });
 export type EntryUI = z.infer<typeof entrySchemaUI>;

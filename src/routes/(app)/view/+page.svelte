@@ -45,13 +45,14 @@
 		{#if myState.entriesExist}
 			<p class="mb-6 text-xl text-red-500">
 				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
+				{myState.registrationCompleted ? ' and is complete' : ''}
 			</p>
 
 			{#each myState.currentEntries as entryItem, entryKey}
 				<Card.Root class="mb-4">
 					<Card.Title class="pl-4 pt-4 capitalize">{entryItem.title}</Card.Title>
 					<Card.Content class="p-0 pl-4 text-sm">
-						<p class="text-xs">({entryItem.inOrOut}){entryItem?.enterMajorPrize ? ' +Major Prize Entry' : ''}</p>
+						<p class="text-xs">({entryItem.inOrOut})</p>
 						<p>{entryItem.description}</p>
 						<div class="grid grid-cols-2">
 							<div class="flex items-center justify-around py-2">

@@ -17,8 +17,6 @@
 		['Bank Account:', myState?.submission?.bankAccountName ?? ''],
 		['BSB:', myState?.submission?.bankBSB ?? ''],
 		['Account:', myState?.submission?.bankAccount ?? ''],
-		['Transport:', myState?.submission?.registrations[0].transport ? 'Yes' : 'No'],
-		['Accommodation:', myState?.submission?.registrations[0].accommodation ? 'Yes' : 'No'],
 		['Crane:', myState?.submission?.registrations[0].crane ? 'Yes' : 'No'],
 		['Bump In:', myState?.submission?.registrations[0].bumpIn ?? ''],
 		['Bump Out:', myState?.submission?.registrations[0].bumpOut ?? ''],
