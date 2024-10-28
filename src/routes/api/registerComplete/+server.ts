@@ -81,7 +81,7 @@ async function sendRegistrationConfirmationEmail({ submission, user }: { submiss
 
 	const mailoptions = {
 		from: 'Sculpture Bermagui<do_not_reply@sculpturebermagui.org.au>',
-		to: user.isAdmin ? user.email : user.proxyEmail,
+		to: user.isAdmin ?  user.proxyEmail : user.email
 		subject: "✔ You've completed your Sculpture Exhibition Registration ✔",
 		html: htmlBody
 	};
@@ -160,7 +160,7 @@ function makeEntriesHTML(entriesData: Entry[]): string {
 			})}
 			</tbody></table>
 			<br/>
-			<img src="${entry.images[0].cloudURL}" width="200">
+			<img src="${entry?.images[0]?.cloudURL ? entry.images[0].cloudURL : '/dummy_160x160_ffffff_cccccc.png'}" width="200">
 			<br/>
 			`
 		)
