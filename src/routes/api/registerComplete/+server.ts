@@ -160,7 +160,7 @@ function makeEntriesHTML(entriesData: Entry[]): string {
 			})}
 			</tbody></table>
 			<br/>
-			<img src="${entry?.images[0]?.cloudURL ? entry.images[0].cloudURL : 'https://sculpturebermagui.org.au/wp-content/uploads/2023/11/placeholder-4-1.webp'}" width="200">
+			<img src="${entry?.images[0]?.cloudURL ? entry.images[0].cloudURL : 'https://sculpturebermagui.org.au/wp-content/uploads/2024/10/no-image-provided.png'}" width="200">
 			<br/>
 			`
 		)
