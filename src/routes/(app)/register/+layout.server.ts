@@ -16,7 +16,7 @@ export const load: LayoutServerLoad = async (event) => {
 			console.log(`Submission Found ${submission.id} with ${submission?.registrations[0]?.entries?.length}`);
 		}
 	}
-	if (submission?.registrations[0].closed) {
+	if (submission && submission.registrations.length > 0 && submission?.registrations[0].closed) {
 		redirect(307, '/view');
 	}
 	return { submission };
