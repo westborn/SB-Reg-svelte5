@@ -79,7 +79,10 @@
 		columnHelper.display({
 			header: 'Thumbnail',
 			id: 'thumbnail',
-			cell: (info) => renderComponent(tableImage, { path: info.row.original.cloudURL })
+			cell: (info) => {
+				if (info.row.original.cloudURL == null) return 'No Image';
+				return renderComponent(tableImage, { path: info.row.original.cloudURL });
+			}
 		}),
 
 		columnHelper.accessor('artistName', { header: 'Name' }),
