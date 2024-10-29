@@ -8,6 +8,11 @@
 	currentStep.step = 2;
 	const myState = getRegisterState();
 
+	const hasNoImage =
+		!myState.artistExists || !myState.entriesExist || myState.currentEntries.some((entry) => entry.images.length === 0)
+			? true
+			: false;
+
 	const textList = $derived([
 		['First Name:', myState?.submission?.firstName ?? ''],
 		['Surname:', myState?.submission?.lastName ?? ''],
@@ -31,17 +36,21 @@
 			<Card.Title class="text-xl">Exhibition Confirmation</Card.Title>
 		</Card.Header>
 		<Card.Content class="p-2 sm:px-6">
-			{#if myState && myState.artistExists && myState.submission}
+			{#if !myState.artistExists || !myState.currentEntries || myState.currentEntries.length === 0}
+				<p class="mt-6 text-xl text-red-400">
+					First you need to register for the exhibition,<br /> and provide some basic details so we can contact you.
+				</p>
+			{:else if hasNoImage}
+				<p class="mt-6 text-xl text-red-400">
+					You have an entry without a picture<br /> Please go back and update the entry.
+				</p>
+			{:else}
 				<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 					{#each textList as [textItem, textValue]}
 						{@render TextList(textItem, textValue)}
 					{/each}
 				</div>
 				<ConfirmDialog />
-			{:else}
-				<p class="text-sm text-muted-foreground">
-					First you need to register for the exhibition,<br /> and provide some basic details so we can contact you.
-				</p>
 			{/if}
 		</Card.Content>
 	</Card.Root>
