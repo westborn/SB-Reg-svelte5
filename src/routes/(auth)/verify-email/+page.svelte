@@ -6,13 +6,14 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
 	import { page } from '$app/stores';
+	import { Loader2 } from 'lucide-svelte';
 
 	let { data } = $props();
 	let { session, user } = data;
 	const form = superForm(data.form, {
 		validators: zodClient(tokenSchema)
 	});
-	const { form: formData, enhance, errors } = form;
+	const { form: formData, enhance, errors, delayed } = form;
 	const url = $page.url;
 	const validatingEmail = url.searchParams.get('email');
 	$formData.email = validatingEmail ?? '';
@@ -43,6 +44,11 @@
 		</Form.Field>
 
 		<Form.Errors errors={$errors._errors} />
-		<Form.Button>Verify email address</Form.Button>
+		<Form.Button disabled={$delayed}>
+			Verify email address
+			{#if $delayed}
+				<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+			{/if}
+		</Form.Button>
 	</form>
 </AuthPage>

@@ -5,6 +5,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
+	import { Loader2 } from 'lucide-svelte';
 
 	let { data } = $props();
 	let { session, user } = data;
@@ -12,7 +13,7 @@
 		validators: zodClient(signupSchema)
 	});
 
-	const { form: formData, enhance, errors } = form;
+	const { form: formData, enhance, errors, delayed } = form;
 </script>
 
 <AuthPage type="signup" {session} {user}>
@@ -34,7 +35,13 @@
 		</Form.Field>
 		<Form.Errors errors={$errors._errors} />
 		<div class="flex">
-			<Form.Button>Register</Form.Button>
+			<Form.Button disabled={$delayed}>
+				Register
+
+				{#if $delayed}
+					<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+				{/if}
+			</Form.Button>
 			<span class="px-4 text-sm text-muted-foreground">
 				We will send a token to your email address for verification - check for spam</span
 			>

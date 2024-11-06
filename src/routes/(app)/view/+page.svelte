@@ -29,14 +29,8 @@
 </script>
 
 <section class="mx-auto mt-2 max-w-[500px] px-3">
-	<h4 class="text-xl font-bold text-primary">
-		Registration Information
-		{#if !REGISTRATIONS_OPEN}
-			<br /><span class="text-red-500">Registrations are not open at the moment</span>
-		{/if}
-	</h4>
-
-	{#if myState.artistExists}
+	{#if REGISTRATIONS_OPEN && myState.artistExists}
+		<h3 class="text-xl font-bold text-primary">Registration Information</h3>
 		<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 			{#each textList as [textItem, textValue]}
 				{@render TextList(textItem, textValue)}
@@ -77,8 +71,10 @@
 				</Card.Root>
 			{/each}
 		{/if}
-	{:else}
+	{:else if REGISTRATIONS_OPEN && !myState.artistExists}
 		<p class="mt-6 text-red-500">No registration found - please Register</p>
+	{:else}
+		<h3 class="text-xl font-bold text-red-500">Registration is not available at the moment</h3>
 	{/if}
 </section>
 {#snippet TextList(textItem: string, textValue: string)}
