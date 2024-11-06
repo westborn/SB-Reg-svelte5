@@ -85,6 +85,7 @@
 			}
 		}),
 
+		columnHelper.accessor('closed', { header: 'Closed' }),
 		columnHelper.accessor('artistName', { header: 'Name' }),
 		columnHelper.accessor('title', { header: 'Title' }),
 		columnHelper.accessor('description', { header: 'Description' }),
@@ -116,6 +117,7 @@
 	}
 
 	const [columnVisibility, setColumnVisibility] = createTableState<VisibilityState>({
+		closed: false,
 		description: false,
 		material: false
 	});

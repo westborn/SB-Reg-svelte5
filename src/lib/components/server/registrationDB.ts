@@ -359,6 +359,7 @@ export type Exhibit = {
 	firstName: string;
 	artistName: string;
 	registrationYear: string;
+	closed: boolean;
 	entryId: number;
 	description: string;
 	dimensions: string;
@@ -388,6 +389,7 @@ export const getExhibits = async ({
 		artist.first_name as "firstName",
 		concat(artist.first_name, ' ', artist.last_name) as "artistName",
 		registration.registration_year as "registrationYear",
+		registration.closed,
 		entry.id as "entryId",
 		entry.description,
 		entry.dimensions,
