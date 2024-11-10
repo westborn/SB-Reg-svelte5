@@ -45,13 +45,22 @@ const auth: Handle = async ({ event, resolve }) => {
 			// JWT validation has failed
 			return { session: null, user: null };
 		}
+		user.isSuperAdmin = false;
+		user.isAdmin = false;
+		user.proxyEmail = null;
+
+		const superAdmins = ['george', 'david', 'webmaster'];
+
+		const userName = user.email.split('@')[0];
 		const userDomain = user.email.split('@')[1];
 		const isAdmin = userDomain === 'sculpturebermagui.org.au';
+		const isSuperAdmin = superAdmins.includes(userName);
 		if (isAdmin && session && user) {
 			user.isAdmin = true;
 			user.proxyEmail = event.cookies.get('proxyEmail');
-		} else {
-			user.isAdmin = false;
+			if (isSuperAdmin) {
+				user.isSuperAdmin = true;
+			}
 		}
 		return { session, user };
 	};

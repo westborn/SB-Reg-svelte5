@@ -39,6 +39,7 @@ export interface User {
 	updated_at: Date;
 	is_anonymous: boolean;
 	isAdmin?: boolean;
+	isSuperAdmin?: boolean;
 	proxyEmail?: string;
 }
 
@@ -127,19 +128,6 @@ export const getSubmission = async ({ isAdmin, proxyEmail, email }: User) => {
 		}
 	});
 	return submission;
-};
-
-export type Artists = ThenArg<ReturnType<typeof getArtists>>;
-export const getArtists = async () => {
-	return await prisma.artistTable.findMany({
-		select: {
-			id: true,
-			email: true,
-			firstName: true,
-			lastName: true,
-			phone: true
-		}
-	});
 };
 
 type ReturnedEntriesEntry = Omit<EntryTable, 'createdAt' | 'updatedAt'>;
@@ -358,6 +346,12 @@ export type Exhibit = {
 	lastName: string;
 	firstName: string;
 	artistName: string;
+	phone: string;
+	postcode: string;
+	firstNations: string;
+	bankAccountName: string;
+	bankBSB: string;
+	bankAccount: string;
 	registrationYear: string;
 	closed: boolean;
 	entryId: number;
@@ -388,6 +382,12 @@ export const getExhibits = async ({
 		artist.last_name as "lastName",
 		artist.first_name as "firstName",
 		concat(artist.first_name, ' ', artist.last_name) as "artistName",
+		artist.phone,
+		artist.postcode,
+		artist.first_nations as "firstNations",
+		artist.bank_account_name as "bankAccountName",
+		artist.bank_bsb as "bankBSB",
+		artist.bank_account as "bankAccount",
 		registration.registration_year as "registrationYear",
 		registration.closed,
 		entry.id as "entryId",
