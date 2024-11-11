@@ -148,7 +148,7 @@
 	<p class="mt-4">
 		Generate a CSV file of the <span class="font-semibold text-red-500">{exhibits.length} exhibits</span> in the current
 		exhibition
-		<Button onclick={() => handleDownload('exhibits', exhibits)}>Download Data</Button>
+		<Button onclick={() => handleDownload('exhibits', exhibits)}>Download Exhibits</Button>
 	</p>
 </section>
 
@@ -158,6 +158,6 @@
 	<p class="mt-4">
 		Generate a CSV file of the <span class="font-semibold text-red-500">{filteredArtists.length} artists</span> in the
 		current exhibition
-		<Button onclick={() => handleDownload('artists', filteredArtists)}>Download Data</Button>
+		<Button onclick={() => handleDownload('artists', filteredArtists)}>Download Artists</Button>
 	</p>
 </section>
