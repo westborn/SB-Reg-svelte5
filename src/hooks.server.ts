@@ -47,7 +47,7 @@ const auth: Handle = async ({ event, resolve }) => {
 		}
 		user.isSuperAdmin = false;
 		user.isAdmin = false;
-		user.proxyEmail = null;
+		user.proxyEmail = 'not set';
 
 		const superAdmins = ['george', 'david', 'webmaster'];
 
@@ -58,7 +58,8 @@ const auth: Handle = async ({ event, resolve }) => {
 		if (isAdmin && session && user) {
 			user.isAdmin = true;
 			if (isSuperAdmin) {
-				user.proxyEmail = event.cookies.get('proxyEmail');
+				const proxyEmail = event.cookies.get('proxyEmail');
+				user.proxyEmail = proxyEmail ? proxyEmail : 'not set';
 				user.isSuperAdmin = true;
 			}
 		}
