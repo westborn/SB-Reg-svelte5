@@ -1,29 +1,90 @@
 <script lang="ts">
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import jsonToCsvExport from 'json-to-csv-export';
 
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
-
-	import * as Select from '$lib/components/ui/select/index.js';
+	import Button from '../../../lib/components/ui/button/button.svelte';
 
 	let { data } = $props();
-	const { emailForm, artists: artistsFromServer } = data;
+	const { emailForm, exhibits: exhibitsFromServer } = data;
 	//don't mutate the original array
-	const artists = [...artistsFromServer].sort((a, b) => a.email.localeCompare(b.email));
+	const exhibits = [...exhibitsFromServer].sort((a, b) => a.email.localeCompare(b.email));
 
 	let searchTerm = $state('');
 
-	// Setup the filter for searching / join a few fields to search on
-	// if no search term entered - don't return anything
+	type FilteredEmail = {
+		email: string;
+		firstName: string;
+		lastName: string;
+	};
+
+	function isUniqueEmail(accumulator: FilteredEmail[], email: string): boolean {
+		return !accumulator.find((x) => x.email === email);
+	}
+
+	function matchesSearchTerm(exhibit: FilteredEmail, term: string): boolean {
+		if (term === '') return false;
+		const searchText = `${exhibit.firstName}${exhibit.lastName}${exhibit.email}`;
+		return searchText.toLowerCase().includes(term.toLowerCase());
+	}
+
+	const filteredEmails = $derived(
+		exhibits.reduce((accumulator: FilteredEmail[], exhibit) => {
+			const artistData = {
+				email: exhibit.email,
+				firstName: exhibit.firstName,
+				lastName: exhibit.lastName
+			};
+			if (isUniqueEmail(accumulator, artistData.email) && matchesSearchTerm(artistData, searchTerm)) {
+				accumulator.push(artistData);
+			}
+			return accumulator;
+		}, [])
+	);
+
 	const filteredArtists = $derived(
-		artists.filter((x) => {
-			if (searchTerm === '') return false;
-			const searchText = x.firstName + x.lastName + x.email;
-			return searchText.toLocaleLowerCase().includes(searchTerm.toLowerCase());
-		})
+		exhibits.reduce((accumulator: FilteredEmail[], exhibit) => {
+			const artistData = {
+				artistId: exhibit.artistId,
+				email: exhibit.email,
+				firstName: exhibit.firstName,
+				lastName: exhibit.lastName,
+				phone: exhibit.phone,
+				postcode: exhibit.postcode,
+				bankAccountName: exhibit.bankAccountName,
+				bankAccount: exhibit.bankAccount,
+				bankBSB: exhibit.bankBSB,
+				firstNations: exhibit.firstNations
+			};
+			if (isUniqueEmail(accumulator, artistData.email)) {
+				accumulator.push(artistData);
+			}
+			return accumulator;
+		}, [])
 	);
 
 	const { message } = superForm(emailForm, {});
+
+	function formatDatePart(num: number): string {
+		return num.toString().padStart(2, '0');
+	}
+
+	function getFormattedDateTime(): string {
+		const date = new Date();
+		const year = date.getFullYear();
+		const month = formatDatePart(date.getMonth() + 1);
+		const day = formatDatePart(date.getDate());
+		const hours = formatDatePart(date.getHours());
+		const minutes = formatDatePart(date.getMinutes());
+		const seconds = formatDatePart(date.getSeconds());
+
+		return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+	}
+
+	function handleDownload(filePrefix: string, data: any) {
+		const filename = `${filePrefix}_${getFormattedDateTime()}.csv`;
+		jsonToCsvExport({ data, filename });
+	}
 </script>
 
 <section class="mx-auto mt-2 px-3">
@@ -32,44 +93,71 @@
 	<p>It is a work in progress and will be updated as new features are added</p>
 	<p class="mt-4 font-semibold">Currently you can:</p>
 	<ul class="mx-12">
-		<li class="w-full list-disc">Set the email address of the artist you would like to act on behalf of</li>
-		<li class="w-full list-disc">View the list of artists in the database</li>
+		<li class="w-full list-disc">
+			Set the email address of the artist you would like to impersonate <span class="text-sm text-red-500">
+				(SuperAdmin Only)</span
+			>
+		</li>
+		<li class="w-full list-disc">Download a list of Exhibits</li>
+		<li class="w-full list-disc">Download a list of Entries</li>
 	</ul>
 	<p class="mt-4">More features will be added soon</p>
 </section>
 
+{#if $page.data.user.isSuperAdmin}
+	<section class="mx-auto mt-2 px-3">
+		<hr class="mt-4" />
+		<h4 class="text-lg font-semibold">
+			Set Artist Email
+			<span class="text-sm">
+				- (Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail})</span></span
+			>
+		</h4>
+		<p class="mt-4">Search for the artist email you'd like to impersonate</p>
+		<!-- Search Box -->
+		<form method="POST" action="?/setArtistEmail">
+			<div>
+				<div class="w-80 rounded p-4">
+					<input
+						bind:value={searchTerm}
+						type="search"
+						class="w-full rounded border border-solid border-gray-300 bg-white px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+						placeholder="Email/First Name/Last Name"
+						aria-label="Search"
+					/>
+				</div>
+			</div>
+
+			<div class="grid w-full grid-cols-1 justify-between md:grid-cols-2 lg:grid-cols-3">
+				{#each filteredEmails as exhibit}
+					<button class="cursor-pointer text-left text-sm font-semibold" name="email" value={exhibit.email}>
+						{exhibit.email} - {exhibit.firstName} {exhibit.lastName}</button
+					>
+				{/each}
+			</div>
+		</form>
+		{#if $message}
+			<div class="text-red-500">{$message}</div>
+		{/if}
+	</section>
+{/if}
+
 <section class="mx-auto mt-2 px-3">
 	<hr class="mt-4" />
-	<h4 class="text-lg font-semibold">
-		Set Artist Email
-		<span class="text-sm">
-			- (Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail})</span></span
-		>
-	</h4>
-	<p class="mt-4">Search for the artist email you'd like to impersonate</p>
-	<!-- Search Box -->
-	<form method="POST" action="?/setArtistEmail">
-		<div>
-			<div class="w-80 rounded p-4">
-				<input
-					bind:value={searchTerm}
-					type="search"
-					class="w-full rounded border border-solid border-gray-300 bg-white px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
-					placeholder="Email"
-					aria-label="Search"
-				/>
-			</div>
-		</div>
+	<h4 class="text-lg font-semibold">Download Exhibits CSV</h4>
+	<p class="mt-4">
+		Generate a CSV file of the <span class="font-semibold text-red-500">{exhibits.length} exhibits</span> in the current
+		exhibition
+		<Button onclick={() => handleDownload('exhibits', exhibits)}>Download Exhibits</Button>
+	</p>
+</section>
 
-		<div class="grid w-full grid-cols-1 justify-between md:grid-cols-2 lg:grid-cols-3">
-			{#each filteredArtists as artist}
-				<button class="cursor-pointer text-left text-sm font-semibold" name="email" value={artist.email}>
-					{artist.email} - {artist.firstName} {artist.lastName}</button
-				>
-			{/each}
-		</div>
-	</form>
-	{#if $message}
-		<div class="text-red-500">{$message}</div>
-	{/if}
+<section class="mx-auto mt-2 px-3">
+	<hr class="mt-4" />
+	<h4 class="text-lg font-semibold">Download Artist details CSV</h4>
+	<p class="mt-4">
+		Generate a CSV file of the <span class="font-semibold text-red-500">{filteredArtists.length} artists</span> in the
+		current exhibition
+		<Button onclick={() => handleDownload('artists', filteredArtists)}>Download Artists</Button>
+	</p>
 </section>

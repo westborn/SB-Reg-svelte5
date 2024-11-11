@@ -6,7 +6,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Loader2 } from 'lucide-svelte';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { toast } from 'svelte-sonner';
 
 	import { confirmSchemaUI } from '$lib/zod-schemas';
@@ -140,7 +140,7 @@
 	<Form.Button disabled={$delayed}>
 		Save?
 		{#if $delayed}
-			<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+			<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
 		{/if}
 	</Form.Button>
 </form>

@@ -84,30 +84,51 @@
 				return renderComponent(tableImage, { path: info.row.original.cloudURL });
 			}
 		}),
-
-		columnHelper.accessor('closed', { header: 'Closed' }),
+		columnHelper.accessor('email', {
+			header: 'Email',
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
 		columnHelper.accessor('artistName', { header: 'Name' }),
 		columnHelper.accessor('title', { header: 'Title' }),
+		columnHelper.accessor('price', {
+			header: 'Price',
+			cell: (info) => convertToDollars(info.getValue(), 0),
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
+		columnHelper.accessor('closed', {
+			header: 'Closed',
+			cell: (info) => (info.getValue() ? 'Yes' : 'No'),
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
 		columnHelper.accessor('description', { header: 'Description' }),
-		columnHelper.accessor('material', { header: 'Material' }),
-
+		columnHelper.accessor('material', {
+			header: 'Material',
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
 		columnHelper.accessor('dimensions', {
 			header: 'Dimensions',
 			enableSorting: false,
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
-
-		columnHelper.accessor('price', {
-			header: 'Price',
-			cell: (info) => convertToDollars(info.getValue(), 0),
+		columnHelper.accessor('bankBSB', {
+			header: 'Bank Details',
+			cell: (info) => info.getValue() + ' - ' + info.row.original.bankAccount,
+			enableSorting: false,
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		})
 	];
 
 	const [pagination, setPagination] = createTableState<PaginationState>({
-		pageSize: 8,
+		pageSize: 20,
 		pageIndex: 0
 	});
 
@@ -118,8 +139,11 @@
 
 	const [columnVisibility, setColumnVisibility] = createTableState<VisibilityState>({
 		closed: false,
+		email: false,
 		description: false,
-		material: false
+		material: false,
+		dimensions: false,
+		bankBSB: false
 	});
 	const [columnFiltersState, setColumnFiltersState] = createTableState<ColumnFiltersState>([]);
 

@@ -12,7 +12,7 @@
 
 	import { artistSchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte.js';
-	import { Loader2 } from 'lucide-svelte';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let myState = getRegisterState();
 
@@ -139,7 +139,7 @@
 	<Form.Button disabled={$delayed}>
 		Save?
 		{#if $delayed}
-			<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+			<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
 		{/if}
 	</Form.Button>
 </form>
