@@ -81,7 +81,7 @@ async function sendRegistrationConfirmationEmail({ submission, user }: { submiss
 
 	const mailoptions = {
 		from: 'Sculpture Bermagui<do_not_reply@sculpturebermagui.org.au>',
-		to: user.isAdmin ? user.proxyEmail : user.email,
+		to: user.email,
 		subject: "✔ You've completed your Sculpture Exhibition Registration ✔",
 		html: htmlBody
 	};

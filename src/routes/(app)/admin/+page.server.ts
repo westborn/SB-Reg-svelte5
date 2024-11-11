@@ -1,6 +1,6 @@
 import { fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getArtists } from '$lib/components/server/registrationDB';
+import { getExhibits } from '$lib/components/server/registrationDB';
 import { z } from 'zod';
 import { artistTableSchema } from '$lib/zod-schemas';
 import { message, superValidate } from 'sveltekit-superforms';
@@ -11,8 +11,8 @@ const emailSchema = z.object({ email: artistTableSchema.shape.email });
 export const load: PageServerLoad = async (event) => {
 	console.log(`${event.route.id} - LOAD - START`);
 	const emailForm = await superValidate(zod(emailSchema), { id: 'emailForm' });
-	const artists = await getArtists();
-	return { emailForm, artists };
+	const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: '2025' });
+	return { emailForm, exhibits };
 };
 
 export const actions: Actions = {
@@ -25,7 +25,7 @@ export const actions: Actions = {
 			return message(form, 'Invalid email for artist.');
 		}
 		const proxyEmail = form.data.email;
-		if (user.isAdmin) {
+		if (user.isSuperAdmin) {
 			cookies.set('proxyEmail', proxyEmail, {
 				path: '/',
 				maxAge: 60 * 60 * 24 * 365,

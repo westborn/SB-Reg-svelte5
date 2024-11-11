@@ -24,7 +24,7 @@ const artistUpdate = async (event: RequestEvent) => {
 	}
 	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
-	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 
 	try {
 		const result = await prisma.artistTable.update({
@@ -58,7 +58,7 @@ const artistCreate = async (event: RequestEvent) => {
 
 	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
-	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 	const newArtist = { ...formValidationResult.data, email: artistEmail };
 
 	try {

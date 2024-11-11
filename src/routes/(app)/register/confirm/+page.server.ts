@@ -24,7 +24,7 @@ const confirmUpdate = async (event: RequestEvent) => {
 	}
 	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
-	const artistEmail = user.isAdmin ? user.proxyEmail : user.email;
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 	let idToUpdate: number;
 	// Get the submission from the database
 	try {

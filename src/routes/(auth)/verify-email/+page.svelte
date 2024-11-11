@@ -6,7 +6,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
 	import { page } from '$app/stores';
-	import { Loader2 } from 'lucide-svelte';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let { data } = $props();
 	let { session, user } = data;
@@ -47,7 +47,7 @@
 		<Form.Button disabled={$delayed}>
 			Verify email address
 			{#if $delayed}
-				<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+				<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
 			{/if}
 		</Form.Button>
 	</form>
