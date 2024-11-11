@@ -1,7 +1,9 @@
 <script lang="ts">
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import jsonToCsvExport from 'json-to-csv-export';
 
 	import { page } from '$app/stores';
+	import Button from '../../../lib/components/ui/button/button.svelte';
 
 	let { data } = $props();
 	const { emailForm, exhibits: exhibitsFromServer } = data;
@@ -10,22 +12,79 @@
 
 	let searchTerm = $state('');
 
-	type FilteredEmails = { email: string; firstName: string; lastName: string }[];
-	// filter unique emails of exhibits where user input matches email, firstname or lastname
-	const filteredEmails: FilteredEmails = $derived(
-		exhibits.reduce((accumulator: FilteredEmails, exhibit) => {
-			const uniqExhibit = { email: exhibit.email, firstName: exhibit.firstName, lastName: exhibit.lastName };
-			// if no search term entered or email already seen, return accumulator
-			if (searchTerm === '' || accumulator.find((x) => x.email === uniqExhibit.email)) return accumulator;
-			const searchText = exhibit.firstName + exhibit.lastName + exhibit.email;
-			if (searchText.toLocaleLowerCase().includes(searchTerm.toLowerCase())) {
-				accumulator.push(uniqExhibit);
+	type FilteredEmail = {
+		email: string;
+		firstName: string;
+		lastName: string;
+	};
+
+	function isUniqueEmail(accumulator: FilteredEmail[], email: string): boolean {
+		return !accumulator.find((x) => x.email === email);
+	}
+
+	function matchesSearchTerm(exhibit: FilteredEmail, term: string): boolean {
+		if (term === '') return false;
+		const searchText = `${exhibit.firstName}${exhibit.lastName}${exhibit.email}`;
+		return searchText.toLowerCase().includes(term.toLowerCase());
+	}
+
+	const filteredEmails = $derived(
+		exhibits.reduce((accumulator: FilteredEmail[], exhibit) => {
+			const artistData = {
+				email: exhibit.email,
+				firstName: exhibit.firstName,
+				lastName: exhibit.lastName
+			};
+			if (isUniqueEmail(accumulator, artistData.email) && matchesSearchTerm(artistData, searchTerm)) {
+				accumulator.push(artistData);
+			}
+			return accumulator;
+		}, [])
+	);
+
+	const filteredArtists = $derived(
+		exhibits.reduce((accumulator: FilteredEmail[], exhibit) => {
+			const artistData = {
+				artistId: exhibit.artistId,
+				email: exhibit.email,
+				firstName: exhibit.firstName,
+				lastName: exhibit.lastName,
+				phone: exhibit.phone,
+				postcode: exhibit.postcode,
+				bankAccountName: exhibit.bankAccountName,
+				bankAccount: exhibit.bankAccount,
+				bankBSB: exhibit.bankBSB,
+				firstNations: exhibit.firstNations
+			};
+			if (isUniqueEmail(accumulator, artistData.email)) {
+				accumulator.push(artistData);
 			}
 			return accumulator;
 		}, [])
 	);
 
 	const { message } = superForm(emailForm, {});
+
+	function formatDatePart(num: number): string {
+		return num.toString().padStart(2, '0');
+	}
+
+	function getFormattedDateTime(): string {
+		const date = new Date();
+		const year = date.getFullYear();
+		const month = formatDatePart(date.getMonth() + 1);
+		const day = formatDatePart(date.getDate());
+		const hours = formatDatePart(date.getHours());
+		const minutes = formatDatePart(date.getMinutes());
+		const seconds = formatDatePart(date.getSeconds());
+
+		return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+	}
+
+	function handleDownload(filePrefix: string, data: any) {
+		const filename = `${filePrefix}_${getFormattedDateTime()}.csv`;
+		jsonToCsvExport({ data, filename });
+	}
 </script>
 
 <section class="mx-auto mt-2 px-3">
@@ -85,20 +144,20 @@
 
 <section class="mx-auto mt-2 px-3">
 	<hr class="mt-4" />
-	<h4 class="text-lg font-semibold">Download Artist CSV</h4>
-	<p class="mt-4">Generate a CSV file of all the exhibits in the current exhibition</p>
-	{#each exhibits as exhibit}
-		<div class="grid grid-cols-4">
-			<div>{exhibit.entryId}</div>
-			<div>{exhibit.email}</div>
-			<div>{exhibit.firstName} {exhibit.lastName}</div>
-			<div>{exhibit.closed}</div>
-		</div>
-	{/each}
+	<h4 class="text-lg font-semibold">Download Exhibits CSV</h4>
+	<p class="mt-4">
+		Generate a CSV file of the <span class="font-semibold text-red-500">{exhibits.length} exhibits</span> in the current
+		exhibition
+		<Button onclick={() => handleDownload('exhibits', exhibits)}>Download Data</Button>
+	</p>
 </section>
 
 <section class="mx-auto mt-2 px-3">
 	<hr class="mt-4" />
-	<h4 class="text-lg font-semibold">Download Entries CSV</h4>
-	<p class="mt-4">Generate a CSV file of all the entries in the current exhibition</p>
+	<h4 class="text-lg font-semibold">Download Artist details CSV</h4>
+	<p class="mt-4">
+		Generate a CSV file of the <span class="font-semibold text-red-500">{filteredArtists.length} artists</span> in the
+		current exhibition
+		<Button onclick={() => handleDownload('artists', filteredArtists)}>Download Data</Button>
+	</p>
 </section>
