@@ -1,3 +1,5 @@
+# Hotfix 1.0.1
+
 # Release 1.0 - 2025 exhibition registration open
 
 # Setup the Project
