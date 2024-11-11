@@ -5,7 +5,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
-	import { Loader2 } from 'lucide-svelte';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let { data } = $props();
 	let { session, user } = data;
@@ -40,7 +40,7 @@
 				Login
 
 				{#if $delayed}
-					<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+					<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
 				{/if}
 			</Form.Button>
 			<span class="px-4 text-sm text-muted-foreground">

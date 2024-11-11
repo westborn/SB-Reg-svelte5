@@ -7,7 +7,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { Loader2 } from 'lucide-svelte';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { toast } from 'svelte-sonner';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
@@ -173,7 +173,7 @@
 	<Form.Button disabled={$delayed}>
 		Save Updated Entry?
 		{#if $delayed}
-			<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+			<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
 		{/if}
 	</Form.Button>
 </form>

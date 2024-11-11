@@ -57,8 +57,8 @@ const auth: Handle = async ({ event, resolve }) => {
 		const isSuperAdmin = superAdmins.includes(userName);
 		if (isAdmin && session && user) {
 			user.isAdmin = true;
-			user.proxyEmail = event.cookies.get('proxyEmail');
 			if (isSuperAdmin) {
+				user.proxyEmail = event.cookies.get('proxyEmail');
 				user.isSuperAdmin = true;
 			}
 		}

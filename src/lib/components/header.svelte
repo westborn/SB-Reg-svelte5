@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
-	import { AlignJustify } from 'lucide-svelte';
+	import AlignJustify from 'lucide-svelte/icons/align-justify';
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
@@ -78,7 +78,7 @@
 				</Tooltip.Trigger>
 				<Tooltip.Content>
 					<p>{loggedInEmail}</p>
-					{#if user.isAdmin && $page.data.user.proxyEmail}
+					{#if user.isSuperAdmin && $page.data.user.proxyEmail}
 						<p><span class="text-xs text-primary">as: {$page.data.user.proxyEmail}</span></p>
 					{/if}
 				</Tooltip.Content>

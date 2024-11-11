@@ -25,7 +25,7 @@ export const actions: Actions = {
 			return message(form, 'Invalid email for artist.');
 		}
 		const proxyEmail = form.data.email;
-		if (user.isAdmin) {
+		if (user.isSuperAdmin) {
 			cookies.set('proxyEmail', proxyEmail, {
 				path: '/',
 				maxAge: 60 * 60 * 24 * 365,

@@ -13,7 +13,7 @@
 	import { getRegisterState } from '$lib/context.svelte';
 	import { cn } from '$lib/utils';
 	import { MAX_IMAGE_SIZE } from '../constants';
-	import { Loader2 } from 'lucide-svelte';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	type Props = {
 		buttonText?: string;
@@ -86,7 +86,7 @@
 						<Button type="submit" disabled={$delayed}>
 							Use this Image?
 							{#if $delayed}
-								<Loader2 class="ml-4 h-6 w-6 animate-spin" />
+								<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
 							{/if}
 						</Button>
 					</div>

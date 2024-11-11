@@ -68,8 +68,8 @@ export interface Data {
 }
 
 export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
-export const getSubmission = async ({ isAdmin, proxyEmail, email }: User) => {
-	const artistEmail = isAdmin ? proxyEmail : email;
+export const getSubmission = async ({ isSuperAdmin, proxyEmail, email }: User) => {
+	const artistEmail = isSuperAdmin ? proxyEmail : email;
 	const submission = await prisma.artistTable.findFirst({
 		where: {
 			email: artistEmail
