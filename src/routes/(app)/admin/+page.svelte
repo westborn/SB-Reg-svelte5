@@ -3,7 +3,8 @@
 	import jsonToCsvExport from 'json-to-csv-export';
 
 	import { page } from '$app/stores';
-	import Button from '../../../lib/components/ui/button/button.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Select from '$lib/components/ui/select/index.js';
 
 	let { data } = $props();
 	const { emailForm, exhibits: exhibitsFromServer } = data;
@@ -85,6 +86,41 @@
 		const filename = `${filePrefix}_${getFormattedDateTime()}.csv`;
 		jsonToCsvExport({ data, filename });
 	}
+
+	const years = [
+		{ value: '2025', label: '2025' },
+		{ value: '2024', label: '2024' },
+		{ value: '2023', label: '2023' },
+		{ value: '2022', label: '2022' }
+	];
+
+	let getCatalogueError = $state('');
+
+	let selectedYear = $state({ value: '2025', label: '2025' });
+	let catalogueData = $state([]);
+	async function getCatalogue() {
+		getCatalogueError = '';
+		try {
+			const result = await fetch(`/api/getExhibits`, {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({ entryYear: selectedYear.value })
+			});
+			if (result.status != 200) {
+				const error = await result.json();
+				console.log('response error', JSON.stringify(error));
+				getCatalogueError = error.message;
+			}
+			catalogueData = await result.json();
+			handleDownload('catalogue', catalogueData);
+		} catch (err) {
+			console.log('registerComplete-err' + err);
+			getCatalogueError = err.message;
+		}
+		return;
+	}
 </script>
 
 <section class="mx-auto mt-2 px-3">
@@ -138,6 +174,33 @@
 		</form>
 		{#if $message}
 			<div class="text-red-500">{$message}</div>
+		{/if}
+	</section>
+
+	<section class="mx-auto mt-2 px-3">
+		<hr class="mt-4" />
+		<h4 class="text-lg font-semibold">Download a Catalogue CSV</h4>
+		<p class="mt-4">
+			Generate a CSV file of the <span class="font-semibold text-red-500">{selectedYear.value}</span> Catalogue
+			<Button onclick={() => getCatalogue()}>Download Catalogue</Button>
+		</p>
+
+		<Select.Root onSelectedChange={(e: any) => (selectedYear = { ...e })} selected={selectedYear}>
+			<Select.Trigger class="w-[120px]">
+				<Select.Value placeholder="Select a year" />
+			</Select.Trigger>
+			<Select.Content>
+				<Select.Group>
+					<Select.Label>Year</Select.Label>
+					{#each years as year}
+						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
+					{/each}
+				</Select.Group>
+			</Select.Content>
+			<Select.Input name="entryYear" />
+		</Select.Root>
+		{#if getCatalogueError}
+			<div class="text-red-500">{getCatalogueError}</div>
 		{/if}
 	</section>
 {/if}
