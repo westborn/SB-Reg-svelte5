@@ -355,6 +355,7 @@ export type Exhibit = {
 	registrationYear: string;
 	closed: boolean;
 	entryId: number;
+	accepted: boolean;
 	description: string;
 	dimensions: string;
 	inOrOut: string;
@@ -391,6 +392,7 @@ export const getExhibits = async ({
 		registration.registration_year as "registrationYear",
 		registration.closed,
 		entry.id as "entryId",
+		entry.accepted,
 		entry.description,
 		entry.dimensions,
 		entry.in_or_out as "inOrOut",
