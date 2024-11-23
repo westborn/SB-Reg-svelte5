@@ -18,7 +18,10 @@
 		"db:reset": "prisma migrate reset --force",
 		"db:seed": "tsx src/scripts/seed.ts",
 		"studio": "prisma studio",
-		"upgrade-deps": "ncu -uis --format group --install always"
+		"upgrade-deps": "ncu -uis --format group --install always",
+		"bump:patch": "npm --no-git-tag-version version patch",
+		"bump:minor": "npm --no-git-tag-version version minor",
+		"bump:major": "npm --no-git-tag-version version major"
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^9.2.0",
