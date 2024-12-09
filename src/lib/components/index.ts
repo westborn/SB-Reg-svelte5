@@ -17,4 +17,5 @@ export { default as ImageUploadForm } from './image-upload-form.svelte';
 export { default as OptimisedImage } from './optimised-image.svelte';
 export { default as StepNavigation } from './step-navigation.svelte';
 export { default as TailwindIndicator } from './tailwind-indicator.svelte';
+export { default as TableImage } from './tableImage.svelte';
 export { default as ThemeToggle } from './theme-toggle.svelte';

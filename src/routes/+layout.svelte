@@ -3,7 +3,6 @@
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { dev } from '$app/environment';
-
 	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 	import { setRegisterState } from '$lib/context.svelte.js';
 
@@ -21,9 +20,17 @@
 				invalidate('supabase:auth');
 			}
 		});
-		console.info(`Environment: dev:${dev} meta.env.MODE:${import.meta.env.MODE}`);
-		console.info(`Running in "${PUBLIC_SQUARE_ENVIRONMENT}" mode`);
-		console.info(`Registrations are ${REGISTRATIONS_OPEN ? 'open' : 'closed'}`);
+		console.info(`
+Environment:        dev:${dev} meta.env.MODE:${import.meta.env.MODE}
+Running in          "${PUBLIC_SQUARE_ENVIRONMENT}" mode
+Registrations are   ${REGISTRATIONS_OPEN ? 'OPEN' : 'CLOSED'}
+NAME:               ${__NAME__}
+VERSION:            ${__VERSION__}
+GITHUBURL           ${__GITHUBURL__}
+SVELTEVERSION:      ${__SVELTEVERSION__}
+SVELTEKITVERSION:   ${__SVELTEKITVERSION__}
+VITEVERSION:        ${__VITEVERSION__}
+TAILWINDCSSVERSION: ${__TAILWINDCSSVERSION__}`);
 		return () => data.subscription.unsubscribe();
 	});
 

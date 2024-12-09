@@ -22,41 +22,66 @@
 	import * as Pagination from '$lib/components/ui/pagination';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import * as Select from '$lib/components/ui/select';
 
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
 	import { createTableState } from './state.svelte';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
-	import tableImage from './tableImage.svelte';
+	import { TableImage } from '$lib/components';
+	import MySwitch from './mySwitch.svelte';
 
+	// the data is picked up from the $page store so it can be used in the table
 	const { data } = $props();
 
 	let exhibits: Exhibit[] = $derived($page.data.exhibits?.slice(0, 999) ?? []);
+	let updateAcceptedError = $state('');
 
-	const years = [
-		{ value: '2025', label: '2025' },
-		{ value: '2024', label: '2024' },
-		{ value: '2023', label: '2023' },
-		{ value: '2022', label: '2022' }
-	];
-
-	let selectedYear = $state({ value: '2025', label: '2025' });
-
-	function handleSelectYear(event: any) {
-		selectedYear = { ...event };
-		const newURL = new URL($page.url);
-		newURL.searchParams?.set('year', selectedYear.value);
-		goto(newURL);
+	async function handleUpdateAccepted(entryId: number, index: number, accepted: boolean) {
+		try {
+			const result = await fetch(`/api/updateAccepted`, {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({ entryId, accepted })
+			});
+			if (result.status != 200) {
+				const error = await result.json();
+				console.log('response error', JSON.stringify(error));
+				updateAcceptedError = error.message;
+			}
+		} catch (err) {
+			console.log('updateAccepted-err' + err);
+			updateAcceptedError = err.message;
+		}
+		exhibits[index].accepted = !exhibits[index].accepted;
+		return;
 	}
 
 	const columnHelper = createColumnHelper<Exhibit>();
 	const columns = [
+		columnHelper.accessor('accepted', {
+			header: 'Accepted?',
+			cell: (info) => {
+				return renderComponent(MySwitch, {
+					handleClick: () => {
+						handleUpdateAccepted(info.row.original.entryId, info.row.index, info.row.original.accepted);
+					},
+					checked: info.getValue()
+				});
+			},
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
+		columnHelper.accessor('entryId', {
+			header: 'EntryId',
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
 		columnHelper.accessor('exhibitNumber', {
 			header: 'Placement',
 			enableSorting: false,
@@ -75,14 +100,20 @@
 				return placement;
 			}
 		}),
-
 		columnHelper.display({
 			header: 'Thumbnail',
 			id: 'thumbnail',
 			cell: (info) => {
 				if (info.row.original.cloudURL == null) return 'No Image';
-				return renderComponent(tableImage, { path: info.row.original.cloudURL });
+				return renderComponent(TableImage, { path: info.row.original.cloudURL });
 			}
+		}),
+		columnHelper.accessor('artistName', { header: 'Artist Name' }),
+		columnHelper.accessor('title', {
+			header: 'Title',
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
 		}),
 		columnHelper.accessor('email', {
 			header: 'Email',
@@ -90,38 +121,9 @@
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
-		columnHelper.accessor('artistName', { header: 'Name' }),
-		columnHelper.accessor('title', { header: 'Title' }),
 		columnHelper.accessor('price', {
 			header: 'Price',
 			cell: (info) => convertToDollars(info.getValue(), 0),
-			enableColumnFilter: false,
-			enableGlobalFilter: false
-		}),
-		columnHelper.accessor('closed', {
-			header: 'Closed',
-			cell: (info) => (info.getValue() ? 'Yes' : 'No'),
-			enableSorting: false,
-			enableColumnFilter: false,
-			enableGlobalFilter: false
-		}),
-		columnHelper.accessor('description', { header: 'Description' }),
-		columnHelper.accessor('material', {
-			header: 'Material',
-			enableSorting: false,
-			enableColumnFilter: false,
-			enableGlobalFilter: false
-		}),
-		columnHelper.accessor('dimensions', {
-			header: 'Dimensions',
-			enableSorting: false,
-			enableColumnFilter: false,
-			enableGlobalFilter: false
-		}),
-		columnHelper.accessor('bankBSB', {
-			header: 'Bank Details',
-			cell: (info) => info.getValue() + ' - ' + info.row.original.bankAccount,
-			enableSorting: false,
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		})
@@ -138,12 +140,7 @@
 	}
 
 	const [columnVisibility, setColumnVisibility] = createTableState<VisibilityState>({
-		closed: false,
-		email: false,
-		description: false,
-		material: false,
-		dimensions: false,
-		bankBSB: false
+		email: false
 	});
 	const [columnFiltersState, setColumnFiltersState] = createTableState<ColumnFiltersState>([]);
 
@@ -185,30 +182,10 @@
 	};
 </script>
 
-<section class="mx-auto mt-2">
-	<div class="flex items-center justify-start gap-3">
-		<h4 class="text-xl font-bold text-primary">Year</h4>
-		<Select.Root onSelectedChange={handleSelectYear} selected={selectedYear}>
-			<Select.Trigger class="w-[120px]">
-				<Select.Value placeholder="Select a year" />
-			</Select.Trigger>
-			<Select.Content>
-				<Select.Group>
-					<Select.Label>Registration Year</Select.Label>
-					{#each years as year}
-						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
-					{/each}
-				</Select.Group>
-			</Select.Content>
-			<Select.Input name="registrationYear" />
-		</Select.Root>
-		<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
-	</div>
-</section>
-
 <div class="grid place-items-center">
 	<div class="inline-grid w-full max-w-screen-lg gap-2 p-2">
 		<div class="flex items-center justify-between">
+			<h4 class="text-xl font-bold text-primary">Accept/Reject Exhibits</h4>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="outline" size="sm" class="ml-auto flex h-8" builders={[builder]}>Columns?</Button>
@@ -230,9 +207,11 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 		</div>
-
+		{#if updateAcceptedError}
+			<p class="text-red-500">{updateAcceptedError}</p>
+		{/if}
 		<div class="px-4">
-			<Table.Root>
+			<Table.Root class="overflow-hidden">
 				<Table.Header>
 					{#each table.getHeaderGroups() as headerGroup}
 						<Table.Row>
@@ -326,25 +305,6 @@
 					<Pagination.Item></Pagination.Item>
 				</Pagination.Content>
 			</Pagination.Root>
-
-			<!-- <div class="flex items-center justify-center gap-2 text-sm">
-				<span class="font-medium">Go to page:</span>
-				<Input
-					type="number"
-					min="1"
-					max={table.getPageCount()}
-					class="h-8 w-20 p-2"
-					onchange={(e) => {
-						const num = e.currentTarget.value ? Number(e.currentTarget.value) - 1 : 0;
-						const index = num < 0 ? 0 : num >= table.getPageCount() ? table.getPageCount() - 1 : num;
-						table.setPageIndex(index);
-						currentPage = index + 1;
-					}}
-					onblur={(e) => {
-						e.currentTarget.value = '';
-					}}
-				/>
-			</div> -->
 		</div>
 	</div>
 </div>

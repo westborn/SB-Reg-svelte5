@@ -1,7 +1,10 @@
 {
 	"name": "sb-reg-svelte5",
-	"version": "0.0.1",
-	"private": true,
+	"version": "1.2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/westborn/SB-Reg-svelte5"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -15,7 +18,10 @@
 		"db:reset": "prisma migrate reset --force",
 		"db:seed": "tsx src/scripts/seed.ts",
 		"studio": "prisma studio",
-		"upgrade-deps": "ncu -uis --format group --install always"
+		"upgrade-deps": "ncu -uis --format group --install always",
+		"bump:patch": "npm --no-git-tag-version version patch",
+		"bump:minor": "npm --no-git-tag-version version minor",
+		"bump:major": "npm --no-git-tag-version version major"
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^9.2.0",
@@ -26,6 +32,7 @@
 		"@types/eslint": "^9.6.1",
 		"@types/nodemailer": "^6.4.16",
 		"autoprefixer": "^10.4.20",
+		"bits-ui": "^0.21.16",
 		"eslint": "^9.14.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.46.0",
@@ -55,7 +62,6 @@
 		"@supabase/supabase-js": "^2.46.1",
 		"@sveltejs/vite-plugin-svelte": "4.0.0",
 		"add": "^2.0.6",
-		"bits-ui": "^0.21.16",
 		"cloudinary": "^2.5.1",
 		"clsx": "^2.1.1",
 		"cmdk-sv": "^0.0.18",

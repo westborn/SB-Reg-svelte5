@@ -1,11 +1,3 @@
-# Release 1.1.0 - 2025 add csv catalogue
-
-# Hotfix 1.0.2
-
-# Hotfix 1.0.1
-
-# Release 1.0 - 2025 exhibition registration open
-
 # Setup the Project
 
 Everything you need to build a Svelte project with sveltekit, tailwind and shadcn-svelte!
