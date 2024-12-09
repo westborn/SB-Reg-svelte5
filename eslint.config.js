@@ -15,7 +15,14 @@ export default [
 		languageOptions: {
 			globals: {
 				...globals.browser,
-				...globals.node
+				...globals.node,
+				__NAME__: 'readonly',
+				__VERSION__: 'readonly',
+				__GITHUBURL__: 'readonly',
+				__SVELTEVERSION__: 'readonly',
+				__SVELTEKITVERSION__: 'readonly',
+				__VITEVERSION__: 'readonly',
+				__TAILWINDCSSVERSION__: 'readonly'
 			}
 		}
 	},

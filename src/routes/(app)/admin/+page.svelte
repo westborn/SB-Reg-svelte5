@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
+	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
+	import { REGISTRATIONS_OPEN } from '$lib/constants.js';
+
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import jsonToCsvExport from 'json-to-csv-export';
 
@@ -121,6 +125,19 @@
 		}
 		return;
 	}
+
+	const textList = [
+		['Environment:', `dev:${dev} meta.env.MODE:${import.meta.env.MODE}`],
+		['Running in "', `${PUBLIC_SQUARE_ENVIRONMENT}" mode`],
+		['Registrations are ', REGISTRATIONS_OPEN ? 'OPEN' : 'CLOSED'],
+		['NAME:', __NAME__],
+		['VERSION:', __VERSION__],
+		['GITHUBURL ', __GITHUBURL__],
+		['SVELTEVERSION:', __SVELTEVERSION__],
+		['SVELTEKITVERSION:', __SVELTEKITVERSION__],
+		['VITEVERSION:', __VITEVERSION__],
+		['TAILWINDCSSVERSION:', __TAILWINDCSSVERSION__]
+	];
 </script>
 
 <section class="mx-auto mt-2 px-3">
@@ -224,3 +241,20 @@
 		<Button onclick={() => handleDownload('artists', filteredArtists)}>Download Artists</Button>
 	</p>
 </section>
+
+{#if $page.data.user.isSuperAdmin}
+	<section class="mx-auto mt-10 px-3">
+		<hr class="mt-4" />
+		<h4 class="text-lg font-semibold">Version Details</h4>
+		{#each textList as [textItem, textValue]}
+			{@render TextList(textItem, textValue)}
+		{/each}
+	</section>
+
+	{#snippet TextList(textItem: string, textValue: string)}
+		<div class="grid grid-cols-[20ch_1fr]">
+			<p class="text-sm">{textItem}</p>
+			<p class="text-sm font-semibold">{textValue}&nbsp</p>
+		</div>
+	{/snippet}
+{/if}
