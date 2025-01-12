@@ -11,7 +11,7 @@
 </script>
 
 <picture>
-	<source type="image/avif" srcset={path.replace('.jpg', '.avif')} />
 	<source type="image/webp" srcset={path.replace('.jpg', '.webp')} />
+	<source type="image/avif" srcset={path.replace('.jpg', '.avif')} />
 	<img src={path} {alt} {width} {height} class={className} />
 </picture>
