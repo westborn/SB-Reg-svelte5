@@ -1,3 +1,5 @@
+# 2025 Registrations now CLOSED
+
 # Setup the Project
 
 Everything you need to build a Svelte project with sveltekit, tailwind and shadcn-svelte!

@@ -7,7 +7,7 @@
 	import { convertToDollars } from '$lib/utils.js';
 
 	let { data } = $props();
-	let { submission } = data;
+	let { submission, user } = data;
 
 	updateSubmission(submission);
 
@@ -29,7 +29,7 @@
 </script>
 
 <section class="mx-auto mt-2 max-w-[500px] px-3">
-	{#if REGISTRATIONS_OPEN && myState.artistExists}
+	{#if (REGISTRATIONS_OPEN || user.isSuperAdmin) && myState.artistExists}
 		<h3 class="text-xl font-bold text-primary">Registration Information</h3>
 		<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 			{#each textList as [textItem, textValue]}

@@ -7,4 +7,9 @@ export const load: PageServerLoad = async (event) => {
 	if (REGISTRATIONS_OPEN) {
 		redirect(302, '/register/artist');
 	}
+	const { user } = await event.locals.V1safeGetSession();
+	console.log(`User: ${user.email} - ${user.isSuperAdmin}`);
+	if (user.isSuperAdmin) {
+		redirect(302, '/register/artist');
+	}
 };
