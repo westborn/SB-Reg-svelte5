@@ -257,4 +257,3 @@
 		</div>
 	{/snippet}
 {/if}
-<pre>$page.data: {JSON.stringify($page.data, null, 4)}</pre>
