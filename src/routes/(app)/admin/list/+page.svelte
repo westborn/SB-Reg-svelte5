@@ -75,6 +75,21 @@
 			}
 		}),
 
+		columnHelper.accessor('accepted', {
+			header: 'Accepted',
+			cell: (info) => (info.getValue() ? 'Yes' : 'No'),
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
+
+		columnHelper.accessor('closed', {
+			header: 'Closed',
+			cell: (info) => (info.getValue() ? 'Yes' : 'No'),
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
 		columnHelper.display({
 			header: 'Thumbnail',
 			id: 'thumbnail',
@@ -97,13 +112,7 @@
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
-		columnHelper.accessor('closed', {
-			header: 'Closed',
-			cell: (info) => (info.getValue() ? 'Yes' : 'No'),
-			enableSorting: false,
-			enableColumnFilter: false,
-			enableGlobalFilter: false
-		}),
+
 		columnHelper.accessor('description', { header: 'Description' }),
 		columnHelper.accessor('material', {
 			header: 'Material',
@@ -137,6 +146,7 @@
 	}
 
 	const [columnVisibility, setColumnVisibility] = createTableState<VisibilityState>({
+		accepted: false,
 		closed: false,
 		email: false,
 		description: false,

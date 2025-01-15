@@ -7,7 +7,7 @@
 	import jsonToCsvExport from 'json-to-csv-export';
 
 	import { page } from '$app/stores';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 
 	let { data } = $props();
@@ -46,6 +46,15 @@
 			return accumulator;
 		}, [])
 	);
+
+	function proxyClosedState() {
+		const proxyExhibit = exhibits.find((item) => $page.data.user.proxyEmail === item.email);
+		if (proxyExhibit) {
+			return proxyExhibit.closed ? 'Closed' : 'Still Open';
+		} else {
+			return 'No Proxy Found';
+		}
+	}
 
 	const filteredArtists = $derived(
 		exhibits.reduce((accumulator: FilteredEmail[], exhibit) => {
@@ -128,7 +137,7 @@
 
 	const textList = [
 		['Environment:', `dev:${dev} meta.env.MODE:${import.meta.env.MODE}`],
-		['Running in "', `${PUBLIC_SQUARE_ENVIRONMENT}" mode`],
+		['Running in ', `"${PUBLIC_SQUARE_ENVIRONMENT}" mode`],
 		['Registrations are ', REGISTRATIONS_OPEN ? 'OPEN' : 'CLOSED'],
 		['NAME:', __NAME__],
 		['VERSION:', __VERSION__],
@@ -144,26 +153,16 @@
 	<h4 class="text-xl font-bold text-primary">Admin Page</h4>
 	<p class="mt-4">This page contains functions that you can use to get different views of the SB database</p>
 	<p>It is a work in progress and will be updated as new features are added</p>
-	<p class="mt-4 font-semibold">Currently you can:</p>
-	<ul class="mx-12">
-		<li class="w-full list-disc">
-			Set the email address of the artist you would like to impersonate <span class="text-sm text-red-500">
-				(SuperAdmin Only)</span
-			>
-		</li>
-		<li class="w-full list-disc">Download a list of Exhibits</li>
-		<li class="w-full list-disc">Download a list of Entries</li>
-	</ul>
-	<p class="mt-4">More features will be added soon</p>
 </section>
 
 {#if $page.data.user.isSuperAdmin}
-	<section class="mx-auto mt-2 px-3">
+	<section class="mx-auto mt-10 px-3">
 		<hr class="mt-4" />
 		<h4 class="text-lg font-semibold">
 			Set Artist Email
 			<span class="text-sm">
-				- (Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail})</span></span
+				- Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail}</span> - {proxyClosedState()}
+				<Button variant="secondary" class="m-6 ">Toggle Open/Closed</Button></span
 			>
 		</h4>
 		<p class="mt-4">Search for the artist email you'd like to impersonate</p>
@@ -194,7 +193,7 @@
 		{/if}
 	</section>
 
-	<section class="mx-auto mt-2 px-3">
+	<section class="mx-auto mt-10 px-3">
 		<hr class="mt-4" />
 		<h4 class="text-lg font-semibold">Download a Catalogue CSV</h4>
 		<p class="mt-4">
@@ -222,7 +221,7 @@
 	</section>
 {/if}
 
-<section class="mx-auto mt-2 px-3">
+<section class="mx-auto mt-10 px-3">
 	<hr class="mt-4" />
 	<h4 class="text-lg font-semibold">Download Exhibits CSV</h4>
 	<p class="mt-4">
@@ -232,7 +231,7 @@
 	</p>
 </section>
 
-<section class="mx-auto mt-2 px-3">
+<section class="mx-auto mt-10 px-3">
 	<hr class="mt-4" />
 	<h4 class="text-lg font-semibold">Download Artist details CSV</h4>
 	<p class="mt-4">
@@ -243,7 +242,7 @@
 </section>
 
 {#if $page.data.user.isSuperAdmin}
-	<section class="mx-auto mt-10 px-3">
+	<section class="mx-auto mt-20 px-3">
 		<hr class="mt-4" />
 		<h4 class="text-lg font-semibold">Version Details</h4>
 		{#each textList as [textItem, textValue]}
@@ -258,3 +257,4 @@
 		</div>
 	{/snippet}
 {/if}
+<pre>$page.data: {JSON.stringify($page.data, null, 4)}</pre>
