@@ -22,5 +22,9 @@ export async function POST(event: RequestEvent) {
 		console.log('Error in getExhibits:', error.message);
 		return new Response(JSON.stringify({ message: 'Error in getExhibits' }), { status: 500 });
 	}
+	//  change cloudURL to contain an "angle zero" transformation to make sure images are oriented correctly
+	exhibits.forEach((exhibit) => {
+		exhibit.cloudURL = exhibit?.cloudURL?.replace('/upload/', '/upload/a_0/');
+	});
 	return new Response(JSON.stringify(exhibits), { status: 200 });
 }
