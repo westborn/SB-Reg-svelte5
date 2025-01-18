@@ -13,7 +13,7 @@
 	let { data } = $props();
 	const { emailForm, exhibits: exhibitsFromServer } = data;
 	//don't mutate the original array
-	const exhibits = [...exhibitsFromServer].sort((a, b) => a.email.localeCompare(b.email));
+	const exhibits = $state([...exhibitsFromServer].sort((a, b) => a.email.localeCompare(b.email)));
 
 	let searchTerm = $state('');
 
@@ -100,6 +100,28 @@
 		jsonToCsvExport({ data, filename });
 	}
 
+	// toggle open/closed is only ever used for the proxyemail
+	// nothing needs to be passed to the function - the user MUST be a superAdmin
+	let toggleOpenClosedError = $state('');
+	async function toggleOpenClosed() {
+		const proxyExhibit = exhibits.find((item) => $page.data.user.proxyEmail === item.email);
+		if (proxyExhibit) {
+			proxyExhibit.closed = !proxyExhibit.closed;
+			//update the server
+			const result = await fetch(`/api/toggleOpenClosed`, {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
+			if (result.status != 200) {
+				const error = await result.json();
+				console.log('response error', JSON.stringify(error));
+				toggleOpenClosedError = error.message;
+			}
+		}
+	}
+
 	const years = [
 		{ value: '2025', label: '2025' },
 		{ value: '2024', label: '2024' },
@@ -108,7 +130,6 @@
 	];
 
 	let getCatalogueError = $state('');
-
 	let selectedYear = $state({ value: '2025', label: '2025' });
 	let catalogueData = $state([]);
 	async function getCatalogue() {
@@ -162,7 +183,7 @@
 			Set Artist Email
 			<span class="text-sm">
 				- Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail}</span> - {proxyClosedState()}
-				<Button variant="secondary" class="m-6 ">Toggle Open/Closed</Button></span
+				<Button onclick={() => toggleOpenClosed()} variant="secondary" class="m-6 ">Toggle Open/Closed</Button></span
 			>
 		</h4>
 		<p class="mt-4">Search for the artist email you'd like to impersonate</p>
@@ -200,6 +221,9 @@
 			Generate a CSV file of the <span class="font-semibold text-red-500">{selectedYear.value}</span> Catalogue
 			<Button onclick={() => getCatalogue()}>Download Catalogue</Button>
 		</p>
+		{#if toggleOpenClosedError}
+			<div class="text-red-500">{toggleOpenClosedError}</div>
+		{/if}
 
 		<Select.Root onSelectedChange={(e: any) => (selectedYear = { ...e })} selected={selectedYear}>
 			<Select.Trigger class="w-[120px]">
