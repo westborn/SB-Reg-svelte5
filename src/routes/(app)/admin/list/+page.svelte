@@ -33,6 +33,7 @@
 	import { createTableState } from './state.svelte';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
+	import { createPersistVisibilityState } from './persistVisibityState.svelte.js';
 
 	const { data } = $props();
 
@@ -145,7 +146,7 @@
 		return isSorted ? (isSorted === 'asc' ? '🔼' : '🔽') : '';
 	}
 
-	const [columnVisibility, setColumnVisibility] = createTableState<VisibilityState>({
+	const [columnVisibility, setColumnVisibility] = createPersistVisibilityState<VisibilityState>({
 		accepted: false,
 		closed: false,
 		email: false,

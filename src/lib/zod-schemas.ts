@@ -177,3 +177,10 @@ export const fileUploadSchema = z.object({
 		.refine((f) => f.size < MAX_IMAGE_SIZE, 'Upload must be less than 5Mb!')
 });
 export type FileUpload = z.infer<typeof fileUploadSchema>;
+
+export const locationSchemaUi = z.object({
+	location: z
+		.string()
+		.min(3, { message: 'location must be 3 numbers' })
+		.max(3, { message: 'location must be 3 numbers' })
+});

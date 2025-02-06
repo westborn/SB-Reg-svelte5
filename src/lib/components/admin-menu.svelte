@@ -21,11 +21,12 @@
 			<DropdownMenu.Group>
 				<DropdownMenu.Item><a class="w-full" href="\admin\list">List all Entries</a></DropdownMenu.Item>
 				<DropdownMenu.Item><a class="w-full" href="\admin\accept">Manage Entry Acceptance</a></DropdownMenu.Item>
+				<DropdownMenu.Item
+					><a class="w-full" href="\admin\locationUpdate">Manage Exhibit Placement (Location)</a></DropdownMenu.Item
+				>
 				<DropdownMenu.Sub>
 					<DropdownMenu.SubTrigger>More Things coming soon</DropdownMenu.SubTrigger>
 					<DropdownMenu.SubContent>
-						<DropdownMenu.Item>Location Selected</DropdownMenu.Item>
-						<DropdownMenu.Separator />
 						<DropdownMenu.Item>More...</DropdownMenu.Item>
 					</DropdownMenu.SubContent>
 				</DropdownMenu.Sub>
