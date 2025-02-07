@@ -26,7 +26,7 @@
 	import { page } from '$app/stores';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
-	import { createTableState } from './state.svelte';
+	import { createTableState } from '$lib/tableState.svelte.js';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
 	import { TableImage } from '$lib/components';

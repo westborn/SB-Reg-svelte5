@@ -30,7 +30,7 @@
 	import { TableImage } from '$lib/components';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
-	import { createTableState } from './state.svelte';
+	import { createTableState } from '$lib/tableState.svelte.js';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
 	import { PersistedState } from 'runed';
@@ -197,7 +197,6 @@
 
 	function createPersistVisibilityState<T>(initialValue: T): [() => T, (updater: Updater<T>) => void] {
 		const value = new PersistedState('persistVisibility', initialValue);
-
 		return [
 			() => value.current,
 			(updater: Updater<T>) => {
