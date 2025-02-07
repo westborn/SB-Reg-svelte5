@@ -33,7 +33,8 @@
 	import { createTableState } from './state.svelte';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
-	import { createPersistVisibilityState } from './persistVisibityState.svelte.js';
+	import { PersistedState } from 'runed';
+	import type { Updater } from '@tanstack/svelte-table';
 
 	const { data } = $props();
 
@@ -193,6 +194,18 @@
 	type SelectChangeEvent = Event & {
 		currentTarget: EventTarget & HTMLSelectElement;
 	};
+
+	function createPersistVisibilityState<T>(initialValue: T): [() => T, (updater: Updater<T>) => void] {
+		const value = new PersistedState('persistVisibility', initialValue);
+
+		return [
+			() => value.current,
+			(updater: Updater<T>) => {
+				if (updater instanceof Function) value.current = updater(value.current);
+				else value.current = updater;
+			}
+		];
+	}
 </script>
 
 <section class="mx-auto mt-2">

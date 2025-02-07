@@ -50,6 +50,9 @@ importers:
       pnpm:
         specifier: ^9.12.3
         version: 9.15.5
+      runed:
+        specifier: ^0.23.2
+        version: 0.23.2(svelte@5.19.8)
       square:
         specifier: ^38.2.0
         version: 38.2.0
@@ -2107,6 +2110,11 @@ packages:
 
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
+
+  runed@0.23.2:
+    resolution: {integrity: sha512-AhHCb5/B+YQW6ar1pzhGQOQy+byfjCH63ofuhrexSWwQKhC0EbQ60Z/wMYwETLo3ZubhwlNryxBt0seOMOrVFQ==}
+    peerDependencies:
+      svelte: ^5.7.0
 
   sade@1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
@@ -4213,6 +4221,11 @@ snapshots:
   run-parallel@1.2.0:
     dependencies:
       queue-microtask: 1.2.3
+
+  runed@0.23.2(svelte@5.19.8):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.19.8
 
   sade@1.8.1:
     dependencies:

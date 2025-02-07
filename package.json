@@ -71,6 +71,7 @@
 		"mode-watcher": "^0.4.1",
 		"nodemailer": "^6.9.16",
 		"pnpm": "^9.12.3",
+		"runed": "^0.23.2",
 		"square": "^38.2.0",
 		"svelte-cloudinary": "^2.2.0",
 		"svelte-sonner": "^0.3.28",
