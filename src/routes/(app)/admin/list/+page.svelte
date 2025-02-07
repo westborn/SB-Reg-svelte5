@@ -25,7 +25,7 @@
 	import * as Select from '$lib/components/ui/select';
 
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	import { TableImage } from '$lib/components';
 
@@ -38,7 +38,7 @@
 
 	const { data } = $props();
 
-	let exhibits: Exhibit[] = $derived($page.data.exhibits?.slice(0, 999) ?? []);
+	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 
 	const years = [
 		{ value: '2025', label: '2025' },
@@ -51,7 +51,7 @@
 
 	function handleSelectYear(event: any) {
 		selectedYear = { ...event };
-		const newURL = new URL($page.url);
+		const newURL = new URL(page.url);
 		newURL.searchParams?.set('year', selectedYear.value);
 		goto(newURL);
 	}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 </script>
 
 <div class="absolute left-0 top-0">
@@ -9,8 +9,7 @@
 			<div class="absolute left-2 top-3">🚀</div>
 		</DropdownMenu.Trigger>
 		<DropdownMenu.Content class="ml-6 mt-4 w-56">
-			<DropdownMenu.Label
-				>Admin Menu<span class="block text-xs">({$page.data.user.proxyEmail})</span></DropdownMenu.Label
+			<DropdownMenu.Label>Admin Menu<span class="block text-xs">({page.data.user.proxyEmail})</span></DropdownMenu.Label
 			>
 			<DropdownMenu.Separator />
 			<DropdownMenu.Group>
