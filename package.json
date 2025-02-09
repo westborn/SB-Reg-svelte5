@@ -70,7 +70,7 @@
 		"lucide-svelte": "^0.456.0",
 		"mode-watcher": "^0.4.1",
 		"nodemailer": "^6.9.16",
-		"pnpm": "^9.12.3",
+		"pnpm": "^10.2.1",
 		"runed": "^0.23.2",
 		"square": "^38.2.0",
 		"svelte-cloudinary": "^2.2.0",
