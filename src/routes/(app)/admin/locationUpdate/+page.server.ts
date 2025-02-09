@@ -6,14 +6,16 @@ import type { Actions, PageServerLoad, RequestEvent } from '../$types';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
-export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
+export const load: PageServerLoad = async () => {
+	// console.log(`${event.route.id} - LOAD - START`);
 	try {
 		const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
-		// return exhibits sorted by exhibitNumbner and entryId
+		// return exhibits sorted by exhibitNumber and entryId (null exhibits come last)
 		// and the location data entry form
 		return {
-			exhibits: exhibits.sort((a, b) => parseInt(a.exhibitNumber) - parseInt(b.exhibitNumber)),
+			exhibits: exhibits.sort(
+				(a, b) => (a.exhibitNumber || '999').localeCompare(b.exhibitNumber || '999') || a.entryId - b.entryId
+			),
 			locationForm: await superValidate(zod(locationSchemaUi))
 		};
 
