@@ -10,10 +10,10 @@ export const load: PageServerLoad = async (event) => {
 	console.log(`${event.route.id} - LOAD - START`);
 	try {
 		const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
-		// return exhibits sorted by entryId
+		// return exhibits sorted by exhibitNumbner and entryId
 		// and the location data entry form
 		return {
-			exhibits: exhibits.sort((a, b) => a.entryId - b.entryId),
+			exhibits: exhibits.sort((a, b) => parseInt(a.exhibitNumber) - parseInt(b.exhibitNumber)),
 			locationForm: await superValidate(zod(locationSchemaUi))
 		};
 

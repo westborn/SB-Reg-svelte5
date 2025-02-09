@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LocationUpdateForm from '$lib/components/location-update-form.svelte';
+	import type { Exhibit } from '$lib/components/server/registrationDB.js';
 
 	const { data } = $props();
 	const { locationForm } = data;
@@ -8,13 +9,17 @@
 	let updateError = $state('');
 
 	function updateLocationOnSuccess(entryId: number, exhibitNumber: string) {
-		console.log(`updateLocationOnSuccess ${entryId} ${exhibitNumber}`);
-		const index = exhibits.findIndex((exhibit) => exhibit.entryId === entryId);
+		const index = exhibits.findIndex((exhibit: Exhibit) => exhibit.entryId === entryId);
 		if (index === -1) {
 			updateError = 'Exhibit not found';
 			return;
 		}
 		exhibits[index].exhibitNumber = exhibitNumber;
+	}
+
+	// Check if exhibitNumber already exists in exhibits
+	function locationAlreadyExists(exhibitNumber: string) {
+		return exhibits.some((exhibit: Exhibit) => exhibit.exhibitNumber === exhibitNumber);
 	}
 </script>
 
@@ -33,13 +38,14 @@
 					<p class="text-nowrap text-primary">Exhibit Number</p>
 					<p class="text-nowrap text-primary">Artist - Title</p>
 					{#each exhibits as exhibit, index}
-						<p class="text-sm">{exhibit.entryId}</p>
+						<p class="py-1 text-sm">{exhibit.entryId}</p>
 						<LocationUpdateForm
 							{locationForm}
 							entryId={exhibit.entryId}
 							exhibitNumber={exhibit.exhibitNumber}
 							formOccurence={index}
 							{updateLocationOnSuccess}
+							{locationAlreadyExists}
 						/>
 						<p class="text-nowrap text-sm">{exhibit.artistName} - {exhibit.title}</p>
 					{/each}

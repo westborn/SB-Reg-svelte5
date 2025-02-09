@@ -9,21 +9,26 @@
 
 	import { locationSchemaUi } from '$lib/zod-schemas';
 
-	let { locationForm, exhibitNumber, entryId, formOccurence, updateLocationOnSuccess } = $props();
+	let { locationForm, exhibitNumber, entryId, formOccurence, updateLocationOnSuccess, locationAlreadyExists } =
+		$props();
 
 	const form = superForm(locationForm, {
 		id: `locationForm-${formOccurence}`,
 		validators: zodClient(locationSchemaUi),
 		resetForm: false,
+		onSubmit({ formData, cancel }) {
+			if (locationAlreadyExists(formData.get('location'))) {
+				toast.error('Location Already Used');
+				cancel();
+			}
+		},
 		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
 				toast.error('Failed');
-				console.log(`Failed: locationForm-${formOccurence}`);
 				return;
 			}
 			toast.success('Success');
-			hideButton = true;
-			console.log(`Success: locationForm-${formOccurence}  new location1: ${result.data.form.message.newLocation}`);
+			disableUpdateButton = true;
 			const newExhibitNumber = isNaN(parseInt(result.data.form.message.newLocation))
 				? null
 				: parseInt(result.data.form.message.newLocation);
@@ -32,9 +37,7 @@
 		},
 		onChange(event) {
 			if (event.target) {
-				// Form input event
-				// console.log(event.path, 'was changed with', event.target, 'in form', event.formElement);
-				hideButton = false;
+				disableUpdateButton = false;
 			}
 		}
 	});
@@ -42,29 +45,30 @@
 	const { form: formData, enhance, delayed } = form;
 	$formData.location = exhibitNumber;
 
-	let hideButton = $state(true);
+	let disableUpdateButton = $state(true);
 </script>
 
 <!-- {#if browser}
 	<SuperDebug data={$formData} />
 {/if} -->
 
-<form method="POST" action="?/locationUpdate" use:enhance class="w-full space-y-4">
+<form method="POST" action="?/locationUpdate" use:enhance>
 	<!-- stop the form from submitting on enter key press -->
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 	<div class="flex gap-4">
 		<Form.Field {form} name="location">
 			<Form.Control let:attrs>
-				<Input autofocus type="text" {...attrs} bind:value={$formData.location} />
+				<Input class="h-6" autofocus type="text" {...attrs} bind:value={$formData.location} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<!-- <Form.Errors errors={$errors._errors} /> -->
-		<Form.Button disabled={hideButton || $delayed} variant="destructive" size="sm">
-			Update?
+		<Form.Button class="h-6" disabled={disableUpdateButton || $delayed} variant="destructive" size="sm">
 			{#if $delayed}
-				<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
+				<LoaderCircle class="ml-4 h-6 w-8 animate-spin" />
+			{:else}
+				<p class="h-6 w-12">Update?</p>
 			{/if}
 		</Form.Button>
 	</div>
