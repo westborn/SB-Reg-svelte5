@@ -20,9 +20,6 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: 4.0.0
         version: 4.0.0(svelte@5.19.8)(vite@5.4.14(@types/node@22.13.1))
-      add:
-        specifier: ^2.0.6
-        version: 2.0.6
       cloudinary:
         specifier: ^2.5.1
         version: 2.5.1
@@ -111,9 +108,6 @@ importers:
       globals:
         specifier: ^15.12.0
         version: 15.14.0
-      npm-check-updates:
-        specifier: ^17.1.10
-        version: 17.1.14
       postcss:
         specifier: ^8.4.48
         version: 8.5.1
@@ -1145,9 +1139,6 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  add@2.0.6:
-    resolution: {integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==}
-
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
@@ -1817,11 +1808,6 @@ packages:
   normalize-url@8.0.1:
     resolution: {integrity: sha512-IO9QvjUMWxPQQhs60oOu10CRkWCiZzSUkzbXGGV9pviYl1fXYcvkzQ5jV9z8Y6un8ARoVRl4EtC6v6jNqbaJ/w==}
     engines: {node: '>=14.16'}
-
-  npm-check-updates@17.1.14:
-    resolution: {integrity: sha512-dr4bXIxETubLI1tFGeock5hN8yVjahvaVpx+lPO4/O2md3zJuxB7FgH3MIoTvQSCgsgkIRpe0skti01IEAA5tA==}
-    engines: {node: ^18.18.0 || >=20.0.0, npm: '>=8.12.1'}
-    hasBin: true
 
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
@@ -3315,8 +3301,6 @@ snapshots:
 
   acorn@8.14.0: {}
 
-  add@2.0.6: {}
-
   ajv@6.12.6:
     dependencies:
       fast-deep-equal: 3.1.3
@@ -4016,8 +4000,6 @@ snapshots:
 
   normalize-url@8.0.1:
     optional: true
-
-  npm-check-updates@17.1.14: {}
 
   object-assign@4.1.1: {}
 
