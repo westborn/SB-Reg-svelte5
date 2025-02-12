@@ -16,11 +16,6 @@
 		}
 		exhibits[index].exhibitNumber = exhibitNumber;
 	}
-
-	// Check if exhibitNumber already exists in exhibits
-	function locationAlreadyExists(exhibitNumber: string) {
-		return exhibits.some((exhibit: Exhibit) => exhibit.exhibitNumber === exhibitNumber);
-	}
 </script>
 
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
@@ -45,7 +40,6 @@
 							exhibitNumber={exhibit.exhibitNumber}
 							formOccurence={index}
 							{updateLocationOnSuccess}
-							{locationAlreadyExists}
 						/>
 						<p class="text-nowrap text-sm">{exhibit.artistName} - {exhibit.title}</p>
 					{/each}

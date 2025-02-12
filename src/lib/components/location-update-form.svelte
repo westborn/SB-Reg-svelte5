@@ -7,24 +7,28 @@
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { toast } from 'svelte-sonner';
 
-	import { locationSchemaUi } from '$lib/zod-schemas';
+	import { locationSchemaUI } from '$lib/zod-schemas';
 
-	let { locationForm, exhibitNumber, entryId, formOccurence, updateLocationOnSuccess, locationAlreadyExists } =
-		$props();
+	let { locationForm, exhibitNumber, entryId, formOccurence, updateLocationOnSuccess } = $props();
 
 	const form = superForm(locationForm, {
 		id: `locationForm-${formOccurence}`,
-		validators: zodClient(locationSchemaUi),
+		validators: zodClient(locationSchemaUI),
 		resetForm: false,
-		onSubmit({ formData, cancel }) {
-			if (locationAlreadyExists(formData.get('location'))) {
-				toast.error('Location Already Used');
+		dataType: 'json',
+		onSubmit({ formData, cancel, jsonData }) {
+			const newLocation = formData.get('location');
+			if (!newLocation) {
+				toast.error('Location Required');
 				cancel();
+				return;
 			}
+			//add the entryId to the data we send to the server
+			jsonData({ location: formData.get('location'), entryId: entryId });
 		},
 		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
-				toast.error('Failed');
+				toast.error('Failed - ' + result.data.form.message);
 				return;
 			}
 			toast.success('Success');

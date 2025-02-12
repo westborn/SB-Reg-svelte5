@@ -178,7 +178,7 @@ export const fileUploadSchema = z.object({
 });
 export type FileUpload = z.infer<typeof fileUploadSchema>;
 
-export const locationSchemaUi = z.object({
+export const locationSchemaUI = z.object({
 	location: z
 		.string()
 		.min(3, { message: 'location must be 3 numbers' })
