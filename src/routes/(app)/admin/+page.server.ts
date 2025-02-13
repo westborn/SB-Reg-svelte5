@@ -9,7 +9,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 const emailSchema = z.object({ email: artistTableSchema.shape.email });
 
 export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
+	//console.log(`${event.route.id} - LOAD - START`);
 	const emailForm = await superValidate(zod(emailSchema), { id: 'emailForm' });
 	const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: '2025' });
 	return { emailForm, exhibits };

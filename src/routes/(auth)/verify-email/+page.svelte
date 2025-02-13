@@ -5,7 +5,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let { data } = $props();
@@ -14,7 +14,7 @@
 		validators: zodClient(tokenSchema)
 	});
 	const { form: formData, enhance, errors, delayed } = form;
-	const url = $page.url;
+	const url = page.url;
 	const validatingEmail = url.searchParams.get('email');
 	$formData.email = validatingEmail ?? '';
 </script>

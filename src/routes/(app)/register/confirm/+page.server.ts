@@ -10,7 +10,7 @@ import { confirmSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
+	//console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
 

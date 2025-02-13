@@ -10,7 +10,7 @@ import {
 } from '$lib/zod-schemas';
 
 export const load: LayoutServerLoad = async (event) => {
-	console.log(`${event.route.id} - LAYOUTLOAD - START`);
+	// console.log(`${event.route.id} - LAYOUTLOAD - START`);
 
 	const [artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm] = await Promise.all([
 		superValidate(zod(artistSchemaUI)),

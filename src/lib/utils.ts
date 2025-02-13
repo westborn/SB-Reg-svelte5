@@ -173,8 +173,10 @@ export function determinePlacement(exhibitNumberString: string, entryYear: strin
 		return 'Hotel';
 	} else if (exhibitNumber >= 500 && exhibitNumber < 800) {
 		return 'Surf Gallery';
-	} else if (exhibitNumber >= 800 && exhibitNumber < 900) {
+	} else if (exhibitNumber >= 800 && exhibitNumber < 850) {
 		return 'Street Gallery';
+	} else if (exhibitNumber >= 850 && exhibitNumber < 900) {
+		return 'Shop 7 Artspace';
 	}
 }
 

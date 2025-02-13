@@ -11,7 +11,7 @@ import { artistSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
+	//console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
 
@@ -48,7 +48,7 @@ const artistUpdate = async (event: RequestEvent) => {
 };
 
 const artistCreate = async (event: RequestEvent) => {
-	console.log(`${event.route.id} - artistCreate - START`);
+	//console.log(`${event.route.id} - artistCreate - START`);
 	const formValidationResult = await superValidate(event, zod(artistSchemaUI));
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {

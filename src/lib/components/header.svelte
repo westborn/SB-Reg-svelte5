@@ -2,7 +2,7 @@
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import AlignJustify from 'lucide-svelte/icons/align-justify';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
@@ -30,7 +30,7 @@
 			</div>
 			<div class="grid grid-cols-3">
 				{#each navItems as { label, href }, i}
-					{#if $page.url.pathname.startsWith(href)}
+					{#if page.url.pathname.startsWith(href)}
 						<Button class="bg-transparent font-semibold text-primary-300" disabled><p>{label}</p></Button>
 					{:else}
 						<Button class="font-semibold text-primary-300" {href} variant="ghost"><p>{label}</p></Button>
@@ -52,7 +52,7 @@
 						</h1>
 						<div class="mt-10 flex flex-col items-start justify-between text-primary-300">
 							{#each navItems as { label, href }, i}
-								{#if $page.url.pathname.startsWith(href)}
+								{#if page.url.pathname.startsWith(href)}
 									<Sheet.Trigger asChild>
 										<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
 									</Sheet.Trigger>
@@ -90,8 +90,8 @@
 				</Tooltip.Trigger>
 				<Tooltip.Content>
 					<p>{loggedInEmail}</p>
-					{#if user.isSuperAdmin && $page.data.user.proxyEmail}
-						<p><span class="text-xs text-primary">as: {$page.data.user.proxyEmail}</span></p>
+					{#if user.isSuperAdmin && page.data.user.proxyEmail}
+						<p><span class="text-xs text-primary">as: {page.data.user.proxyEmail}</span></p>
 					{/if}
 				</Tooltip.Content>
 			</Tooltip.Root>
