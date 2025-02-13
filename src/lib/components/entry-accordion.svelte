@@ -14,7 +14,7 @@
 	{#each myState.currentEntries as entryItem, entryKey}
 		{@const currentEntryId = myState.currentEntries[entryKey].id}
 		<Accordion.Item value={entryItem.id.toString()}>
-			<Accordion.Trigger>Entry {entryKey + 1} - {entryItem.title}</Accordion.Trigger>
+			<Accordion.Trigger>{entryItem.title}</Accordion.Trigger>
 			<Accordion.Content>
 				<Card.Root class="mb-4">
 					<Card.Title class="pl-4 pt-4 capitalize">{entryItem.title}</Card.Title>

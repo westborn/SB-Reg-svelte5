@@ -4,7 +4,8 @@
 
 	const { data } = $props();
 	const { locationForm } = data;
-	let exhibits = $state(data.exhibits || []);
+	const acceptedExhibits = data.exhibits?.filter((exhibit: Exhibit) => exhibit.accepted);
+	let exhibits = $state(acceptedExhibits || []);
 
 	let updateError = $state('');
 

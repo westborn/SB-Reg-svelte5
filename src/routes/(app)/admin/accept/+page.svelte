@@ -72,19 +72,19 @@
 					checked: info.getValue()
 				});
 			},
-			enableSorting: false,
+			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
 		columnHelper.accessor('entryId', {
 			header: 'EntryId',
-			enableSorting: false,
+			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
 		columnHelper.accessor('exhibitNumber', {
 			header: 'Placement',
-			enableSorting: false,
+			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false,
 			cell: (info) => {
