@@ -3,7 +3,7 @@ import { EXHIBITION_YEAR } from '$lib/constants';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
+	//console.log(`${event.route.id} - LOAD - START`);
 	const { user } = await event.locals.V1safeGetSession();
 	const entryYear = event.url.searchParams.get('year') ?? '2025';
 	// Only admins can see the current exhibition year entries

@@ -14,6 +14,7 @@ export { default as EntryUpdateDialog } from './entry-update-dialog.svelte';
 export { default as EntryUpdateForm } from './entry-update-form.svelte';
 export { default as Header } from './header.svelte';
 export { default as ImageUploadForm } from './image-upload-form.svelte';
+export { default as LocationUpdateForm } from './location-update-form.svelte';
 export { default as OptimisedImage } from './optimised-image.svelte';
 export { default as StepNavigation } from './step-navigation.svelte';
 export { default as TailwindIndicator } from './tailwind-indicator.svelte';

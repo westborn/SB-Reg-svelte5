@@ -121,6 +121,9 @@ export const getSubmission = async ({ isSuperAdmin, proxyEmail, email }: User) =
 									cloudURL: true
 								}
 							}
+						},
+						orderBy: {
+							title: 'asc'
 						}
 					}
 				}

@@ -18,7 +18,7 @@ import {
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
 
 export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
+	//console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
 
@@ -232,7 +232,7 @@ const entryCreate = async (event: RequestEvent) => {
 };
 
 const imageUpload = async (event: RequestEvent) => {
-	console.log(`${event.route.id} - imageUpload - ACTION`);
+	//console.log(`${event.route.id} - imageUpload - ACTION`);
 
 	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
 	if (!formValidationResult.valid) {
@@ -277,7 +277,7 @@ const imageUpload = async (event: RequestEvent) => {
 };
 
 const entryDelete = async (event: RequestEvent) => {
-	console.log(`${event.route.id} - entryDelete - ACTION`);
+	//console.log(`${event.route.id} - entryDelete - ACTION`);
 
 	const formValidationResult = await superValidate(event, zod(entryDeleteSchemaUI));
 	if (!formValidationResult.valid) {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { CatalogueCard } from '$lib/components';
 	import * as Select from '$lib/components/ui/select';
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
@@ -14,7 +14,7 @@
 
 	const { data } = $props();
 
-	let allExhibits: Exhibit[] = $derived($page.data.exhibits?.slice(0, 999) ?? []);
+	let allExhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 
 	const pageSize = 3; // Number of items to scroll at a time
 	let numToDisplay = $state(10);
@@ -54,7 +54,7 @@
 
 	function handleSelectYear(event: any) {
 		selectedYear = { ...event };
-		const newURL = new URL($page.url);
+		const newURL = new URL(page.url);
 		newURL.searchParams?.set('year', selectedYear.value);
 		console.log(newURL.toString());
 		goto(newURL);

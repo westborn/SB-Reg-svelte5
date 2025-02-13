@@ -23,19 +23,19 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
-	import { createTableState } from './state.svelte';
+	import { createTableState } from '$lib/tableState.svelte.js';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
 	import { TableImage } from '$lib/components';
 	import MySwitch from './mySwitch.svelte';
 
-	// the data is picked up from the $page store so it can be used in the table
+	// the data is picked up from the page store so it can be used in the table
 	const { data } = $props();
 
-	let exhibits: Exhibit[] = $derived($page.data.exhibits?.slice(0, 999) ?? []);
+	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 	let updateAcceptedError = $state('');
 
 	async function handleUpdateAccepted(entryId: number, index: number, accepted: boolean) {
@@ -72,19 +72,19 @@
 					checked: info.getValue()
 				});
 			},
-			enableSorting: false,
+			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
 		columnHelper.accessor('entryId', {
 			header: 'EntryId',
-			enableSorting: false,
+			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
 		columnHelper.accessor('exhibitNumber', {
 			header: 'Placement',
-			enableSorting: false,
+			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false,
 			cell: (info) => {

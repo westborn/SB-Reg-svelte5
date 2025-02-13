@@ -3,7 +3,7 @@ import { EXHIBITION_YEAR } from '$lib/constants';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	console.log(`${event.route.id} - LOAD - START`);
+	//console.log(`${event.route.id} - LOAD - START`);
 	try {
 		const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
 		return { exhibits };

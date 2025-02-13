@@ -25,18 +25,20 @@
 	import * as Select from '$lib/components/ui/select';
 
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	import { TableImage } from '$lib/components';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
-	import { createTableState } from './state.svelte';
+	import { createTableState } from '$lib/tableState.svelte.js';
 
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
+	import { PersistedState } from 'runed';
+	import type { Updater } from '@tanstack/svelte-table';
 
 	const { data } = $props();
 
-	let exhibits: Exhibit[] = $derived($page.data.exhibits?.slice(0, 999) ?? []);
+	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 
 	const years = [
 		{ value: '2025', label: '2025' },
@@ -49,7 +51,7 @@
 
 	function handleSelectYear(event: any) {
 		selectedYear = { ...event };
-		const newURL = new URL($page.url);
+		const newURL = new URL(page.url);
 		newURL.searchParams?.set('year', selectedYear.value);
 		goto(newURL);
 	}
@@ -145,7 +147,7 @@
 		return isSorted ? (isSorted === 'asc' ? '🔼' : '🔽') : '';
 	}
 
-	const [columnVisibility, setColumnVisibility] = createTableState<VisibilityState>({
+	const [columnVisibility, setColumnVisibility] = createPersistVisibilityState<VisibilityState>({
 		accepted: false,
 		closed: false,
 		email: false,
@@ -192,6 +194,17 @@
 	type SelectChangeEvent = Event & {
 		currentTarget: EventTarget & HTMLSelectElement;
 	};
+
+	function createPersistVisibilityState<T>(initialValue: T): [() => T, (updater: Updater<T>) => void] {
+		const value = new PersistedState('persistVisibility', initialValue);
+		return [
+			() => value.current,
+			(updater: Updater<T>) => {
+				if (updater instanceof Function) value.current = updater(value.current);
+				else value.current = updater;
+			}
+		];
+	}
 </script>
 
 <section class="mx-auto mt-2">

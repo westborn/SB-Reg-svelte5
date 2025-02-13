@@ -6,7 +6,7 @@
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import jsonToCsvExport from 'json-to-csv-export';
 
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 
@@ -48,7 +48,7 @@
 	);
 
 	function proxyClosedState() {
-		const proxyExhibit = exhibits.find((item) => $page.data.user.proxyEmail === item.email);
+		const proxyExhibit = exhibits.find((item) => page.data.user.proxyEmail === item.email);
 		if (proxyExhibit) {
 			return proxyExhibit.closed ? 'Closed' : 'Still Open';
 		} else {
@@ -104,7 +104,7 @@
 	// nothing needs to be passed to the function - the user MUST be a superAdmin
 	let toggleOpenClosedError = $state('');
 	async function toggleOpenClosed() {
-		const proxyExhibit = exhibits.find((item) => $page.data.user.proxyEmail === item.email);
+		const proxyExhibit = exhibits.find((item) => page.data.user.proxyEmail === item.email);
 		if (proxyExhibit) {
 			proxyExhibit.closed = !proxyExhibit.closed;
 			//update the server
@@ -176,13 +176,13 @@
 	<p>It is a work in progress and will be updated as new features are added</p>
 </section>
 
-{#if $page.data.user.isSuperAdmin}
+{#if page.data.user.isSuperAdmin}
 	<section class="mx-auto mt-10 px-3">
 		<hr class="mt-4" />
 		<h4 class="text-lg font-semibold">
 			Set Artist Email
 			<span class="text-sm">
-				- Currently acting as: <span class="text-red-500">{$page.data.user.proxyEmail}</span> - {proxyClosedState()}
+				- Currently acting as: <span class="text-red-500">{page.data.user.proxyEmail}</span> - {proxyClosedState()}
 				<Button onclick={() => toggleOpenClosed()} variant="secondary" class="m-6 ">Toggle Open/Closed</Button></span
 			>
 		</h4>
@@ -265,7 +265,7 @@
 	</p>
 </section>
 
-{#if $page.data.user.isSuperAdmin}
+{#if page.data.user.isSuperAdmin}
 	<section class="mx-auto mt-20 px-3">
 		<hr class="mt-4" />
 		<h4 class="text-lg font-semibold">Version Details</h4>
