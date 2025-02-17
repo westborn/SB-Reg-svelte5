@@ -60,7 +60,7 @@
 	const columns = [
 		columnHelper.accessor('exhibitNumber', {
 			header: 'Placement',
-			enableSorting: false,
+			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false,
 			cell: (info) => {
