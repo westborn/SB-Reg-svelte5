@@ -356,6 +356,9 @@ export type Exhibit = {
 	bankBSB: string;
 	bankAccount: string;
 	registrationYear: string;
+	bumpIn: string;
+	bumpOut: string;
+	displayRequirements: string;
 	closed: boolean;
 	entryId: number;
 	accepted: boolean;
@@ -365,6 +368,7 @@ export type Exhibit = {
 	material: string;
 	title: string;
 	price: number;
+	specialRequirements: string;
 	imageId: number;
 	cloudURL: string;
 	exhibitNumber: string;
@@ -394,6 +398,9 @@ export const getExhibits = async ({
 		artist.bank_account as "bankAccount",
 		registration.registration_year as "registrationYear",
 		registration.closed,
+		registration.bump_in as "bumpIn",
+		registration.bump_out as "bumpOut",
+		registration.display_requirements as "displayRequirements",
 		entry.id as "entryId",
 		entry.accepted,
 		entry.description,
@@ -402,6 +409,7 @@ export const getExhibits = async ({
 		entry.material,
 		entry.title,
 		entry.price_in_cents as "price",
+		entry.special_requirements as "specialRequirements",
 		image.id as "imageId",
 		image.cloud_url as "cloudURL",
 		CASE WHEN location.exhibit_number is NULL THEN NULL ELSE location.exhibit_number END as "exhibitNumber"
@@ -414,7 +422,7 @@ export const getExhibits = async ({
 		where
 		-- -- artist.email = 'epsilonartist@gmail.com' AND
 		registration.registration_year = ${entryYear}
-		order by location.exhibit_number asc
+		order by location.exhibit_number asc, entry.id asc
 		OFFSET ${offset} ROWS
 		LIMIT ${rows}
 		`;
