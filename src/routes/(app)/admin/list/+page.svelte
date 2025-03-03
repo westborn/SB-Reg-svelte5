@@ -107,6 +107,13 @@
 			enableGlobalFilter: false
 		}),
 		columnHelper.accessor('artistName', { header: 'Name' }),
+		columnHelper.accessor('phone', {
+			header: 'Phone',
+			cell: (info) => info.getValue(),
+			enableSorting: false,
+			enableColumnFilter: false,
+			enableGlobalFilter: false
+		}),
 		columnHelper.accessor('title', { header: 'Title' }),
 		columnHelper.accessor('price', {
 			header: 'Price',
@@ -114,7 +121,6 @@
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
-
 		columnHelper.accessor('description', { header: 'Description' }),
 		columnHelper.accessor('material', {
 			header: 'Material',
@@ -148,6 +154,7 @@
 	}
 
 	const [columnVisibility, setColumnVisibility] = createPersistVisibilityState<VisibilityState>({
+		exhibitNumber: false,
 		accepted: false,
 		closed: false,
 		email: false,
