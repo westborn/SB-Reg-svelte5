@@ -140,6 +140,13 @@ export const confirmSchemaUI = z.object({
 });
 export type RegistrationUI = z.infer<typeof confirmSchemaUI>;
 
+// Custom validation function to check word count
+const maxWords = (max: number) => (val: string) => {
+	if (val.split(' ').length > max) {
+		return false;
+	}
+	return true;
+};
 export const entrySchemaUI = z.object({
 	id: z.number().int(),
 	title: z.string({ required_error: 'Title is required' }),
@@ -149,13 +156,18 @@ export const entrySchemaUI = z.object({
 		.int({ message: 'Whole dollars please' })
 		.gt(0, { message: 'You MUST enter a price' })
 		.nullable()
-		.refine((val) => val > 0, { message: 'Number is required.' }),
+		.refine((val) => val !== null && val > 0, { message: 'Number is required.' }),
 	material: z.string().nullish(),
 	dimLength: z.string().nullish(),
 	dimWidth: z.string().nullish(),
 	dimHeight: z.string().nullish(),
 	specialRequirements: z.string().nullish(),
-	description: z.string().nullish()
+	description: z
+		.string()
+		.refine(maxWords(30), {
+			message: 'Please keep the description to 25 words or less'
+		})
+		.nullish()
 });
 export type EntryUI = z.infer<typeof entrySchemaUI>;
 
