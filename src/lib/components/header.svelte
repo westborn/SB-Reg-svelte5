@@ -7,6 +7,7 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { AdminMenu, ThemeToggle } from '$lib/components';
+	import { EXHIBITION_YEAR } from '../constants';
 
 	let data = $props();
 	const { navItems, user } = data;
@@ -26,7 +27,7 @@
 		<div class="hidden h-14 grid-cols-[200px_2fr] items-center md:grid">
 			<div class=" flex">
 				<img src="/favicon-32x32.png" alt="Sculpture Bermagui Logo" class="mt-2 h-10" />
-				<h1 class="text-center text-lg text-primary-400">Exhibition Registration</h1>
+				<h1 class="ml-2 text-lg text-primary-400">Exhibition Registration {EXHIBITION_YEAR}</h1>
 			</div>
 			<div class="grid grid-cols-3">
 				{#each navItems as { label, href }, i}
@@ -48,7 +49,7 @@
 					>
 					<Sheet.Content side="left" class="w-1/2">
 						<h1 class="mt-4 text-center text-sm text-primary-400 md:hidden">
-							Sculpture Bermagui Exhibition Registration
+							Exhibition Registration {EXHIBITION_YEAR}
 						</h1>
 						<div class="mt-10 flex flex-col items-start justify-between text-primary-300">
 							{#each navItems as { label, href }, i}
