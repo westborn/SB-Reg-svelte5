@@ -1,148 +1,137 @@
-# 2025 Registrations now CLOSED
+# Sculpture Bermagui Registration System
 
-# Setup the Project
+## Overview
 
-Everything you need to build a Svelte project with sveltekit, tailwind and shadcn-svelte!
+The Sculpture Bermagui Registration System is a modern web application built with SvelteKit 5 that manages the complete lifecycle of artist registrations and artwork submissions for the annual sculpture exhibition. This system handles everything from initial artist registration through exhibition management and logistics.
 
-## Creating a project
+## 📈 Current Status
 
-Standard setup from the docs for sveltekit, tailwind and shadcn-svelte!
+**Version**: 1.4.2  
+**Exhibition Year**: 2025 (Automatically calculated)
+
+### **2025 Registrations now CLOSED**
+
+This system successfully manages the annual Sculpture Bermagui exhibition with support for:
+
+- Multi-year exhibitions with historical data
+- Scalable artist and artwork management
+- Comprehensive administrative tools
+- Modern, responsive user interface
+- Robust data migration capabilities
+
+Built with modern web technologies and designed for scalability, this system continues to evolve to meet the growing needs of the Sculpture Bermagui community.
+
+## 🎨 What This System Does
+
+### For Artists
+
+- **Register for the exhibition** with personal and banking details
+- **Submit artwork entries** with detailed descriptions, materials, and dimensions
+- **Upload images** of their artwork via Cloudinary integration
+- **Manage registration logistics** including bump-in/bump-out schedules and special requirements
+- **Receive email confirmations** with registration summaries and payment instructions
+
+### For Administrators
+
+- **Manage exhibitions** across multiple years (2023, 2024, 2025)
+- **Review and approve entries** for the exhibition
+- **Assign exhibit locations** and numbers to accepted works
+- **Handle logistics** including crane requirements, accommodation, and transport
+- **Export data** for external systems and reporting
+- **Proxy functionality** to manage registrations on behalf of artists
+
+### Exhibition Management
+
+- **Multi-year support** with configurable exhibition years
+- **Entry categorization** (Indoor/Outdoor sculptures)
+- **Major prize tracking** for competition entries
+- **Pricing management** for artwork sales
+- **Location assignment** for physical exhibition layout
+
+## 🚀 Technology Stack
+
+- **Frontend**: SvelteKit 5 with TypeScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: Supabase Auth
+- **UI Framework**: Tailwind CSS with Shadcn-svelte components
+- **Image Storage**: Cloudinary
+- **Email**: Nodemailer with Gmail integration
+- **Deployment**: Netlify
+- **Package Manager**: pnpm
+
+## 📊 Key Features
+
+### Registration Workflow
+
+1. **Artist Registration** - Basic contact and banking information
+2. **Entry Submission** - Artwork details with image uploads
+3. **Confirmation** - Review and finalize registration
+4. **Payment** - Integration with payment processing
+5. **Email Confirmation** - Detailed registration summary
+
+### Administrative Tools
+
+- **Admin Dashboard** for managing all registrations
+- **Bulk Operations** for handling multiple entries
+- **Data Migration** scripts for importing historical data
+- **Exhibition Queries** with advanced filtering and pagination
+- **Report Generation** for various stakeholders
+
+### Data Management
+
+- **Historical Data** support for previous exhibitions (2023, 2024)
+- **Image Migration** from Google Drive to Cloudinary
+- **Database Migrations** with Prisma
+- **Seed Scripts** for development data
+
+## 🛠 Development Commands
 
 ```bash
-pnpm create svelte@latest ./
-pnpm dlx svelte-add@latest tailwindcss
-pnpm i
-pnpm i -D prettier prettier-plugin-svelte
-pnpm dlx shadcn-svelte@latest init
+# Development
+pnpm dev                    # Start development server
+pnpm build                  # Build for production
+pnpm preview                # Preview production build
 
+# Database
+pnpm db:migrate            # Run database migrations
+pnpm db:reset              # Reset database
+pnpm db:seed               # Seed development data
+pnpm studio                # Open Prisma Studio
+
+# Code Quality
+pnpm check                 # Type checking
+pnpm lint                  # ESLint
+pnpm format                # Prettier formatting
+
+# Versioning
+pnpm bump:patch            # Bump patch version
+pnpm bump:minor            # Bump minor version
+pnpm bump:major            # Bump major version
 ```
 
-## Adding shadcn-svelte components with super-forms, formsnap and zod
-
-```bash
-npx shadcn-svelte@latest init
-pnpm i -D zod
-pnpm i formsnap sveltekit-superforms zod
-pnpm i mode-watcher
-
-pnpm dlx shadcn-svelte@latest add alert-dialog avatar button card dialog form input lable textarea tooltip sonner
+## 📁 Project Structure
 
 ```
-
-## Update the Shadcn theme to the colours you like.
-
-### Use this website - https://ui.jln.dev/
-
-```
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* from shadcn-svelte theme creator - https://www.shadcn-svelte.com/themes */
-/*		Change dark mode input */
-/*		from	--input: 217.2 32.6% 17.5%; */
-/*		to:		--input: 217.2 32.6% 35%; */
-
-@layer base {
-	:root {
-		--background: 0 0% 100%;
-		--foreground: 222.2 84% 4.9%;
-		--card: 0 0% 100%;
-		--card-foreground: 222.2 84% 80%;
-		--popover: 0 0% 100%;
-		--popover-foreground: 222.2 84% 4.9%;
-		--primary: 221.2 83.2% 53.3%;
-		--primary-foreground: 210 40% 98%;
-		--secondary: 210 40% 96.1%;
-		--secondary-foreground: 222.2 47.4% 11.2%;
-		--muted: 210 40% 96.1%;
-		--muted-foreground: 215.4 16.3% 46.9%;
-		--accent: 210 40% 96.1%;
-		--accent-foreground: 222.2 47.4% 11.2%;
-		--destructive: 0 72.22% 50.59%;
-		--destructive-foreground: 210 40% 98%;
-		--border: 214.3 31.8% 91.4%;
-		--input: 214.3 31.8% 91.4%;
-		--ring: 221.2 83.2% 53.3%;
-		--radius: 1rem;
-	}
-	.dark {
-		--background: 222.2 84% 4.9%;
-		--foreground: 210 40% 98%;
-		--card: 222.2 84% 4.9%;
-		--card-foreground: 210 40% 98%;
-		--popover: 222.2 84% 4.9%;
-		--popover-foreground: 210 40% 98%;
-		--primary: 217.2 91.2% 59.8%;
-		--primary-foreground: 222.2 47.4% 11.2%;
-		--secondary: 217.2 32.6% 17.5%;
-		--secondary-foreground: 210 40% 98%;
-		--muted: 217.2 32.6% 17.5%;
-		--muted-foreground: 215 20.2% 65.1%;
-		--accent: 217.2 32.6% 17.5%;
-		--accent-foreground: 210 40% 98%;
-		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 210 40% 98%;
-		--border: 217.2 32.6% 17.5%;
-		--input: 217.2 32.6% 35%;
-		--ring: 224.3 76.3% 48%;
-	}
-}
-
-@layer base {
-	* {
-		@apply border-border;
-	}
-	body {
-		@apply bg-background text-foreground;
-	}
-}
+src/
+├── lib/
+│   ├── components/         # Reusable UI components
+│   ├── server/            # Server-side utilities
+│   └── data/              # Historical JSON data
+├── routes/
+│   ├── (app)/             # Main application routes
+│   ├── (auth)/            # Authentication routes
+│   └── api/               # API endpoints
+├── scripts/               # Data migration and utility scripts
+└── prisma/                # Database schema and migrations
 ```
 
-## Make darkmode the default in app.html
+## 🔧 Configuration
 
-```
-<html lang="en" class="dark" style="color-scheme: dark">
-```
+The system uses environment variables for configuration:
 
-form errors fix in huntabyte's youtube
-https://www.youtube.com/watch?v=vz8y2Nnz7T4&t=406s
-3:12:28 you can extend Shadcn to add our own little errors
-
-## Add prisma
-
-prisma db pull - turn your database schema into a Prisma schema.  
-prisma generate - generate the Prisma Client.
-
-```
-pnpm install prisma --save-dev
-pnpm dlx prisma init
-```
-
-edit the prisma.schenas file to add provision for auth
-
-```
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  schemas  = ["auth", "public"]
-}
-
-```
-
-### Prisma fix for supabase Auth
-
-We need to setup an initial migration to make sure the auth tables are in our schema, but, we don't ever update them
-
-Use prisma pull to sync existing supabase with prisma and then tell prisma that we have completed this migation
-
-```
-pnpm prisma db pull
-pnpm prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script --output prisma/migrations/0_init/migration.sql
-pnpm prisma migrate resolve --applied 0_init
-```
+- Database connection (PostgreSQL)
+- Supabase authentication
+- Cloudinary image storage
+- Email service (Gmail)
+- Payment processing
+- Exhibition year settings
