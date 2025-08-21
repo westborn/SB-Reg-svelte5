@@ -57,7 +57,7 @@
 
 	<Form.Field {form} name="displayRequirements">
 		<Form.Control let:attrs>
-			<Form.Label>Any special requirements for the display area</Form.Label>
+			<Form.Label>Any special requirement e.g. does your artwork need a flat area</Form.Label>
 			<Input type="text" {...attrs} bind:value={$formData.displayRequirements} />
 		</Form.Control>
 		<Form.FieldErrors />
