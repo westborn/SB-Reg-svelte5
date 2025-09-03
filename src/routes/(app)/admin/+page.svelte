@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { dev } from '$app/environment';
 	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
-	import { REGISTRATIONS_OPEN } from '$lib/constants.js';
+	import { EXHIBITION_YEAR, REGISTRATIONS_OPEN } from '$lib/constants.js';
 
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import jsonToCsvExport from 'json-to-csv-export';
@@ -159,7 +159,8 @@
 	const textList = [
 		['Environment:', `dev:${dev} meta.env.MODE:${import.meta.env.MODE}`],
 		['Running in ', `"${PUBLIC_SQUARE_ENVIRONMENT}" mode`],
-		['Registrations are ', REGISTRATIONS_OPEN ? 'OPEN' : 'CLOSED'],
+		['Registrations are', `${REGISTRATIONS_OPEN ? 'OPEN' : 'CLOSED'}`],
+		['Current Year is', `${EXHIBITION_YEAR}`],
 		['NAME:', __NAME__],
 		['VERSION:', __VERSION__],
 		['GITHUBURL ', __GITHUBURL__],
