@@ -18,6 +18,7 @@ This system successfully manages the annual Sculpture Bermagui exhibition with s
 - Comprehensive administrative tools
 - Modern, responsive user interface
 - Robust data migration capabilities
+- **Full test coverage** with automated testing
 
 Built with modern web technologies and designed for scalability, this system continues to evolve to meet the growing needs of the Sculpture Bermagui community.
 
@@ -98,6 +99,12 @@ pnpm db:reset              # Reset database
 pnpm db:seed               # Seed development data
 pnpm studio                # Open Prisma Studio
 
+# Testing
+pnpm test                  # Run tests in watch mode
+pnpm test:run              # Run tests once
+pnpm test:ui               # Run tests with UI interface
+pnpm test:coverage         # Run tests with coverage report
+
 # Code Quality
 pnpm check                 # Type checking
 pnpm lint                  # ESLint
@@ -108,6 +115,47 @@ pnpm bump:patch            # Bump patch version
 pnpm bump:minor            # Bump minor version
 pnpm bump:major            # Bump major version
 ```
+
+## 🧪 Testing
+
+This project includes a comprehensive testing setup with:
+
+- **Vitest** for unit and integration testing
+- **Testing Library** for component testing
+- **Jest DOM** for enhanced DOM assertions
+- **Coverage reporting** with detailed metrics
+- **CI/CD integration** with GitHub Actions
+
+### Test Structure
+
+```
+src/
+├── lib/
+│   ├── utils.test.ts           # Utility function tests
+│   ├── zod-schemas.test.ts     # Schema validation tests
+│   └── theme-toggle.test.ts    # Component tests
+└── tests/
+    ├── setup.ts               # Test environment setup
+    └── example.test.ts         # Example test patterns
+```
+
+### Running Tests
+
+```bash
+# Development (watch mode)
+pnpm test
+
+# Single run (CI)
+pnpm test:run
+
+# With coverage
+pnpm test:coverage
+
+# Interactive UI
+pnpm test:ui
+```
+
+For detailed testing documentation, see [docs/TESTING.md](docs/TESTING.md).
 
 ## 📁 Project Structure
 
