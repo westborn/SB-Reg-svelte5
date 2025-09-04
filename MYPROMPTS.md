@@ -17,4 +17,11 @@ Write a plan in @docs/plans/multipleImages.md, and let me validate it before sta
 
 ---
 
+change the plan. allow any number of images to be stored in the database for an entry. implement UI code to only allow 3 at the moment. One image should be designated as the "primary_image" and this should be the defualt set when the first image is uploaded.
+The primary_image relationship can be held in a separate table that references images.
+The primary_image can be changed to any existing image when updating an entry
+rewrite the plan in multipleImages.md
+
 ---
+
+## change the plan to add a github commit after each phase and also add each phase to the FEATURES.md file. there is no need to display the plan, just update the multipleImages.md with the new plan
