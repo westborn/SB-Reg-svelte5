@@ -100,18 +100,6 @@ model locationTable {
   @@map("location")
 }
 
-model newimages {
-  id        BigInt @id @default(autoincrement())
-  cloud_id  String
-  cloud_url String
-}
-
-model oldimages {
-  id        BigInt @id @default(autoincrement())
-  cloud_id  String
-  cloud_url String
-}
-
 enum Indigenous {
   Yes
   No
