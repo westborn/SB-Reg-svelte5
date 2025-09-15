@@ -50,41 +50,43 @@ model registrationTable {
 }
 
 model entryTable {
-  id                  Int               @id @default(autoincrement())
-  artistId            Int               @map("artist_id")
-  accepted            Boolean           @default(false)
-  registrationId      Int               @map("registration_id")
+  id                  Int                @id @default(autoincrement())
+  artistId            Int                @map("artist_id")
+  accepted            Boolean            @default(false)
+  registrationId      Int                @map("registration_id")
   description         String?
   dimensions          String?
-  enterMajorPrize     Boolean           @default(false) @map("enter_major_prize")
-  inOrOut             EntryType         @map("in_or_out")
+  enterMajorPrize     Boolean            @default(false) @map("enter_major_prize")
+  inOrOut             EntryType          @map("in_or_out")
   material            String?
-  price               Int               @map("price_in_cents")
-  specialRequirements String?           @map("special_requirements")
+  price               Int                @map("price_in_cents")
+  specialRequirements String?            @map("special_requirements")
   title               String
-  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt           DateTime          @updatedAt @map("updated_at")
-  artist              artistTable       @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  registration        registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+  artist              artistTable        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  registration        registrationTable  @relation(fields: [registrationId], references: [id], onDelete: Cascade)
   images              imageTable[]
   location            locationTable?
+  primaryImage        primaryImageTable?
 
   @@map("entry")
 }
 
 model imageTable {
-  id               Int                @id @default(autoincrement())
-  artistId         Int                @map("artist_id")
-  registrationId   Int?               @map("registration_id")
-  entryId          Int?               @map("entry_id")
-  cloudId          String             @map("cloud_id")
-  cloudURL         String             @map("cloud_url")
-  originalFileName String             @map("original_file_name")
-  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt        DateTime           @updatedAt @map("updated_at")
-  artist           artistTable        @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  entry            entryTable?        @relation(fields: [entryId], references: [id], onDelete: Cascade)
-  registration     registrationTable? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  id                   Int                 @id @default(autoincrement())
+  artistId             Int                 @map("artist_id")
+  registrationId       Int?                @map("registration_id")
+  entryId              Int?                @map("entry_id")
+  cloudId              String              @map("cloud_id")
+  cloudURL             String              @map("cloud_url")
+  originalFileName     String              @map("original_file_name")
+  createdAt            DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+  artist               artistTable         @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  entry                entryTable?         @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  registration         registrationTable?  @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  primaryImageRelation primaryImageTable[]
 
   @@map("image")
 }
@@ -98,6 +100,18 @@ model locationTable {
   entry         entryTable @relation(fields: [entryId], references: [id], onDelete: Cascade)
 
   @@map("location")
+}
+
+model primaryImageTable {
+  id        Int        @id @default(autoincrement())
+  entryId   Int        @unique @map("entry_id")
+  imageId   Int        @map("image_id")
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  entry     entryTable @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  image     imageTable @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  @@map("primary_image")
 }
 
 enum Indigenous {
