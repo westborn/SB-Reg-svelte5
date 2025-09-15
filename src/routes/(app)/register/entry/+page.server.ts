@@ -7,11 +7,14 @@ import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
-import { entryDeleteSchemaUI, entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
+import { entryDeleteSchemaUI, entrySchemaUI, fileUploadSchema, multipleImagesSchema } from '$lib/zod-schemas';
 import {
 	createImage,
 	createNewRegistration,
 	getSubmission,
+	createPrimaryImageRelation,
+	setPrimaryImage,
+	deleteImage,
 	type CurrentImage,
 	type User
 } from '$lib/components/server/registrationDB';
@@ -90,6 +93,15 @@ const entryUpdate = async (event: RequestEvent) => {
 					return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 				}
 			}
+
+			// Set the new image as primary (will create or update primary image relation)
+			try {
+				await setPrimaryImage(entryFromDB.id, updatedImage.id);
+			} catch (error) {
+				console.error(`${event.route.id} - Error setting primary image:`, error);
+				return message(formValidationResult, 'Error setting primary image');
+			}
+
 			//TODO Update image tag to be attached
 			// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
 		}
@@ -108,7 +120,7 @@ const entryUpdate = async (event: RequestEvent) => {
 				description: description ?? '',
 				specialRequirements: specialRequirements ?? '',
 				dimensions,
-				price: price * 100
+				price: (price ?? 0) * 100
 			}
 		});
 
@@ -196,7 +208,7 @@ const entryCreate = async (event: RequestEvent) => {
 				specialRequirements: specialRequirements ?? '',
 				enterMajorPrize: true,
 				dimensions,
-				price: price * 100
+				price: (price ?? 0) * 100
 			}
 		});
 		if (!newEntry) {
@@ -208,7 +220,7 @@ const entryCreate = async (event: RequestEvent) => {
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
 
-	// If an image was provided, update the image with the new entry details
+	// If an image was provided, update the image with the new entry details and set as primary
 	if (workingImage) {
 		const updatedImage = await prisma.imageTable.update({
 			where: { id: workingImage.id },
@@ -221,6 +233,15 @@ const entryCreate = async (event: RequestEvent) => {
 			console.error(`${event.route.id} - Updating DB Image${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
+
+		// Set this image as the primary image for the entry
+		try {
+			await createPrimaryImageRelation(newEntry.id, updatedImage.id);
+		} catch (error) {
+			console.error(`${event.route.id} - Error creating primary image relation:`, error);
+			return message(formValidationResult, 'Error setting primary image');
+		}
+
 		//TODO Update image tag to be attached
 		// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
 	}
@@ -322,4 +343,68 @@ const entryDelete = async (event: RequestEvent) => {
 	return returnData;
 };
 
-export const actions: Actions = { entryUpdate, entryCreate, entryDelete, imageUpload };
+const setPrimaryImageAction = async (event: RequestEvent) => {
+	const setPrimaryImageSchema = z.object({
+		entryId: z.number().int(),
+		imageId: z.number().int()
+	});
+
+	const formValidationResult = await superValidate(event, zod(setPrimaryImageSchema));
+
+	if (!formValidationResult.valid) {
+		return message(formValidationResult, 'Invalid data for setting primary image', { status: 400 });
+	}
+
+	const { user } = await event.locals.V1safeGetSession();
+	const { entryId, imageId } = formValidationResult.data;
+
+	try {
+		await setPrimaryImage(entryId, imageId);
+	} catch (error) {
+		console.error(`${event.route.id} - Error setting primary image:`, error);
+		return message(formValidationResult, 'Error setting primary image');
+	}
+
+	// Return the updated submission
+	const updatedSubmission = await getSubmission(user as User);
+	const returnData = { formValidationResult, updatedSubmission };
+	return returnData;
+};
+
+const imageDeleteAction = async (event: RequestEvent) => {
+	const imageDeleteSchema = z.object({
+		imageId: z.number().int(),
+		entryId: z.number().int()
+	});
+
+	const formValidationResult = await superValidate(event, zod(imageDeleteSchema));
+
+	if (!formValidationResult.valid) {
+		return message(formValidationResult, 'Invalid data for deleting image', { status: 400 });
+	}
+
+	const { user } = await event.locals.V1safeGetSession();
+	const { imageId, entryId } = formValidationResult.data;
+
+	try {
+		const result = await deleteImage(imageId, entryId);
+		console.log('Image deleted successfully', result);
+	} catch (error) {
+		console.error(`${event.route.id} - Error deleting image:`, error);
+		return message(formValidationResult, error instanceof Error ? error.message : 'Error deleting image');
+	}
+
+	// Return the updated submission
+	const updatedSubmission = await getSubmission(user as User);
+	const returnData = { formValidationResult, updatedSubmission };
+	return returnData;
+};
+
+export const actions: Actions = {
+	entryUpdate,
+	entryCreate,
+	entryDelete,
+	imageUpload,
+	setPrimaryImage: setPrimaryImageAction,
+	imageDelete: imageDeleteAction
+};

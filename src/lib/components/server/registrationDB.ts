@@ -1,8 +1,8 @@
 import { prisma } from '$lib/components/server/prisma';
-import { EXHIBITION_YEAR } from '$lib/constants';
+import { EXHIBITION_YEAR, MIN_IMAGES_PER_ENTRY } from '$lib/constants';
 
 import { EntryType } from '$lib/constants';
-import type { EntryTable, ImageTable } from '$lib/zod-schemas';
+import type { EntryTable, ImageTable, PrimaryImageTable } from '$lib/zod-schemas';
 
 // Two different ways to add types from a prisma query
 
@@ -119,6 +119,21 @@ export const getSubmission = async ({ isSuperAdmin, proxyEmail, email }: User) =
 									originalFileName: true,
 									cloudId: true,
 									cloudURL: true
+								}
+							},
+							primaryImage: {
+								select: {
+									id: true,
+									entryId: true,
+									imageId: true,
+									image: {
+										select: {
+											id: true,
+											cloudId: true,
+											cloudURL: true,
+											originalFileName: true
+										}
+									}
 								}
 							}
 						},
@@ -300,6 +315,145 @@ export const createImage = async (workingImage: CurrentImage) => {
 		}
 	});
 	return image;
+};
+
+/////////////////////////////////////////
+// MULTIPLE IMAGES HELPER FUNCTIONS
+/////////////////////////////////////////
+
+export type EntryImagesWithPrimary = ThenArg<ReturnType<typeof getEntryImagesWithPrimary>>;
+export const getEntryImagesWithPrimary = async (entryId: number) => {
+	const entry = await prisma.entryTable.findUnique({
+		where: { id: entryId },
+		select: {
+			images: {
+				select: {
+					id: true,
+					artistId: true,
+					registrationId: true,
+					entryId: true,
+					originalFileName: true,
+					cloudId: true,
+					cloudURL: true
+				},
+				orderBy: { createdAt: 'asc' }
+			},
+			primaryImage: {
+				select: {
+					imageId: true,
+					image: {
+						select: {
+							id: true,
+							cloudId: true,
+							cloudURL: true,
+							originalFileName: true
+						}
+					}
+				}
+			}
+		}
+	});
+
+	if (!entry) return null;
+
+	// Mark primary image in the images array
+	const imagesWithPrimary = entry.images.map((image) => ({
+		...image,
+		isPrimary: entry.primaryImage?.imageId === image.id
+	}));
+
+	return {
+		images: imagesWithPrimary,
+		primaryImageId: entry.primaryImage?.imageId || null
+	};
+};
+
+export const setPrimaryImage = async (entryId: number, imageId: number) => {
+	// Verify the image belongs to this entry
+	const image = await prisma.imageTable.findFirst({
+		where: { id: imageId, entryId: entryId }
+	});
+
+	if (!image) {
+		throw new Error('Image not found or does not belong to this entry');
+	}
+
+	// Update or create primary image relationship
+	await prisma.primaryImageTable.upsert({
+		where: { entryId: entryId },
+		update: { imageId: imageId },
+		create: { entryId: entryId, imageId: imageId }
+	});
+
+	return true;
+};
+
+export const deleteImage = async (imageId: number, entryId: number) => {
+	// Validate that entry has more than minimum required images
+	const entryImages = await prisma.imageTable.findMany({
+		where: { entryId: entryId }
+	});
+
+	if (entryImages.length <= MIN_IMAGES_PER_ENTRY) {
+		throw new Error('Cannot delete the last remaining image. Entry must have at least one image.');
+	}
+
+	// Check if this is the primary image
+	const primaryImage = await prisma.primaryImageTable.findUnique({
+		where: { entryId: entryId }
+	});
+
+	const isDeletingPrimary = primaryImage?.imageId === imageId;
+
+	// If deleting primary image, reassign primary to first remaining image
+	if (isDeletingPrimary) {
+		const remainingImages = entryImages.filter((img) => img.id !== imageId);
+		if (remainingImages.length > 0) {
+			await prisma.primaryImageTable.update({
+				where: { entryId: entryId },
+				data: { imageId: remainingImages[0].id }
+			});
+		}
+	}
+
+	// Delete the image
+	await prisma.imageTable.delete({
+		where: { id: imageId }
+	});
+
+	return { deletedPrimaryImage: isDeletingPrimary };
+};
+
+export const createPrimaryImageRelation = async (entryId: number, imageId: number) => {
+	const primaryImage = await prisma.primaryImageTable.create({
+		data: {
+			entryId: entryId,
+			imageId: imageId
+		},
+		select: {
+			id: true,
+			entryId: true,
+			imageId: true,
+			createdAt: true,
+			updatedAt: true
+		}
+	});
+	return primaryImage;
+};
+
+export const updatePrimaryImageRelation = async (entryId: number, imageId: number) => {
+	const primaryImage = await prisma.primaryImageTable.update({
+		where: { entryId: entryId },
+		data: { imageId: imageId },
+		select: {
+			id: true,
+			entryId: true,
+			imageId: true,
+			createdAt: true,
+			updatedAt: true
+		}
+	});
+	return primaryImage;
 };
 
 // TODO - is this type of select still required?
