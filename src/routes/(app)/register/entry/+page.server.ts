@@ -26,8 +26,12 @@ export const load: PageServerLoad = async (event) => {
 };
 
 const entryUpdate = async (event: RequestEvent) => {
-	const updateImageSchema = entrySchemaUI.extend({ image: z.string().nullable(), idToUpdate: z.number() });
-	const formValidationResult = await superValidate(event, zod(updateImageSchema));
+	const updateImagesSchema = entrySchemaUI.extend({
+		images: z.string().nullable(),
+		primaryImageId: z.number().nullable(),
+		idToUpdate: z.number()
+	});
+	const formValidationResult = await superValidate(event, zod(updateImagesSchema));
 
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -35,13 +39,18 @@ const entryUpdate = async (event: RequestEvent) => {
 		});
 	}
 	const { user } = await event.locals.V1safeGetSession();
-	// extract the image data and entry id that we need to update
-	let workingImage = null;
+
+	// extract the images data and entry id that we need to update
+	let workingImages: CurrentImage[] = [];
+	let primaryImageId: number | null = null;
 	let idToUpdate = null;
+
 	try {
-		if (formValidationResult.data.image) {
-			workingImage = JSON.parse(formValidationResult.data.image);
+		if (formValidationResult.data.images) {
+			workingImages = JSON.parse(formValidationResult.data.images);
 		}
+		primaryImageId = formValidationResult.data.primaryImageId;
+
 		if (!formValidationResult.data.idToUpdate) {
 			console.error('No entry ID provided for update - aborting update.');
 			return message(formValidationResult, 'No entry ID provided for update - aborting update.', { status: 400 });
@@ -67,43 +76,58 @@ const entryUpdate = async (event: RequestEvent) => {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 
-		// Get the image from the database if there is one
-		const imageFromDB = entryFromDB.images.find((image) => image.entryId === idToUpdate);
+		// Get the existing images from the database
+		const existingImages = entryFromDB.images || [];
 
-		//check if the user is trying to update the image (the cloudinary id will have changed)
-		if (workingImage && workingImage.cloudId !== imageFromDB?.cloudId) {
-			// update the DB image to link to this entry
-			console.log('Updating image with new entry details');
-			const updatedImage = await prisma.imageTable.update({
-				where: { id: workingImage.id },
-				data: {
-					registrationId: entryFromDB.registrationId,
-					entryId: entryFromDB.id
-				}
-			});
-			if (!updatedImage) {
-				console.error(`${event.route.id} - Updating DB Image${GENERIC_ERROR_MESSAGE}`);
-				return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-			}
-			if (imageFromDB) {
-				//delete the old image from the database
-				const deletedImage = await prisma.imageTable.delete({ where: { id: imageFromDB.id } });
-				if (!deletedImage) {
-					console.error(`${event.route.id} - Deleting Old DB Image${GENERIC_ERROR_MESSAGE}`);
-					return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+		// Handle image updates if there are working images
+		if (workingImages && workingImages.length > 0) {
+			// Get working image IDs (filter out null images and null IDs)
+			const workingImageIds = workingImages.filter((img) => img && img.id).map((img) => img!.id);
+			const existingImageIds = existingImages.map((img) => img.id);
+
+			// Find images to remove (existing but not in working images)
+			const imagesToRemove = existingImages.filter((img) => !workingImageIds.includes(img.id));
+
+			// Find images to add (working but not in existing, and have valid IDs)
+			const imagesToAdd = workingImages.filter((img) => img && img.id && !existingImageIds.includes(img.id));
+
+			// Remove images that are no longer needed
+			for (const imageToRemove of imagesToRemove) {
+				try {
+					await deleteImage(imageToRemove.id, entryFromDB.id);
+					console.log('Removed image:', imageToRemove.id);
+				} catch (error) {
+					console.error('Error removing image:', error);
 				}
 			}
 
-			// Set the new image as primary (will create or update primary image relation)
-			try {
-				await setPrimaryImage(entryFromDB.id, updatedImage.id);
-			} catch (error) {
-				console.error(`${event.route.id} - Error setting primary image:`, error);
-				return message(formValidationResult, 'Error setting primary image');
+			// Add new images to the entry
+			for (const imageToAdd of imagesToAdd) {
+				if (imageToAdd && imageToAdd.id) {
+					try {
+						await prisma.imageTable.update({
+							where: { id: imageToAdd.id },
+							data: {
+								registrationId: entryFromDB.registrationId,
+								entryId: entryFromDB.id
+							}
+						});
+						console.log('Added image to entry:', imageToAdd.id);
+					} catch (error) {
+						console.error('Error adding image to entry:', error);
+					}
+				}
 			}
 
-			//TODO Update image tag to be attached
-			// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
+			// Update primary image relationship if specified
+			if (primaryImageId && workingImageIds.includes(primaryImageId)) {
+				try {
+					await setPrimaryImage(entryFromDB.id, primaryImageId);
+				} catch (error) {
+					console.error(`${event.route.id} - Error setting primary image:`, error);
+					return message(formValidationResult, 'Error setting primary image');
+				}
+			}
 		}
 
 		const { title, price, inOrOut, material, specialRequirements, description, dimHeight, dimLength, dimWidth } =
@@ -141,8 +165,11 @@ const entryUpdate = async (event: RequestEvent) => {
 };
 
 const entryCreate = async (event: RequestEvent) => {
-	const newImageSchema = entrySchemaUI.extend({ image: z.string().nullable() });
-	const formValidationResult = await superValidate(event, zod(newImageSchema));
+	const newImagesSchema = entrySchemaUI.extend({
+		images: z.string().nullable(),
+		primaryImageId: z.number().nullable()
+	});
+	const formValidationResult = await superValidate(event, zod(newImagesSchema));
 
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Entry is Invalid - please reload and try again, or, call us!!', {
@@ -150,15 +177,19 @@ const entryCreate = async (event: RequestEvent) => {
 		});
 	}
 	const { user } = await event.locals.V1safeGetSession();
-	// Process image data if available
-	let workingImage = null;
+
+	// Process images data if available
+	let workingImages: CurrentImage[] = [];
+	let primaryImageId: number | null = null;
+
 	try {
-		if (formValidationResult.data.image) {
-			workingImage = JSON.parse(formValidationResult.data.image);
+		if (formValidationResult.data.images) {
+			workingImages = JSON.parse(formValidationResult.data.images);
 		}
+		primaryImageId = formValidationResult.data.primaryImageId;
 	} catch (error) {
-		console.error('Error parsing image data:', error);
-		return message(formValidationResult, 'Error processing image data.', { status: 400 });
+		console.error('Error parsing images data:', error);
+		return message(formValidationResult, 'Error processing images data.', { status: 400 });
 	}
 
 	let artistId: number;
@@ -220,26 +251,35 @@ const entryCreate = async (event: RequestEvent) => {
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
 
-	// If an image was provided, update the image with the new entry details and set as primary
-	if (workingImage) {
-		const updatedImage = await prisma.imageTable.update({
-			where: { id: workingImage.id },
-			data: {
-				registrationId,
-				entryId: newEntry.id
+	// If images were provided, update the images with the new entry details and set primary
+	if (workingImages && workingImages.length > 0) {
+		// Update all working images to link to the new entry
+		for (const workingImage of workingImages) {
+			if (workingImage && workingImage.id) {
+				try {
+					await prisma.imageTable.update({
+						where: { id: workingImage.id },
+						data: {
+							registrationId,
+							entryId: newEntry.id
+						}
+					});
+					console.log('Linked image to entry:', workingImage.id);
+				} catch (error) {
+					console.error('Error linking image to entry:', error);
+				}
 			}
-		});
-		if (!updatedImage) {
-			console.error(`${event.route.id} - Updating DB Image${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 
-		// Set this image as the primary image for the entry
-		try {
-			await createPrimaryImageRelation(newEntry.id, updatedImage.id);
-		} catch (error) {
-			console.error(`${event.route.id} - Error creating primary image relation:`, error);
-			return message(formValidationResult, 'Error setting primary image');
+		// Set the primary image if specified, otherwise use the first image
+		const imageIdToSetAsPrimary = primaryImageId || workingImages[0]?.id;
+		if (imageIdToSetAsPrimary) {
+			try {
+				await createPrimaryImageRelation(newEntry.id, imageIdToSetAsPrimary);
+			} catch (error) {
+				console.error(`${event.route.id} - Error creating primary image relation:`, error);
+				return message(formValidationResult, 'Error setting primary image');
+			}
 		}
 
 		//TODO Update image tag to be attached

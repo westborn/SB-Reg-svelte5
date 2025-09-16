@@ -11,8 +11,8 @@
 	import { toast } from 'svelte-sonner';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
-	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
-	import { ImageUploadForm, OptimisedImage } from '$lib/components';
+	import { getRegisterState } from '$lib/context.svelte';
+	import { MultipleImageUploadForm, ImageGallery } from '$lib/components';
 
 	type Props = {
 		currentEntryId: number;
@@ -20,15 +20,20 @@
 
 	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
-	updateWorkingImage(null);
 
 	const form = superForm(myState.entryForm, {
 		id: `entryUpdateForm`,
 		validators: zodClient(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
-			// pass the image that we accepted, into this form's data when they save the new entry
-			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage), idToUpdate: currentEntryId });
+			// pass the images that we accepted, into this form's data when they save the updated entry
+			const imagesWithPrimary = myState.getImagesWithPrimary();
+			jsonData({
+				...$formData,
+				images: JSON.stringify(imagesWithPrimary.images),
+				primaryImageId: imagesWithPrimary.primaryImageId,
+				idToUpdate: currentEntryId
+			});
 		},
 		onResult({ result }: { result: any }) {
 			console.log('Action result', result);
@@ -60,10 +65,8 @@
 		//split the dimensions string into the three fields
 		const dimensions = entry?.dimensions?.split('x') || [];
 		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
-		//set the working image to the current image if there is one
-		if (entry.images[0]) {
-			updateWorkingImage({ ...entry.images[0], artistId: myState.submission?.registrations[0].artistId as number });
-		}
+		//load the working images from the current entry
+		myState.loadImagesFromEntry(entry);
 	}
 </script>
 
@@ -80,19 +83,14 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	{#if myState.workingImage?.cloudURL}
-		<div class="self-center">
-			<OptimisedImage
-				path={myState.workingImage?.cloudURL ? myState.workingImage?.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
-				alt="Current Image"
-				width={128}
-				height={128}
-				class="h-32 w-32 overflow-hidden rounded object-contain"
-			/>
+	{#if myState.workingImages && myState.workingImages.length > 0}
+		<div class="space-y-2">
+			<Label>Current Images</Label>
+			<ImageGallery images={myState.workingImages} primaryImageId={myState.primaryImageId} columns={3} />
 		</div>
 	{/if}
 
-	<ImageUploadForm buttonText={'Replace Image?'} />
+	<MultipleImageUploadForm triggerText="Upload Images" />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>

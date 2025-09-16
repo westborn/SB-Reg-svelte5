@@ -6,4 +6,5 @@
 | 003 | multipleImages - Phase 1 | Database schema changes and migration for primary images support                                                            | ✅   |
 | 004 | multipleImages - Phase 2 | Backend API changes for multiple images support                                                                             | ✅   |
 | 005 | multipleImages - Phase 3 | State management updates for multiple images                                                                                | ✅   |
+| 006 | multipleImages - Phase 4 | Core UI components for image management                                                                                     | ✅   |
 | 001 | Change Label             | For the Exhibition Confirmation form, change the label to "Any special requirement e.g. does your artwork need a flat area" | ✅   |

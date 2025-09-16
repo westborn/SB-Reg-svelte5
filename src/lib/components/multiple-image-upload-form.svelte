@@ -11,7 +11,7 @@
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import Upload from 'lucide-svelte/icons/upload';
-	import AlertCircle from 'lucide-svelte/icons/alert-circle';
+	import AlertCircle from 'lucide-svelte/icons/circle-alert';
 	import type { CurrentImage } from '$lib/components/server/registrationDB';
 
 	type Props = {

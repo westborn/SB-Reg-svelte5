@@ -3,6 +3,7 @@
 	import { OptimisedImage } from '$lib/components/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import type { Exhibit } from '$lib/components/server/registrationDB';
+	import Camera from 'lucide-svelte/icons/camera';
 
 	const {
 		exhibitNumber,
@@ -14,8 +15,9 @@
 		material,
 		price,
 		dimensions,
-		title
-	} = $props() as Exhibit;
+		title,
+		hasMultipleImages = false
+	} = $props() as Exhibit & { hasMultipleImages?: boolean };
 </script>
 
 <!-- card -->
@@ -26,7 +28,7 @@
 		</div>
 		<span class="ml-2 pt-1 text-sm font-bold">{title} - {artistName}</span>
 	</div>
-	<div>
+	<div class="relative">
 		<OptimisedImage
 			path={cloudURL ? cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
 			alt={title}
@@ -34,6 +36,11 @@
 			height={128}
 			class="h-32 w-32 overflow-hidden rounded object-contain"
 		/>
+		{#if hasMultipleImages}
+			<div class="absolute right-1 top-1 rounded-full bg-black bg-opacity-70 p-1">
+				<Camera class="h-3 w-3 text-white" />
+			</div>
+		{/if}
 	</div>
 	<div class="w-full px-3 pb-2">
 		<p class="text-base">{description}</p>
@@ -42,7 +49,7 @@
 			<p class="text-xs">{dimensions}</p>
 			<p class="text-xs">{determinePlacement(exhibitNumber, registrationYear, inOrOut)}</p>
 		</div>
-		<p class="w-full text-center text-base font-medium">{convertToDollars(parseInt(price))}</p>
+		<p class="w-full text-center text-base font-medium">{convertToDollars(parseInt(price.toString()))}</p>
 	</div>
 </Card.Root>
 <!-- card -->
