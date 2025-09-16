@@ -11,19 +11,23 @@
 	import { toast } from 'svelte-sonner';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
-	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
-	import { ImageUploadForm, OptimisedImage } from '$lib/components';
+	import { getRegisterState } from '$lib/context.svelte';
+	import { MultipleImageUploadForm, ImageGallery } from '$lib/components';
 
 	let myState = getRegisterState();
-	updateWorkingImage(null);
 
 	const form = superForm(myState.entryForm, {
 		id: `entryCreateForm`,
 		validators: zodClient(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
-			// pass the image that we accepted, into this form's data when they save the new entry
-			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage) });
+			// pass the images that we accepted, into this form's data when they save the new entry
+			const imagesWithPrimary = myState.getImagesWithPrimary();
+			jsonData({
+				...$formData,
+				images: JSON.stringify(imagesWithPrimary.images),
+				primaryImageId: imagesWithPrimary.primaryImageId
+			});
 		},
 		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
@@ -54,19 +58,14 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	{#if myState.workingImage?.cloudURL}
-		<div class="self-center">
-			<OptimisedImage
-				path={myState.workingImage?.cloudURL ? myState.workingImage?.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
-				alt="Current Image"
-				width={128}
-				height={128}
-				class="h-32 w-32 overflow-hidden rounded object-contain"
-			/>
+	{#if myState.workingImages && myState.workingImages.length > 0}
+		<div class="space-y-2">
+			<Label>Current Images</Label>
+			<ImageGallery images={myState.workingImages} primaryImageId={myState.primaryImageId} columns={3} />
 		</div>
 	{/if}
 
-	<ImageUploadForm buttonText={'Upload Image'} />
+	<MultipleImageUploadForm triggerText="Upload Images" />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>

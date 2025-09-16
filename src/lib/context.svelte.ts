@@ -98,10 +98,15 @@ export class RegisterState {
 	}
 
 	getImagesWithPrimary() {
-		return this.workingImages.map((image) => ({
+		const imagesWithPrimary = this.workingImages.map((image) => ({
 			...image,
 			isPrimary: image?.id === this.primaryImageId
 		}));
+
+		return {
+			images: imagesWithPrimary,
+			primaryImageId: this.primaryImageId
+		};
 	}
 
 	clearWorkingImages() {
