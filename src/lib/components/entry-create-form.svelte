@@ -51,9 +51,11 @@
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 	<Form.Field {form} name="title">
-		<Form.Control let:attrs>
-			<Form.Label>Title for this Exhibit</Form.Label>
-			<Input autofocus type="text" {...attrs} bind:value={$formData.title} required />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Title for this Exhibit</Form.Label>
+				<Input autofocus type="text" {...props} bind:value={$formData.title} required />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -78,22 +80,25 @@
 				<RadioGroup.Item value="Indoor" id="r2" />
 				<Label for="r2">Indoor</Label>
 			</div>
-			<RadioGroup.Input name="inOrOut" />
 		</RadioGroup.Root>
 	</Form.Field>
 
 	<Form.Field {form} name="price">
-		<Form.Control let:attrs>
-			<Form.Label>Price (in whole dollars)</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.price} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Price (in whole dollars)</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.price} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="material">
-		<Form.Control let:attrs>
-			<Form.Label>Material used in this piece</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.material} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Material used in this piece</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.material} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -103,46 +108,56 @@
 	</p>
 	<div class="grid grid-cols-3 gap-4">
 		<Form.Field {form} name="dimLength">
-			<Form.Control let:attrs>
-				<Form.Label>Length</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.dimLength} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Length</Form.Label>
+					<Input type="text" {...props} bind:value={$formData.dimLength} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="dimWidth">
-			<Form.Control let:attrs>
-				<Form.Label>Width</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.dimWidth} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Width</Form.Label>
+					<Input type="text" {...props} bind:value={$formData.dimWidth} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="dimHeight">
-			<Form.Control let:attrs>
-				<Form.Label>Height</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.dimHeight} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Height</Form.Label>
+					<Input type="text" {...props} bind:value={$formData.dimHeight} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 	</div>
 	<Form.Field {form} name="specialRequirements">
-		<Form.Control let:attrs>
-			<Form.Label>Any special requirements?</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.specialRequirements} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Any special requirements?</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.specialRequirements} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="description">
-		<Form.Control let:attrs>
-			<Form.Label>Description for the catalogue (25 words)</Form.Label>
-			<Textarea {...attrs} class="resize-none" bind:value={$formData.description as string} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Description for the catalogue (25 words)</Form.Label>
+				<Textarea {...props} class="resize-none" bind:value={$formData.description as string} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Errors errors={$errors._errors} />
+	<!-- <Form.Errors errors={$errors._errors} /> -->
 	<Form.Button disabled={$delayed}>
 		Save New Entry?
 		{#if $delayed}

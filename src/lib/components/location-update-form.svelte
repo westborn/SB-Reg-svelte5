@@ -61,8 +61,10 @@
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 	<div class="flex gap-4">
 		<Form.Field {form} name="location">
-			<Form.Control let:attrs>
-				<Input class="h-6" autofocus type="text" {...attrs} bind:value={$formData.location} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Input class="h-6" autofocus type="text" {...props} bind:value={$formData.location} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>

@@ -56,9 +56,11 @@
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 	<Form.Field {form} name="displayRequirements">
-		<Form.Control let:attrs>
-			<Form.Label>Any special requirement e.g. does your artwork need a flat area</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.displayRequirements} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Any special requirement e.g. does your artwork need a flat area</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.displayRequirements} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -78,7 +80,6 @@
 				<RadioGroup.Item value="Friday morning 7 March (until noon)" id="bi3" />
 				<Label for="bi3">Friday morning 7 March (until noon)</Label>
 			</div>
-			<RadioGroup.Input name="bumpIn" />
 		</RadioGroup.Root>
 	</Form.Field>
 
@@ -93,7 +94,6 @@
 				<RadioGroup.Item value="Monday morning 17 March (9am to noon)" id="bo2" />
 				<Label for="bo2">Monday morning 17 March (9am to noon)</Label>
 			</div>
-			<RadioGroup.Input name="bumpOut" />
 		</RadioGroup.Root>
 	</Form.Field>
 
@@ -108,35 +108,40 @@
 				<RadioGroup.Item value="No" id="c2" />
 				<Label for="c2">No</Label>
 			</div>
-			<RadioGroup.Input name="crane" />
 		</RadioGroup.Root>
 	</Form.Field>
 
 	<Form.Field {form} name="bankAccountName">
-		<Form.Control let:attrs>
-			<Form.Label>Bank Account Name</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankAccountName} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Bank Account Name</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankAccountName} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="bankBSB">
-		<Form.Control let:attrs>
-			<Form.Label>Account BSB</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankBSB} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Account BSB</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankBSB} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="bankAccount">
-		<Form.Control let:attrs>
-			<Form.Label>Account Number</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankAccount} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Account Number</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankAccount} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Errors errors={$errors._errors} />
+	<!-- <Form.Errors errors={$errors._errors} /> -->
 	<Form.Button disabled={$delayed}>
 		Save?
 		{#if $delayed}

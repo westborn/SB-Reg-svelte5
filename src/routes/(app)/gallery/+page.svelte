@@ -43,19 +43,14 @@
 		}
 	};
 
-	const years = [
-		{ value: '2025', label: '2025' },
-		{ value: '2024', label: '2024' },
-		{ value: '2023', label: '2023' },
-		{ value: '2022', label: '2022' }
-	];
+	const years = ['2026', '2025', '2024', '2023', '2022'];
 
-	let selectedYear = $state({ value: '2025', label: '2025' });
+	let selectedYear = $state('2026');
 
 	function handleSelectYear(event: any) {
 		selectedYear = { ...event };
 		const newURL = new URL(page.url);
-		newURL.searchParams?.set('year', selectedYear.value);
+		newURL.searchParams?.set('year', selectedYear);
 		console.log(newURL.toString());
 		goto(newURL);
 	}
@@ -64,19 +59,13 @@
 <section class="mx-auto mt-2">
 	<div class="flex items-center justify-center gap-3">
 		<h4 class="text-xl font-bold text-primary">Exhibit Information</h4>
-		<Select.Root onSelectedChange={handleSelectYear} selected={selectedYear}>
-			<Select.Trigger class="w-[120px]">
-				<Select.Value placeholder="Select a year" />
-			</Select.Trigger>
+		<Select.Root type="single" bind:value={selectedYear} name="entryYear">
+			<Select.Trigger class="w-[120px]">Select a year</Select.Trigger>
 			<Select.Content>
-				<Select.Group>
-					<Select.Label>Year</Select.Label>
-					{#each years as year}
-						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
-					{/each}
-				</Select.Group>
+				{#each years as year}
+					<Select.Item value={year}>{year}</Select.Item>
+				{/each}
 			</Select.Content>
-			<Select.Input name="entryYear" />
 		</Select.Root>
 	</div>
 </section>

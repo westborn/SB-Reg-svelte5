@@ -40,19 +40,14 @@
 
 	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 
-	const years = [
-		{ value: '2025', label: '2025' },
-		{ value: '2024', label: '2024' },
-		{ value: '2023', label: '2023' },
-		{ value: '2022', label: '2022' }
-	];
+	const years = ['2026', '2025', '2024', '2023', '2022'];
 
-	let selectedYear = $state({ value: '2025', label: '2025' });
+	let selectedYear = $state('2026');
 
 	function handleSelectYear(event: any) {
 		selectedYear = { ...event };
 		const newURL = new URL(page.url);
-		newURL.searchParams?.set('year', selectedYear.value);
+		newURL.searchParams?.set('year', selectedYear);
 		goto(newURL);
 	}
 
@@ -217,19 +212,13 @@
 <section class="mx-auto mt-2">
 	<div class="flex items-center justify-start gap-3">
 		<h4 class="text-xl font-bold text-primary">Year</h4>
-		<Select.Root onSelectedChange={handleSelectYear} selected={selectedYear}>
-			<Select.Trigger class="w-[120px]">
-				<Select.Value placeholder="Select a year" />
-			</Select.Trigger>
+		<Select.Root type="single" bind:value={selectedYear} name="registrationYear">
+			<Select.Trigger class="w-[120px]">Select a year</Select.Trigger>
 			<Select.Content>
-				<Select.Group>
-					<Select.Label>Registration Year</Select.Label>
-					{#each years as year}
-						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
-					{/each}
-				</Select.Group>
+				{#each years as year}
+					<Select.Item value={year}>{year}</Select.Item>
+				{/each}
 			</Select.Content>
-			<Select.Input name="registrationYear" />
 		</Select.Root>
 		<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
 	</div>
@@ -239,8 +228,10 @@
 	<div class="inline-grid w-full max-w-screen-lg gap-2 p-2">
 		<div class="flex items-center justify-between">
 			<DropdownMenu.Root>
-				<DropdownMenu.Trigger asChild let:builder>
-					<Button variant="outline" size="sm" class="ml-auto flex h-8" builders={[builder]}>Columns?</Button>
+				<DropdownMenu.Trigger>
+					{#snippet child({ props })}
+						<Button {...props} variant="outline" size="sm" class="ml-auto flex h-8">Columns?</Button>
+					{/snippet}
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					<DropdownMenu.Label>Toggle columns</DropdownMenu.Label>
@@ -315,45 +306,45 @@
 				bind:page={currentPage}
 				count={table.getRowCount()}
 				perPage={table.getState().pagination.pageSize}
-				let:pages
-				let:currentPage
 			>
-				<Pagination.Content class="gap-0.5 sm:gap-1">
-					<Pagination.Item>
-						<Pagination.PrevButton
-							class="px-2 [&>span]:sr-only"
-							disabled={!table.getCanPreviousPage()}
-							on:click={() => table.previousPage()}
-						/>
-					</Pagination.Item>
-					{#each pages as page (page.key)}
-						{#if page.type === 'ellipsis'}
-							<Pagination.Item>
-								<Pagination.Ellipsis class="w-4 sm:w-9" />
-							</Pagination.Item>
-						{:else}
-							<Pagination.Item>
-								<Pagination.Link
-									size="default"
-									class="min-w-3 max-w-14 px-3 sm:px-4"
-									{page}
-									isActive={currentPage === page.value}
-									onclick={() => table.setPageIndex(page.value - 1)}
-								>
-									{page.value}
-								</Pagination.Link>
-							</Pagination.Item>
-						{/if}
-					{/each}
-					<Pagination.Item>
-						<Pagination.NextButton
-							class="px-2 [&>span]:sr-only"
-							disabled={!table.getCanNextPage()}
-							on:click={() => table.nextPage()}
-						/>
-					</Pagination.Item>
-					<Pagination.Item></Pagination.Item>
-				</Pagination.Content>
+				{#snippet children({ pages, currentPage })}
+					<Pagination.Content class="gap-0.5 sm:gap-1">
+						<Pagination.Item>
+							<Pagination.PrevButton
+								class="px-2 [&>span]:sr-only"
+								disabled={!table.getCanPreviousPage()}
+								onclick={() => table.previousPage()}
+							/>
+						</Pagination.Item>
+						{#each pages as page (page.key)}
+							{#if page.type === 'ellipsis'}
+								<Pagination.Item>
+									<Pagination.Ellipsis class="w-4 sm:w-9" />
+								</Pagination.Item>
+							{:else}
+								<Pagination.Item>
+									<Pagination.Link
+										size="default"
+										class="min-w-3 max-w-14 px-3 sm:px-4"
+										{page}
+										isActive={currentPage === page.value}
+										onclick={() => table.setPageIndex(page.value - 1)}
+									>
+										{page.value}
+									</Pagination.Link>
+								</Pagination.Item>
+							{/if}
+						{/each}
+						<Pagination.Item>
+							<Pagination.NextButton
+								class="px-2 [&>span]:sr-only"
+								disabled={!table.getCanNextPage()}
+								onclick={() => table.nextPage()}
+							/>
+						</Pagination.Item>
+						<Pagination.Item></Pagination.Item>
+					</Pagination.Content>
+				{/snippet}
 			</Pagination.Root>
 
 			<!-- <div class="flex items-center justify-center gap-2 text-sm">
