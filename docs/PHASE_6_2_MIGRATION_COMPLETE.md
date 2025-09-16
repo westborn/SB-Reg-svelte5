@@ -12,7 +12,7 @@ The data migration successfully created primary image records for all existing e
 ### Migration Statistics
 
 - **Total entries in database**: 353
-- **Entries with images**: 349  
+- **Entries with images**: 349
 - **Entries without images**: 4
 - **Primary image records created**: 349
 - **Success rate**: 100% (349/349)
@@ -21,6 +21,7 @@ The data migration successfully created primary image records for all existing e
 ## Migration Logic
 
 For each entry with images:
+
 1. Selected the **first image by creation date** as the primary image
 2. Created a record in the `primary_image` table linking the entry to its primary image
 3. Validated that the image belongs to the correct entry
@@ -33,7 +34,7 @@ All validation tests passed:
 ✅ **Test 1**: All entries with images have primary image records  
 ✅ **Test 2**: All primary images belong to their respective entries  
 ✅ **Test 3**: No entries have multiple primary image records  
-✅ **Test 4**: All primary images have valid cloud storage references  
+✅ **Test 4**: All primary images have valid cloud storage references
 
 ## Database State After Migration
 
@@ -46,10 +47,12 @@ All validation tests passed:
 ## Files Created
 
 ### Migration Scripts
+
 - `scripts/data-migration-primary-images.ts` - Main migration script with dry-run capability
 - `scripts/validate-primary-images.ts` - Comprehensive validation script
 
 ### Migration Features
+
 - **Dry run mode**: Preview changes before execution
 - **Comprehensive logging**: Detailed progress reporting
 - **Error handling**: Graceful failure handling with detailed error reporting
@@ -59,16 +62,19 @@ All validation tests passed:
 ## How to Use the Scripts
 
 ### Run Migration (Dry Run)
+
 ```bash
 npx tsx scripts/data-migration-primary-images.ts
 ```
 
 ### Run Migration (Execute)
+
 ```bash
 npx tsx scripts/data-migration-primary-images.ts --execute
 ```
 
 ### Validate Data Integrity
+
 ```bash
 npx tsx scripts/validate-primary-images.ts
 ```

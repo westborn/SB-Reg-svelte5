@@ -1,6 +1,6 @@
 /**
  * Data Migration Script: Create Primary Image Records
- * 
+ *
  * This script creates primary_image records for all existing entries that have images.
  * It sets the first image (by creation date) as the primary image for each entry.
  */
@@ -61,7 +61,7 @@ async function migratePrimaryImages() {
 				if (entry.images.length > 0) {
 					// Set the first image (by creation date) as the primary image
 					const primaryImage = entry.images[0];
-					
+
 					await prisma.primaryImageTable.create({
 						data: {
 							entryId: entry.id,
@@ -70,7 +70,9 @@ async function migratePrimaryImages() {
 					});
 
 					migrationCount++;
-					console.log(`✅ Entry ${entry.id} ("${entry.title}"): Set primary image to "${primaryImage.originalFileName}" (ID: ${primaryImage.id})`);
+					console.log(
+						`✅ Entry ${entry.id} ("${entry.title}"): Set primary image to "${primaryImage.originalFileName}" (ID: ${primaryImage.id})`
+					);
 				}
 			} catch (error) {
 				const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -83,7 +85,7 @@ async function migratePrimaryImages() {
 		console.log('\n📈 Migration Summary:');
 		console.log(`✅ Successfully migrated: ${migrationCount} entries`);
 		console.log(`❌ Failed migrations: ${errors.length} entries`);
-		
+
 		if (errors.length > 0) {
 			console.log('\n❌ Migration Errors:');
 			errors.forEach(({ entryId, error }) => {
@@ -94,7 +96,6 @@ async function migratePrimaryImages() {
 		// Step 4: Validate data integrity
 		console.log('\n🔍 Validating data integrity...');
 		await validateDataIntegrity();
-
 	} catch (error) {
 		console.error('💥 Migration failed with error:', error);
 		throw error;
@@ -145,15 +146,19 @@ async function validateDataIntegrity() {
 		});
 
 		const invalidPrimaryImages = primaryImagesWithDetails.filter(
-			primaryImage => primaryImage.image.entryId !== primaryImage.entryId
+			(primaryImage) => primaryImage.image.entryId !== primaryImage.entryId
 		);
 
 		if (invalidPrimaryImages.length === 0) {
 			console.log('✅ Data integrity check passed: All primary images belong to their respective entries');
 		} else {
-			console.log(`❌ Data integrity check failed: ${invalidPrimaryImages.length} primary images point to images that don't belong to their entry`);
-			invalidPrimaryImages.forEach(primaryImage => {
-				console.log(`   Primary image ${primaryImage.id}: Entry ${primaryImage.entryId} -> Image ${primaryImage.imageId} (belongs to entry ${primaryImage.image.entryId})`);
+			console.log(
+				`❌ Data integrity check failed: ${invalidPrimaryImages.length} primary images point to images that don't belong to their entry`
+			);
+			invalidPrimaryImages.forEach((primaryImage) => {
+				console.log(
+					`   Primary image ${primaryImage.id}: Entry ${primaryImage.entryId} -> Image ${primaryImage.imageId} (belongs to entry ${primaryImage.image.entryId})`
+				);
 			});
 		}
 
@@ -162,7 +167,6 @@ async function validateDataIntegrity() {
 		const totalPrimaryImages = await prisma.primaryImageTable.count();
 		console.log(`📊 Total primary image records: ${totalPrimaryImages}`);
 		console.log('✅ Data integrity check completed (orphan check skipped due to cascade constraints)');
-
 	} catch (error) {
 		console.error('💥 Data integrity validation failed:', error);
 	}
@@ -195,16 +199,17 @@ async function dryRun() {
 		});
 
 		console.log(`📊 Found ${entriesWithImages.length} entries that need primary image records:`);
-		
-		entriesWithImages.forEach(entry => {
+
+		entriesWithImages.forEach((entry) => {
 			if (entry.images.length > 0) {
 				const primaryImage = entry.images[0];
-				console.log(`   Entry ${entry.id} ("${entry.title}"): Would set primary to "${primaryImage.originalFileName}" (${entry.images.length} total images)`);
+				console.log(
+					`   Entry ${entry.id} ("${entry.title}"): Would set primary to "${primaryImage.originalFileName}" (${entry.images.length} total images)`
+				);
 			}
 		});
 
 		console.log('\n💡 Run with --execute flag to perform the actual migration');
-
 	} catch (error) {
 		console.error('💥 Dry run failed:', error);
 	} finally {

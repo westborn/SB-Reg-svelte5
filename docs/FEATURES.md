@@ -9,5 +9,5 @@
 | 006 | multipleImages - Phase 4   | Core UI components for image management                                                                                     | ✅   |
 | 007 | multipleImages - Phase 5   | Integration with entry forms                                                                                                | ✅   |
 | 008 | multipleImages - Phase 6.1 | Database migration script creation and execution                                                                            | ✅   |
-| 009 | multipleImages - Phase 6.2 | Data migration: Create primary image records for all existing entries with images                                          | ✅   |
+| 009 | multipleImages - Phase 6.2 | Data migration: Create primary image records for all existing entries with images                                           | ✅   |
 | 001 | Change Label               | For the Exhibition Confirmation form, change the label to "Any special requirement e.g. does your artwork need a flat area" | ✅   |

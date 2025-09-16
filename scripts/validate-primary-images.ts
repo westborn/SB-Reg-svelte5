@@ -1,6 +1,6 @@
 /**
  * Validation Script: Check Primary Image Data Integrity
- * 
+ *
  * This script validates that the primary image migration was successful
  * and that all data integrity constraints are maintained.
  */
@@ -53,9 +53,13 @@ async function validatePrimaryImageIntegrity() {
 		if (entriesWithImagesMissingPrimary.length === 0) {
 			console.log('✅ Test 1 PASSED: All entries with images have primary image records');
 		} else {
-			console.log(`❌ Test 1 FAILED: ${entriesWithImagesMissingPrimary.length} entries with images are missing primary image records:`);
-			entriesWithImagesMissingPrimary.forEach(entry => {
-				console.log(`   Entry ${entry.id} ("${entry.title}") has ${entry._count.images} images but no primary image record`);
+			console.log(
+				`❌ Test 1 FAILED: ${entriesWithImagesMissingPrimary.length} entries with images are missing primary image records:`
+			);
+			entriesWithImagesMissingPrimary.forEach((entry) => {
+				console.log(
+					`   Entry ${entry.id} ("${entry.title}") has ${entry._count.images} images but no primary image record`
+				);
 			});
 		}
 
@@ -74,23 +78,27 @@ async function validatePrimaryImageIntegrity() {
 		});
 
 		const invalidRelations = allPrimaryImages.filter(
-			primaryImage => primaryImage.image.entryId !== primaryImage.entryId
+			(primaryImage) => primaryImage.image.entryId !== primaryImage.entryId
 		);
 
 		if (invalidRelations.length === 0) {
 			console.log('✅ Test 2 PASSED: All primary images belong to their respective entries');
 		} else {
-			console.log(`❌ Test 2 FAILED: ${invalidRelations.length} primary image records point to images that don't belong to their entry:`);
-			invalidRelations.forEach(relation => {
-				console.log(`   Primary image ${relation.id}: Entry ${relation.entryId} -> Image ${relation.imageId} (belongs to entry ${relation.image.entryId})`);
+			console.log(
+				`❌ Test 2 FAILED: ${invalidRelations.length} primary image records point to images that don't belong to their entry:`
+			);
+			invalidRelations.forEach((relation) => {
+				console.log(
+					`   Primary image ${relation.id}: Entry ${relation.entryId} -> Image ${relation.imageId} (belongs to entry ${relation.image.entryId})`
+				);
 			});
 		}
 
 		// Test 3: Check that no entries have multiple primary image records (should be impossible due to unique constraint)
 		const duplicatePrimaryImages = await prisma.$queryRaw<Array<{ entry_id: number; count: number }>>`
-			SELECT entry_id, COUNT(*) as count 
-			FROM primary_image 
-			GROUP BY entry_id 
+			SELECT entry_id, COUNT(*) as count
+			FROM primary_image
+			GROUP BY entry_id
 			HAVING COUNT(*) > 1
 		`;
 
@@ -98,7 +106,7 @@ async function validatePrimaryImageIntegrity() {
 			console.log('✅ Test 3 PASSED: No entries have multiple primary image records');
 		} else {
 			console.log(`❌ Test 3 FAILED: ${duplicatePrimaryImages.length} entries have multiple primary image records:`);
-			duplicatePrimaryImages.forEach(duplicate => {
+			duplicatePrimaryImages.forEach((duplicate) => {
 				console.log(`   Entry ${duplicate.entry_id} has ${duplicate.count} primary image records`);
 			});
 		}
@@ -125,21 +133,25 @@ async function validatePrimaryImageIntegrity() {
 		});
 
 		const inaccessiblePrimaryImages = primaryImagesWithImageData.filter(
-			primaryImage => !primaryImage.image || !primaryImage.image.cloudId || !primaryImage.image.cloudURL
+			(primaryImage) => !primaryImage.image || !primaryImage.image.cloudId || !primaryImage.image.cloudURL
 		);
 
 		if (inaccessiblePrimaryImages.length === 0) {
 			console.log('✅ Test 4 PASSED: All primary images have valid cloud storage references');
 		} else {
-			console.log(`❌ Test 4 FAILED: ${inaccessiblePrimaryImages.length} primary images have missing or invalid cloud storage references:`);
-			inaccessiblePrimaryImages.forEach(primaryImage => {
-				console.log(`   Primary image ${primaryImage.id} for entry ${primaryImage.entry.id} ("${primaryImage.entry.title}") has invalid cloud data`);
+			console.log(
+				`❌ Test 4 FAILED: ${inaccessiblePrimaryImages.length} primary images have missing or invalid cloud storage references:`
+			);
+			inaccessiblePrimaryImages.forEach((primaryImage) => {
+				console.log(
+					`   Primary image ${primaryImage.id} for entry ${primaryImage.entry.id} ("${primaryImage.entry.title}") has invalid cloud data`
+				);
 			});
 		}
 
 		// Summary
 		console.log('\n📋 Validation Summary:');
-		const allTestsPassed = 
+		const allTestsPassed =
 			entriesWithImagesMissingPrimary.length === 0 &&
 			invalidRelations.length === 0 &&
 			duplicatePrimaryImages.length === 0 &&
@@ -152,7 +164,6 @@ async function validatePrimaryImageIntegrity() {
 			console.log('⚠️  SOME TESTS FAILED: Primary image data integrity issues found');
 			console.log('   Please review the failed tests above and run the migration script if needed');
 		}
-
 	} catch (error) {
 		console.error('💥 Validation failed with error:', error);
 		throw error;
