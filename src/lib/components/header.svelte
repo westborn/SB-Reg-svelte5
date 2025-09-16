@@ -53,11 +53,11 @@
 						<div class="mt-10 flex flex-col items-start justify-between text-primary-300">
 							{#each navItems as { label, href }, i}
 								{#if page.url.pathname.startsWith(href)}
-									<Sheet.Trigger asChild>
+									<Sheet.Trigger>
 										<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
 									</Sheet.Trigger>
 								{:else}
-									<Sheet.Trigger asChild>
+									<Sheet.Trigger>
 										<Button
 											class="font-semibold text-primary-300"
 											{href}
@@ -80,21 +80,23 @@
 
 		<div class="flex items-center">
 			<Button href={'/logout'} variant="ghost">Logout</Button>
-			<Tooltip.Root openDelay={0}>
-				<Tooltip.Trigger>
-					<Avatar.Root>
-						<Avatar.Fallback class="uppercase">
-							{avatar}
-						</Avatar.Fallback>
-					</Avatar.Root>
-				</Tooltip.Trigger>
-				<Tooltip.Content>
-					<p>{loggedInEmail}</p>
-					{#if user.isSuperAdmin && page.data.user.proxyEmail}
-						<p><span class="text-xs text-primary">as: {page.data.user.proxyEmail}</span></p>
-					{/if}
-				</Tooltip.Content>
-			</Tooltip.Root>
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<Avatar.Root>
+							<Avatar.Fallback class="uppercase">
+								{avatar}
+							</Avatar.Fallback>
+						</Avatar.Root>
+					</Tooltip.Trigger>
+					<Tooltip.Content>
+						<p>{loggedInEmail}</p>
+						{#if user.isSuperAdmin && page.data.user.proxyEmail}
+							<p><span class="text-xs text-primary">as: {page.data.user.proxyEmail}</span></p>
+						{/if}
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 			<!-- TODO - do we need a theme toggle? -->
 			<!-- <ThemeToggle></ThemeToggle> -->
 		</div>
