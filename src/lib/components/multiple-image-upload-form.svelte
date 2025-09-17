@@ -130,7 +130,7 @@
 			const result = await response.json();
 
 			// Replace in working images
-			const imageIndex = images.findIndex((img) => img.id === imageId);
+			const imageIndex = images.findIndex((img) => img && img.id === imageId);
 			if (imageIndex >= 0) {
 				myState.workingImages[imageIndex] = result.image;
 
@@ -163,8 +163,8 @@
 
 			// If this was the primary image, set new primary
 			if (primaryImageId === imageId && images.length > 0) {
-				const remainingImages = images.filter((img) => img.id !== imageId);
-				if (remainingImages.length > 0) {
+				const remainingImages = images.filter((img) => img && img.id !== imageId);
+				if (remainingImages.length > 0 && remainingImages[0]) {
 					myState.setPrimaryImage(remainingImages[0].id);
 				}
 			}
@@ -194,9 +194,9 @@
 	};
 </script>
 
-<Dialog.Root {open} onOpenChange={handleOpenChange}>
-	<Dialog.Trigger asChild let:builder>
-		<Button builders={[builder]} variant="outline" class="w-full">
+<Dialog.Root onOpenChange={handleOpenChange}>
+	<Dialog.Trigger class="w-full">
+		<Button variant="default">
 			<Upload class="mr-2 h-4 w-4" />
 			{triggerText}
 		</Button>
@@ -230,7 +230,7 @@
 
 			<!-- Image Grid -->
 			<div class="grid grid-cols-3 gap-4">
-				{#each imageSlots as slot, index (slot.index)}
+				{#each imageSlots() as slot, index (slot.index)}
 					<ImageSlot
 						image={slot.image}
 						isPrimary={slot.image?.id === primaryImageId}
