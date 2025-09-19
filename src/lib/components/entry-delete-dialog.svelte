@@ -37,10 +37,8 @@
 </script>
 
 <AlertDialog.Root bind:open={myState.entryDeleteDialogOpen}>
-	<AlertDialog.Trigger asChild let:builder>
-		<Button builders={[builder]} variant="outline" size="sm" class="bg-red-700 hover:bg-red-500"
-			><span class="text-xs text-white"> Delete </span></Button
-		>
+	<AlertDialog.Trigger>
+		<Button variant="destructive">Delete</Button>
 	</AlertDialog.Trigger>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
