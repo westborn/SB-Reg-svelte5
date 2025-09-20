@@ -9,23 +9,14 @@
 	import { toast } from 'svelte-sonner';
 	import { cn } from '$lib/utils';
 
-	type Props = {
-		currentEntryId: number;
-	};
-
-	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
 
-	function handleOpenDialog() {
-		myState.openEntryDeleteDialog(currentEntryId);
-	}
-
-	// Use the entry ID from global state to ensure we're deleting the correct entry
-	let deletingEntryId = $derived(myState.currentEditingEntryId ?? currentEntryId);
+	// Use the entry ID from global state
+	let deletingEntryId = $derived(myState.currentEditingEntryId);
 
 	const form = superForm(myState.entryDeleteForm, {
 		validators: zodClient(entryDeleteSchemaUI),
-		id: `deleteEntryForm-${currentEntryId}`,
+		id: `deleteEntryForm`,
 		onResult({ result }: { result: any }) {
 			console.log('Action result', result);
 			if (result.type != 'success') {
@@ -43,9 +34,6 @@
 </script>
 
 <AlertDialog.Root bind:open={myState.entryDeleteDialogOpen}>
-	<AlertDialog.Trigger>
-		<Button variant="destructive" onclick={handleOpenDialog}>Delete</Button>
-	</AlertDialog.Trigger>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title>Delete Entry</AlertDialog.Title>
