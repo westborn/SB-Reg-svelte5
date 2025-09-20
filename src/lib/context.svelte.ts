@@ -36,6 +36,7 @@ export class RegisterState {
 	entryDeleteDialogOpen = $state(false);
 	imageUploadDialogOpen = $state(false);
 	stepsAllowed = $state(false);
+	currentEditingEntryId = $state() as number | null;
 	artistForm = $state() as SuperValidated<Infer<typeof artistSchemaUI>>;
 	entryForm = $state() as SuperValidated<Infer<typeof entrySchemaUI>>;
 	entryDeleteForm = $state() as SuperValidated<Infer<typeof entryDeleteSchemaUI>>;
@@ -127,6 +128,20 @@ export class RegisterState {
 		} else {
 			this.clearWorkingImages();
 		}
+	}
+
+	openEntryUpdateDialog(entryId: number) {
+		this.currentEditingEntryId = entryId;
+		this.entryUpdateDialogOpen = true;
+		const entry = this.submission?.registrations[0].entries.find((entry) => entry.id === entryId);
+		if (entry) {
+			this.loadImagesFromEntry(entry);
+		}
+	}
+
+	openEntryDeleteDialog(entryId: number) {
+		this.currentEditingEntryId = entryId;
+		this.entryDeleteDialogOpen = true;
 	}
 }
 export type RegisterStateType = InstanceType<typeof RegisterState>;

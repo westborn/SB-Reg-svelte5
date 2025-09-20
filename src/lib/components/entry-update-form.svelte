@@ -21,6 +21,9 @@
 	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
 
+	// Use the entry ID from global state to ensure we're editing the correct entry
+	let editingEntryId = $derived(myState.currentEditingEntryId ?? currentEntryId);
+
 	const form = superForm(myState.entryForm, {
 		id: `entryUpdateForm`,
 		validators: zodClient(entrySchemaUI),
@@ -32,7 +35,7 @@
 				...$formData,
 				images: JSON.stringify(imagesWithPrimary.images),
 				primaryImageId: imagesWithPrimary.primaryImageId,
-				idToUpdate: currentEntryId
+				idToUpdate: editingEntryId
 			});
 		},
 		onResult({ result }: { result: any }) {
@@ -51,22 +54,25 @@
 	const { form: formData, enhance, delayed, errors } = form;
 
 	// get the form field values from the submission object using the id that was passed in
-	const entry = myState?.submission?.registrations[0].entries.find((entry) => entry.id === currentEntryId);
-	if (entry) {
-		({
-			id: $formData.id,
-			inOrOut: $formData.inOrOut,
-			description: $formData.description,
-			material: $formData.material,
-			specialRequirements: $formData.specialRequirements,
-			title: $formData.title
-		} = entry);
-		$formData.price = entry.price ? entry.price / 100 : 0;
-		//split the dimensions string into the three fields
-		const dimensions = entry?.dimensions?.split('x') || [];
-		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
-		// Image loading is now handled in the EntryUpdateDialog component
-	}
+	let entry = $derived(myState?.submission?.registrations[0].entries.find((entry) => entry.id === editingEntryId));
+
+	// Initialize form data when entry changes
+	$effect(() => {
+		if (entry) {
+			({
+				id: $formData.id,
+				inOrOut: $formData.inOrOut,
+				description: $formData.description,
+				material: $formData.material,
+				specialRequirements: $formData.specialRequirements,
+				title: $formData.title
+			} = entry);
+			$formData.price = entry.price ? entry.price / 100 : 0;
+			//split the dimensions string into the three fields
+			const dimensions = entry?.dimensions?.split('x') || [];
+			[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
+		}
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->

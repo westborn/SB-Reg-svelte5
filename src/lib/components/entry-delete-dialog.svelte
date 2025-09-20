@@ -16,6 +16,13 @@
 	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
 
+	function handleOpenDialog() {
+		myState.openEntryDeleteDialog(currentEntryId);
+	}
+
+	// Use the entry ID from global state to ensure we're deleting the correct entry
+	let deletingEntryId = $derived(myState.currentEditingEntryId ?? currentEntryId);
+
 	const form = superForm(myState.entryDeleteForm, {
 		validators: zodClient(entryDeleteSchemaUI),
 		id: `deletePostForm-${currentEntryId}`,
@@ -38,7 +45,7 @@
 
 <AlertDialog.Root bind:open={myState.entryDeleteDialogOpen}>
 	<AlertDialog.Trigger>
-		<Button variant="destructive">Delete</Button>
+		<Button variant="destructive" onclick={handleOpenDialog}>Delete</Button>
 	</AlertDialog.Trigger>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
@@ -46,7 +53,7 @@
 			<AlertDialog.Description>Are you sure you want to delete this entry?</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<form method="POST" use:enhance action="?/entryDelete&id={currentEntryId}">
+			<form method="POST" use:enhance action="?/entryDelete&id={deletingEntryId}">
 				<Button class={cn(buttonVariants({ variant: 'destructive' }), 'bg-red-700 hover:bg-red-500')} type="submit"
 					>Yes, delete.</Button
 				>

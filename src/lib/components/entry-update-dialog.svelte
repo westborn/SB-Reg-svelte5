@@ -12,19 +12,13 @@
 	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
 
-	// Load entry images when dialog opens
-	$effect(() => {
-		if (myState.entryUpdateDialogOpen) {
-			const entry = myState?.submission?.registrations[0].entries.find((entry) => entry.id === currentEntryId);
-			if (entry) {
-				myState.loadImagesFromEntry(entry);
-			}
-		}
-	});
+	function handleOpenDialog() {
+		myState.openEntryUpdateDialog(currentEntryId);
+	}
 </script>
 
 <Dialog.Root bind:open={myState.entryUpdateDialogOpen}>
-	<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'sm' })}
+	<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'sm' })} onclick={handleOpenDialog}
 		><span class="text-xs"> Edit </span></Dialog.Trigger
 	>
 	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
@@ -33,7 +27,7 @@
 			<Dialog.Description>Make changes to your entry.<br />Click save when you're done.</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<EntryUpdateForm {currentEntryId} />
+			<EntryUpdateForm currentEntryId={myState.currentEditingEntryId ?? currentEntryId} />
 		</div>
 	</Dialog.Content>
 </Dialog.Root>
