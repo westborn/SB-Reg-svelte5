@@ -11,6 +11,7 @@ export { default as EntryCard } from './entry-card.svelte';
 export { default as EntryCreateDialog } from './entry-create-dialog.svelte';
 export { default as EntryCreateForm } from './entry-create-form.svelte';
 export { default as EntryDeleteDialog } from './entry-delete-dialog.svelte';
+export { default as EntryUpdateButton } from './entry-update-button.svelte';
 export { default as EntryUpdateDialog } from './entry-update-dialog.svelte';
 export { default as EntryUpdateForm } from './entry-update-form.svelte';
 export { default as Header } from './header.svelte';

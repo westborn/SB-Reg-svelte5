@@ -2,7 +2,7 @@
 	import * as Accordion from '$lib/components/ui/accordion/index.js';
 	import { Badge } from '$lib/components/ui/badge';
 	import { getRegisterState } from '$lib/context.svelte';
-	import { EntryUpdateDialog, EntryDeleteDialog, EntryCard } from '$lib/components';
+	import { EntryUpdateButton, EntryDeleteDialog, EntryCard } from '$lib/components';
 	import Images from 'lucide-svelte/icons/images';
 
 	let myState = getRegisterState();
@@ -29,7 +29,7 @@
 			<Accordion.Content>
 				<EntryCard {entryItem} variant="accordion" showActions={showButtons}>
 					{#snippet children()}
-						<EntryUpdateDialog {currentEntryId} />
+						<EntryUpdateButton {currentEntryId} />
 						<EntryDeleteDialog {currentEntryId} />
 					{/snippet}
 				</EntryCard>

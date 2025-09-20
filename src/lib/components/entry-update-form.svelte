@@ -25,7 +25,7 @@
 	let editingEntryId = $derived(myState.currentEditingEntryId ?? currentEntryId);
 
 	const form = superForm(myState.entryForm, {
-		id: `entryUpdateForm`,
+		id: `entryUpdateForm-${currentEntryId}`,
 		validators: zodClient(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
@@ -80,7 +80,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm">
+<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm-{currentEntryId}">
 	<!-- stop the form from submitting on enter key press -->
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
