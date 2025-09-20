@@ -162,18 +162,18 @@
 
 						<!-- Hover actions -->
 						<div
-							class="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+							class="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
 						>
 							{#if image.id !== primaryImageId}
-								<Button size="sm" variant="secondary" onclick={() => handleSetPrimary(image.id)}>
-									<Star class="mr-1 h-4 w-4" />
+								<Button size="xs" variant="secondary" onclick={() => handleSetPrimary(image.id)}>
+									<Star class="mr-1 h-3 w-3" />
 									Set Primary
 								</Button>
 							{/if}
 
 							{#if images.length > MIN_IMAGES_PER_ENTRY}
-								<Button size="sm" variant="destructive" onclick={() => handleRemove(image.id)}>
-									<X class="mr-1 h-4 w-4" />
+								<Button size="xs" variant="destructive" onclick={() => handleRemove(image.id)}>
+									<X class="mr-1 h-3 w-3" />
 									Remove
 								</Button>
 							{/if}
