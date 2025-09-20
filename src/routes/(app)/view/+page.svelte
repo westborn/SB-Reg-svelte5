@@ -1,9 +1,7 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card/index.js';
-
 	import { REGISTRATIONS_OPEN } from '$lib/constants';
 	import { getRegisterState, updateSubmission } from '$lib/context.svelte.js';
-	import { OptimisedImage } from '$lib/components';
+	import { EntryCard } from '$lib/components';
 	import { convertToDollars } from '$lib/utils.js';
 
 	let { data } = $props();
@@ -43,32 +41,7 @@
 			</p>
 
 			{#each myState.currentEntries as entryItem, entryKey}
-				<Card.Root class="mb-4">
-					<Card.Title class="pl-4 pt-4 capitalize">{entryItem.title}</Card.Title>
-					<Card.Content class="p-0 pl-4 text-sm">
-						<p class="text-xs">({entryItem.inOrOut})</p>
-						<p>{entryItem.description}</p>
-						<div class="grid grid-cols-2">
-							<div class="flex items-center justify-around py-2">
-								<OptimisedImage
-									path={entryItem?.images?.[0]?.cloudURL
-										? entryItem?.images?.[0]?.cloudURL
-										: '/dummy_160x160_ffffff_cccccc.png'}
-									alt="Current Image"
-									width={160}
-									height={160}
-									class="h-40 w-40 overflow-hidden rounded object-contain"
-								/>
-							</div>
-							<div class="flex flex-col">
-								<p class="mt-3 text-lg">{convertToDollars(entryItem.price)}</p>
-								<p>{entryItem.material}</p>
-								<p>{entryItem?.specialRequirements}</p>
-								<p>({entryItem.dimensions})</p>
-							</div>
-						</div>
-					</Card.Content>
-				</Card.Root>
+				<EntryCard {entryItem} />
 			{/each}
 		{/if}
 	{:else if REGISTRATIONS_OPEN && !myState.artistExists}
