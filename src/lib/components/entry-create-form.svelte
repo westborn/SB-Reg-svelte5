@@ -60,14 +60,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	{#if myState.workingImages && myState.workingImages.length > 0}
-		<div class="space-y-2">
-			<Label>Current Images</Label>
-			<ImageGallery images={myState.workingImages} primaryImageId={myState.primaryImageId} columns={3} />
-		</div>
-	{/if}
-
-	<MultipleImageUploadForm triggerText="Upload Images" />
+	<MultipleImageUploadForm />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>

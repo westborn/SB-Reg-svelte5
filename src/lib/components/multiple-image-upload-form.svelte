@@ -1,39 +1,19 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
-	import { Input } from '$lib/components/ui/input';
 	import { Badge } from '$lib/components/ui/badge';
-	import { ImageSlot } from '$lib/components';
 	import { getRegisterState } from '$lib/context.svelte';
 	import { MAX_IMAGES_UI_LIMIT, MIN_IMAGES_PER_ENTRY } from '$lib/constants';
-	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-	import { page } from '$app/stores';
 	import Upload from 'lucide-svelte/icons/upload';
 	import AlertCircle from 'lucide-svelte/icons/circle-alert';
+	import Star from 'lucide-svelte/icons/star';
+	import X from 'lucide-svelte/icons/x';
 	import type { CurrentImage } from '$lib/components/server/registrationDB';
-
-	type Props = {
-		open?: boolean;
-		onOpenChange?: (open: boolean) => void;
-		triggerText?: string;
-		title?: string;
-		description?: string;
-	};
-
-	let {
-		open = $bindable(false),
-		onOpenChange,
-		triggerText = 'Upload Images',
-		title = 'Upload Images',
-		description = `Upload up to ${MAX_IMAGES_UI_LIMIT} images for your entry`
-	}: Props = $props();
 
 	let myState = getRegisterState();
 	let fileInputRef: HTMLInputElement | undefined = $state();
-	let uploadingIndex: number | null = $state(null);
-	let replacingImageId: number | null = $state(null);
+	let isUploading = $state(false);
 
 	// Reactive state for images display
 	const images = $derived(myState.workingImages || []);
@@ -41,59 +21,51 @@
 	const canAddMore = $derived(images.length < MAX_IMAGES_UI_LIMIT);
 	const hasMinImages = $derived(images.length >= MIN_IMAGES_PER_ENTRY);
 
-	// Create array of 3 slots for UI
-	const imageSlots = $derived(() => {
-		const slots: Array<{ image: CurrentImage | null; index: number }> = [];
-		for (let i = 0; i < MAX_IMAGES_UI_LIMIT; i++) {
-			slots.push({
-				image: images[i] || null,
-				index: i
-			});
-		}
-		return slots;
-	});
+	const handleAddImage = () => {
+		fileInputRef?.click();
+	};
 
 	const handleFileSelect = (event: Event) => {
 		const target = event.target as HTMLInputElement;
-		const file = target.files?.[0];
-		if (!file) return;
+		const selectedFile = target.files?.[0];
+		if (!selectedFile) return;
 
-		if (replacingImageId) {
-			// Replace existing image
-			handleImageReplace(file, replacingImageId);
-		} else {
-			// Add new image
-			handleImageUpload(file);
-		}
+		handleImageUpload(selectedFile);
 
 		// Clear the input
 		target.value = '';
-		replacingImageId = null;
 	};
 
-	const handleImageUpload = async (file: File) => {
+	const handleImageUpload = async (selectedFile: File) => {
 		if (!canAddMore) {
 			toast.error(`Maximum ${MAX_IMAGES_UI_LIMIT} images allowed`);
 			return;
 		}
 
-		const newIndex = images.length;
-		uploadingIndex = newIndex;
+		isUploading = true;
 
 		try {
+			// Create FormData for the API call
 			const formData = new FormData();
-			formData.append('file', file);
+			formData.append('file', selectedFile);
 
+			// Call the image upload API
 			const response = await fetch('/api/image-upload', {
 				method: 'POST',
 				body: formData
 			});
 
 			if (!response.ok) {
-				throw new Error('Upload failed');
+				const errorText = await response.text();
+				throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorText}`);
 			}
 
+			// Parse the response
 			const result = await response.json();
+
+			if (!result.success || !result.image) {
+				throw new Error('No image data received from server');
+			}
 
 			// Add to working images
 			myState.addWorkingImage(result.image);
@@ -108,50 +80,9 @@
 			console.error('Upload error:', error);
 			toast.error('Failed to upload image');
 		} finally {
-			uploadingIndex = null;
+			isUploading = false;
 		}
 	};
-
-	const handleImageReplace = async (file: File, imageId: number) => {
-		try {
-			const formData = new FormData();
-			formData.append('file', file);
-			formData.append('replaceImageId', imageId.toString());
-
-			const response = await fetch('/api/image-upload', {
-				method: 'POST',
-				body: formData
-			});
-
-			if (!response.ok) {
-				throw new Error('Replace failed');
-			}
-
-			const result = await response.json();
-
-			// Replace in working images
-			const imageIndex = images.findIndex((img) => img && img.id === imageId);
-			if (imageIndex >= 0) {
-				myState.workingImages[imageIndex] = result.image;
-
-				// Update primary if this was the primary image
-				if (primaryImageId === imageId) {
-					myState.setPrimaryImage(result.image.id);
-				}
-			}
-
-			toast.success('Image replaced successfully');
-		} catch (error) {
-			console.error('Replace error:', error);
-			toast.error('Failed to replace image');
-		}
-	};
-
-	const handleUpload = () => {
-		replacingImageId = null;
-		fileInputRef?.click();
-	};
-
 	const handleRemove = async (imageId: number) => {
 		if (images.length <= MIN_IMAGES_PER_ENTRY) {
 			toast.error(`Minimum ${MIN_IMAGES_PER_ENTRY} image required`);
@@ -159,10 +90,11 @@
 		}
 
 		try {
+			// Remove from local state
 			myState.removeWorkingImage(imageId);
 
 			// If this was the primary image, set new primary
-			if (primaryImageId === imageId && images.length > 0) {
+			if (primaryImageId === imageId) {
 				const remainingImages = images.filter((img) => img && img.id !== imageId);
 				if (remainingImages.length > 0 && remainingImages[0]) {
 					myState.setPrimaryImage(remainingImages[0].id);
@@ -180,86 +112,93 @@
 		myState.setPrimaryImage(imageId);
 		toast.success('Primary image updated');
 	};
-
-	const handleReplace = (imageId: number) => {
-		replacingImageId = imageId;
-		fileInputRef?.click();
-	};
-
-	const handleOpenChange = (newOpen: boolean) => {
-		open = newOpen;
-		if (onOpenChange) {
-			onOpenChange(newOpen);
-		}
-	};
 </script>
 
-<Dialog.Root onOpenChange={handleOpenChange}>
-	<Dialog.Trigger class="w-full">
-		<Button variant="default">
-			<Upload class="mr-2 h-4 w-4" />
-			{triggerText}
-		</Button>
-	</Dialog.Trigger>
-
-	<Dialog.Content class="max-h-[90vh] max-w-2xl overflow-y-auto">
-		<Dialog.Header>
-			<Dialog.Title>{title}</Dialog.Title>
-			<Dialog.Description>{description}</Dialog.Description>
-		</Dialog.Header>
-
-		<div class="space-y-6">
-			<!-- Upload Status -->
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<Label>Images ({images.length}/{MAX_IMAGES_UI_LIMIT})</Label>
-					{#if !hasMinImages}
-						<Badge variant="destructive" class="text-xs">
-							<AlertCircle class="mr-1 h-3 w-3" />
-							Minimum {MIN_IMAGES_PER_ENTRY} required
-						</Badge>
-					{/if}
-				</div>
-				{#if canAddMore}
-					<Button size="sm" onclick={handleUpload}>
-						<Upload class="mr-2 h-4 w-4" />
-						Add Image
-					</Button>
-				{/if}
-			</div>
-
-			<!-- Image Grid -->
-			<div class="grid grid-cols-3 gap-4">
-				{#each imageSlots() as slot, index (slot.index)}
-					<ImageSlot
-						image={slot.image}
-						isPrimary={slot.image?.id === primaryImageId}
-						isEmpty={!slot.image}
-						isLoading={uploadingIndex === index}
-						onUpload={canAddMore ? handleUpload : undefined}
-						onRemove={handleRemove}
-						onSetPrimary={handleSetPrimary}
-						onReplace={handleReplace}
-						showRemove={images.length > MIN_IMAGES_PER_ENTRY}
-						showSetPrimary={images.length > 1}
-					/>
-				{/each}
-			</div>
-
-			<!-- Instructions -->
-			<div class="space-y-1 text-sm text-muted-foreground">
-				<p>• Upload up to {MAX_IMAGES_UI_LIMIT} images</p>
-				<p>• First image will be set as primary automatically</p>
-				<p>• Click "Set Primary" to change which image represents your entry</p>
-				<p>• Hover over images to see action buttons</p>
-			</div>
+<div class="space-y-4">
+	<!-- Header with status and add button -->
+	<div class="flex items-center justify-between">
+		<div class="flex items-center gap-2">
+			<Label class="text-base font-medium">Images ({images.length}/{MAX_IMAGES_UI_LIMIT})</Label>
+			{#if !hasMinImages}
+				<Badge variant="destructive" class="text-xs">
+					<AlertCircle class="mr-1 h-3 w-3" />
+					At least {MIN_IMAGES_PER_ENTRY} required
+				</Badge>
+			{/if}
 		</div>
 
-		<Dialog.Footer>
-			<Button variant="outline" onclick={() => handleOpenChange(false)}>Done</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+		{#if canAddMore}
+			<Button size="sm" onclick={handleAddImage} disabled={isUploading} variant="outline">
+				<Upload class="mr-2 h-4 w-4" />
+				{isUploading ? 'Uploading...' : 'Add Image'}
+			</Button>
+		{/if}
+	</div>
+
+	<!-- Images grid or empty state -->
+	{#if images.length === 0}
+		<div class="rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 text-center">
+			<Upload class="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+			<p class="mb-4 text-sm text-muted-foreground">No images uploaded yet</p>
+			<Button onclick={handleAddImage} disabled={isUploading}>
+				<Upload class="mr-2 h-4 w-4" />
+				{isUploading ? 'Uploading...' : 'Upload First Image'}
+			</Button>
+		</div>
+	{:else}
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+			{#each images.filter((img) => img !== null) as image (image.id)}
+				<div class="group relative overflow-hidden rounded-lg border bg-card">
+					<!-- Image -->
+					<div class="relative aspect-square">
+						<img src={image.cloudURL} alt={image.originalFileName} class="h-full w-full object-cover" />
+
+						<!-- Primary indicator -->
+						{#if image.id === primaryImageId}
+							<div class="absolute left-2 top-2 rounded-full bg-yellow-500 p-1 text-white">
+								<Star class="h-4 w-4 fill-current" />
+							</div>
+						{/if}
+
+						<!-- Hover actions -->
+						<div
+							class="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+						>
+							{#if image.id !== primaryImageId}
+								<Button size="sm" variant="secondary" onclick={() => handleSetPrimary(image.id)}>
+									<Star class="mr-1 h-4 w-4" />
+									Set Primary
+								</Button>
+							{/if}
+
+							{#if images.length > MIN_IMAGES_PER_ENTRY}
+								<Button size="sm" variant="destructive" onclick={() => handleRemove(image.id)}>
+									<X class="mr-1 h-4 w-4" />
+									Remove
+								</Button>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Image info -->
+					<div class="p-3">
+						<p class="truncate text-sm font-medium">{image.originalFileName}</p>
+						{#if image.id === primaryImageId}
+							<p class="text-xs font-medium text-yellow-600">Primary Image</p>
+						{/if}
+					</div>
+				</div>
+			{/each}
+		</div>
+
+		<!-- Instructions -->
+		<div class="space-y-1 text-sm text-muted-foreground">
+			<p>• The first image you upload becomes the primary image automatically</p>
+			<p>• Hover over images to set a different primary image or remove them</p>
+			<p>• The primary image will be used as the main photo for your entry</p>
+		</div>
+	{/if}
+</div>
 
 <!-- Hidden file input -->
 <input bind:this={fileInputRef} type="file" accept="image/*" onchange={handleFileSelect} class="hidden" />
