@@ -125,7 +125,7 @@
 	const years = ['2026', '2025', '2024', '2023', '2022'];
 
 	let getCatalogueError = $state('');
-	let selectedYear = $state('2026');
+	let selectedYear = $state(EXHIBITION_YEAR);
 	let catalogueData = $state([]);
 	async function getCatalogue() {
 		getCatalogueError = '';

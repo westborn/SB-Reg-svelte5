@@ -1,6 +1,7 @@
 import { fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getExhibits } from '$lib/components/server/registrationDB';
+import { EXHIBITION_YEAR } from '$lib/constants';
 import { z } from 'zod';
 import { artistTableSchema } from '$lib/zod-schemas';
 import { message, superValidate } from 'sveltekit-superforms';
@@ -11,7 +12,7 @@ const emailSchema = z.object({ email: artistTableSchema.shape.email });
 export const load: PageServerLoad = async (event) => {
 	//console.log(`${event.route.id} - LOAD - START`);
 	const emailForm = await superValidate(zod(emailSchema), { id: 'emailForm' });
-	const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: '2025' });
+	const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
 	return { emailForm, exhibits };
 };
 

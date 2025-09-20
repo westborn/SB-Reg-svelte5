@@ -5,7 +5,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	//console.log(`${event.route.id} - LOAD - START`);
 	const { user } = await event.locals.V1safeGetSession();
-	const entryYear = event.url.searchParams.get('year') ?? '2025';
+	const entryYear = event.url.searchParams.get('year') ?? EXHIBITION_YEAR;
 	// Only admins can see the current exhibition year entries
 	if (entryYear.localeCompare(EXHIBITION_YEAR) === 0 && !user.isAdmin) {
 		return { exhibits: [] };

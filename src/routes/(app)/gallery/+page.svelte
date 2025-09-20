@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { CatalogueCard } from '$lib/components';
 	import * as Select from '$lib/components/ui/select';
+	import { EXHIBITION_YEAR } from '$lib/constants';
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
 
 	$effect(() => {
@@ -45,7 +46,7 @@
 
 	const years = ['2026', '2025', '2024', '2023', '2022'];
 
-	let selectedYear = $state('2026');
+	let selectedYear = $state(EXHIBITION_YEAR);
 
 	function handleSelectYear(event: any) {
 		selectedYear = { ...event };

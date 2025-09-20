@@ -28,6 +28,7 @@
 	import { page } from '$app/state';
 
 	import { TableImage } from '$lib/components';
+	import { EXHIBITION_YEAR } from '$lib/constants';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
 	import { createTableState } from '$lib/tableState.svelte.js';
@@ -42,7 +43,7 @@
 
 	const years = ['2026', '2025', '2024', '2023', '2022'];
 
-	let selectedYear = $state('2026');
+	let selectedYear = $state(EXHIBITION_YEAR);
 
 	function handleSelectYear(event: any) {
 		selectedYear = { ...event };
