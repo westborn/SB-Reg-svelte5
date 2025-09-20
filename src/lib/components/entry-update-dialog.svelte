@@ -11,6 +11,16 @@
 
 	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
+
+	// Load entry images when dialog opens
+	$effect(() => {
+		if (myState.entryUpdateDialogOpen) {
+			const entry = myState?.submission?.registrations[0].entries.find((entry) => entry.id === currentEntryId);
+			if (entry) {
+				myState.loadImagesFromEntry(entry);
+			}
+		}
+	});
 </script>
 
 <Dialog.Root bind:open={myState.entryUpdateDialogOpen}>

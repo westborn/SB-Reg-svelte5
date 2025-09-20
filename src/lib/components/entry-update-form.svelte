@@ -65,8 +65,7 @@
 		//split the dimensions string into the three fields
 		const dimensions = entry?.dimensions?.split('x') || [];
 		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
-		//load the working images from the current entry
-		myState.loadImagesFromEntry(entry);
+		// Image loading is now handled in the EntryUpdateDialog component
 	}
 </script>
 
