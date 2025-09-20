@@ -16,7 +16,6 @@ export { default as EntryUpdateForm } from './entry-update-form.svelte';
 export { default as Header } from './header.svelte';
 export { default as ImageGallery } from './image-gallery.svelte';
 export { default as ImageSlot } from './image-slot.svelte';
-export { default as ImageUploadForm } from './image-upload-form.svelte';
 export { default as LocationUpdateForm } from './location-update-form.svelte';
 export { default as MultipleImageUploadForm } from './multiple-image-upload-form.svelte';
 export { default as OptimisedImage } from './optimised-image.svelte';
