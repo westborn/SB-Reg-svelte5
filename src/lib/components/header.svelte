@@ -6,11 +6,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { AdminMenu, ThemeToggle } from '$lib/components';
+	import { AdminMenu } from '$lib/components';
 
 	let data = $props();
 	const { navItems, user } = data;
-	const loggedInEmail = user ? user.email : 'full@example.com';
+	const loggedInEmail = user?.email ?? 'Guest';
 	const avatar = loggedInEmail.slice(0, 2);
 
 	let sheetOpen = $state(false);
@@ -24,7 +24,7 @@
 	<nav class="container grid h-14 grid-cols-[1fr_120px] items-center">
 		<!-- Desktop -->
 		<div class="hidden h-14 grid-cols-[200px_2fr] items-center md:grid">
-			<div class=" flex">
+			<div class="flex">
 				<img src="/favicon-32x32.png" alt="Sculpture Bermagui Logo" class="mt-2 h-10" />
 				<h1 class="text-center text-lg text-primary-400">Exhibition Registration</h1>
 			</div>
@@ -40,7 +40,7 @@
 		</div>
 
 		<!-- Mobile -->
-		<div class=" grid h-14 grid-cols-[120px_1fr] items-center md:hidden">
+		<div class="grid h-14 grid-cols-[120px_1fr] items-center md:hidden">
 			<div>
 				<Sheet.Root bind:open={sheetOpen}>
 					<Sheet.Trigger class={buttonVariants({ variant: 'ghost' })}
@@ -97,8 +97,6 @@
 					</Tooltip.Content>
 				</Tooltip.Root>
 			</Tooltip.Provider>
-			<!-- TODO - do we need a theme toggle? -->
-			<!-- <ThemeToggle></ThemeToggle> -->
 		</div>
 	</nav>
 </header>

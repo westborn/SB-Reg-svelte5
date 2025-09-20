@@ -24,7 +24,7 @@
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Artist is now Registered');
-			myState.artistCreateDialogOpen = false; //TODO: this is not working
+			myState.artistCreateDialogOpen = false;
 			return;
 		}
 	});

@@ -37,7 +37,7 @@
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Entry Added');
-			myState.entryCreateDialogOpen = false; //TODO: this is not working
+			myState.entryCreateDialogOpen = false;
 			return;
 		}
 	});

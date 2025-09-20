@@ -26,7 +26,7 @@
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success(' Registration Updated');
-			myState.artistUpdateDialogOpen = false; //TODO: this is not working
+			myState.artistUpdateDialogOpen = false;
 			return;
 		}
 	});

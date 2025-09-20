@@ -281,9 +281,6 @@ const entryCreate = async (event: RequestEvent) => {
 				return message(formValidationResult, 'Error setting primary image');
 			}
 		}
-
-		//TODO Update image tag to be attached
-		// cloudinary.v2.uploader.explicit(public_id, options).then(callback);
 	}
 
 	// Return the updated submission
@@ -327,8 +324,6 @@ const imageUpload = async (event: RequestEvent) => {
 			originalFileName: formValidationResult.data.image.name
 		} as CurrentImage);
 
-		//TODO update tag when image is attached to an entry
-		// cloudinary.v2.uploader.replace_tag(tag, public_ids, options, callback);
 		const returnData = { formValidationResult, newImage };
 		return withFiles(returnData);
 	} catch (error) {

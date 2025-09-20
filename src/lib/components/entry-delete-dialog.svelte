@@ -25,22 +25,21 @@
 
 	const form = superForm(myState.entryDeleteForm, {
 		validators: zodClient(entryDeleteSchemaUI),
-		id: `deletePostForm-${currentEntryId}`,
+		id: `deleteEntryForm-${currentEntryId}`,
 		onResult({ result }: { result: any }) {
 			console.log('Action result', result);
 			if (result.type != 'success') {
 				toast.error('Failed to delete entry');
-				myState.entryDeleteDialogOpen = false; //TODO: is this working??
+				myState.entryDeleteDialogOpen = false;
 				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Entry Deleted');
-			myState.entryDeleteDialogOpen = false; //TODO: is this working??
-			return;
+			myState.entryDeleteDialogOpen = false;
 		}
 	});
 
-	const { form: formData, enhance, message, errors } = form;
+	const { enhance } = form;
 </script>
 
 <AlertDialog.Root bind:open={myState.entryDeleteDialogOpen}>

@@ -46,7 +46,7 @@
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Entry Updated');
-			myState.entryUpdateDialogOpen = false; //TODO: is this working??
+			myState.entryUpdateDialogOpen = false;
 			return;
 		}
 	});
@@ -56,9 +56,12 @@
 	// get the form field values from the submission object using the id that was passed in
 	let entry = $derived(myState?.submission?.registrations[0].entries.find((entry) => entry.id === editingEntryId));
 
-	// Initialize form data when entry changes
+	// Initialize form data when entry is first available
+	let lastEntryId = $state<number | null>(null);
+
 	$effect(() => {
-		if (entry) {
+		// Only reinitialize if we're looking at a different entry
+		if (entry && entry.id !== lastEntryId) {
 			({
 				id: $formData.id,
 				inOrOut: $formData.inOrOut,
@@ -71,6 +74,7 @@
 			//split the dimensions string into the three fields
 			const dimensions = entry?.dimensions?.split('x') || [];
 			[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
+			lastEntryId = entry.id;
 		}
 	});
 </script>

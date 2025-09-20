@@ -25,7 +25,7 @@
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success(' Registration Updated');
-			myState.confirmDialogOpen = false; //TODO: is this working??
+			myState.confirmDialogOpen = false;
 			return;
 		}
 	});
