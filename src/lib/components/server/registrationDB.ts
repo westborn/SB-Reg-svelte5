@@ -572,7 +572,8 @@ export const getExhibits = async ({
 		join registration on artist.id = registration.artist_id
 		join entry on registration.id = entry.registration_id
 		LEFT OUTER join location on entry.id = location.entry_id
-		LEFT OUTER join image on entry.id = image.entry_id
+		LEFT OUTER join primary_image on entry.id = primary_image.entry_id
+		LEFT OUTER join image on primary_image.image_id = image.id
 		where
 		-- -- artist.email = 'epsilonartist@gmail.com' AND
 		registration.registration_year = ${entryYear}
