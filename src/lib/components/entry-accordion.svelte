@@ -14,17 +14,15 @@
 	{#each myState.currentEntries as entryItem, entryKey}
 		{@const currentEntryId = myState.currentEntries[entryKey].id}
 		<Accordion.Item value={entryItem.id.toString()}>
-			<Accordion.Trigger class="flex items-center justify-between">
+			<Accordion.Trigger>
 				<span>{entryItem.title}</span>
-				<div class="flex items-center gap-2">
-					{#if entryItem.images && entryItem.images.length > 0}
-						<Badge variant="secondary" class="text-xs">
-							<Images class="mr-1 h-3 w-3" />
-							{entryItem.images.length}
-							{entryItem.images.length === 1 ? 'image' : 'images'}
-						</Badge>
-					{/if}
-				</div>
+				{#if entryItem.images && entryItem.images.length > 0}
+					<Badge variant="secondary" class="text-xs">
+						<Images class="mr-1 h-3 w-3" />
+						{entryItem.images.length}
+						{entryItem.images.length === 1 ? 'image' : 'images'}
+					</Badge>
+				{/if}
 			</Accordion.Trigger>
 			<Accordion.Content>
 				<EntryCard {entryItem} variant="accordion" showActions={showButtons}>
