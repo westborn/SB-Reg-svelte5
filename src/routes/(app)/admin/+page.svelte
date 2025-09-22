@@ -146,7 +146,10 @@
 			handleDownload('catalogue', catalogueData);
 		} catch (err) {
 			console.log('registerComplete-err' + err);
-			getCatalogueError = err.message;
+			getCatalogueError =
+				typeof err === 'object' && err !== null && 'message' in err
+					? (err as { message: string }).message
+					: String(err);
 		}
 		return;
 	}

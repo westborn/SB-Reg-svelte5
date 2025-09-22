@@ -32,9 +32,6 @@
 	import { TableImage } from '$lib/components';
 	import MySwitch from './mySwitch.svelte';
 
-	// the data is picked up from the page store so it can be used in the table
-	const { data } = $props();
-
 	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 	let updateAcceptedError = $state('');
 

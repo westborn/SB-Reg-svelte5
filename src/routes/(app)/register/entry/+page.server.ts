@@ -7,7 +7,7 @@ import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
-import { entryDeleteSchemaUI, entrySchemaUI, fileUploadSchema, multipleImagesSchema } from '$lib/zod-schemas';
+import { entryDeleteSchemaUI, entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
 import {
 	createImage,
 	createNewRegistration,

@@ -40,8 +40,9 @@ export async function POST({ request }) {
 		// }
 		console.log('error after POST to api/payment');
 		console.log(`err is: ${err}`);
-		console.log(err.status, JSON.stringify(err?.result, null, 4));
-		const data = JSON.stringify(err.errors, null, 4);
+		const errorObj = err as any;
+		console.log(errorObj.status, JSON.stringify(errorObj?.result, null, 4));
+		const data = JSON.stringify(errorObj.errors, null, 4);
 		const myOptions = { status: 400, statusText: 'It was NOT good!' };
 		const myResponse = new Response(data, myOptions);
 		return myResponse;

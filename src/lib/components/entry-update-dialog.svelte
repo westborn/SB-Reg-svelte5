@@ -3,7 +3,6 @@
 
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { EntryUpdateForm } from '$lib/components';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
 	let myState = getRegisterState();
 

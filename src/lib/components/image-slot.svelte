@@ -4,7 +4,6 @@
 	import { OptimisedImage } from '$lib/components';
 	import { getRegisterState } from '$lib/context.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
-	import ImageIcon from 'lucide-svelte/icons/image';
 	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import Star from 'lucide-svelte/icons/star';
 	import StarOff from 'lucide-svelte/icons/star-off';

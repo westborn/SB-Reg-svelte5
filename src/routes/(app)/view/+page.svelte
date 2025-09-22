@@ -2,7 +2,6 @@
 	import { REGISTRATIONS_OPEN } from '$lib/constants';
 	import { getRegisterState, updateSubmission } from '$lib/context.svelte.js';
 	import { EntryCard } from '$lib/components';
-	import { convertToDollars } from '$lib/utils.js';
 
 	let { data } = $props();
 	let { submission, user } = data;

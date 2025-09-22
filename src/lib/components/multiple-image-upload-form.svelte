@@ -9,7 +9,6 @@
 	import AlertCircle from 'lucide-svelte/icons/circle-alert';
 	import Star from 'lucide-svelte/icons/star';
 	import X from 'lucide-svelte/icons/x';
-	import type { CurrentImage } from '$lib/components/server/registrationDB';
 
 	let myState = getRegisterState();
 	let fileInputRef: HTMLInputElement | undefined = $state();
@@ -165,14 +164,14 @@
 							class="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
 						>
 							{#if image.id !== primaryImageId}
-								<Button size="xs" variant="secondary" onclick={() => handleSetPrimary(image.id)}>
+								<Button size="sm" variant="secondary" onclick={() => handleSetPrimary(image.id)}>
 									<Star class="mr-1 h-3 w-3" />
 									Set Primary
 								</Button>
 							{/if}
 
 							{#if images.length > MIN_IMAGES_PER_ENTRY}
-								<Button size="xs" variant="destructive" onclick={() => handleRemove(image.id)}>
+								<Button size="sm" variant="destructive" onclick={() => handleRemove(image.id)}>
 									<X class="mr-1 h-3 w-3" />
 									Remove
 								</Button>

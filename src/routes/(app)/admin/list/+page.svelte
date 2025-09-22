@@ -37,8 +37,6 @@
 	import { PersistedState } from 'runed';
 	import type { Updater } from '@tanstack/svelte-table';
 
-	const { data } = $props();
-
 	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 
 	const years = ['2026', '2025', '2024', '2023', '2022'];
