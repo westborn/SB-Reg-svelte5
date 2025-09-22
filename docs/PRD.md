@@ -11,7 +11,7 @@ The Sculpture Bermagui Registration System is a web application built with Svelt
 ## Technology Stack
 
 - **Frontend**: SvelteKit 5 with TypeScript
-- **UI Components**: Shadcn-svelte with custom theming
+- **UI Components**: bits-ui with shadcn-svelte style components
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Supabase Auth integration
 - **Styling**: Tailwind CSS with custom color scheme
@@ -34,8 +34,11 @@ The Sculpture Bermagui Registration System is a web application built with Svelt
 
 ### 3. Image Management
 
+- **Multiple Image Upload**: Support for up to 3 images per entry (UI limit, database supports unlimited)
+- **Primary Image Designation**: One image designated as primary for display purposes
 - **Image Upload**: Integration with Cloudinary for artwork image storage
 - **Image Association**: Link images to specific entries
+- **Image Management**: Users can add, remove, and replace images with validation
 
 ### 4. Exhibition Management
 
@@ -57,16 +60,18 @@ The system uses a multi-table structure:
 - **RegistrationTable**: Annual registration records
 - **EntryTable**: Individual artwork submissions
 - **ImageTable**: Artwork images
+- **PrimaryImageTable**: Primary image designation for entries
 - **LocationTable**: Exhibition placement information
 
 ## User Interface
 
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 - **Custom Theme**: Blue-green color scheme with custom CSS variables in [app.pcss](src/app.pcss)
-- **Component Library**: Reusable UI components using Shadcn-svelte including:
+- **Component Library**: Reusable UI components using bits-ui including:
   - Dialog components for modals
   - Sheet components for side panels
   - Form components with validation
+  - Multiple image upload and management components
   - Consistent styling across the application
 
 ## Authentication & Authorization
@@ -93,6 +98,8 @@ The system uses a multi-table structure:
 - **Code Quality**: ESLint and Prettier configuration
 - **Build System**: Vite-based build with SvelteKit
 - **Database Management**: Prisma migrations and schema management
+- **Validation Scripts**: Data integrity validation for primary images and migration processes
+- **Script Execution**: TypeScript scripts using tsx for maintenance and validation tasks
 
 ## Privacy & Legal
 
@@ -104,3 +111,5 @@ The system uses a multi-table structure:
 - The system is designed to handle annual exhibitions with year-based configuration
 - Extensible architecture for adding new features and exhibition types
 - Scalable database design for growing artist and artwork collections
+- Multiple images feature completed with room for UI expansion beyond 3-image limit
+- Database supports unlimited images per entry for future enhancements

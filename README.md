@@ -21,13 +21,20 @@ This system successfully manages the annual Sculpture Bermagui exhibition with s
 
 Built with modern web technologies and designed for scalability, this system continues to evolve to meet the growing needs of the Sculpture Bermagui community.
 
+## ✨ Recent Major Features
+
+- **Multiple Images Support**: Artists can now upload up to 3 images per entry with primary image designation
+- **Database Schema Evolution**: Added primary image table with complete data migration and validation
+- **Enhanced Image Management**: Full CRUD operations for images with integrity validation
+- **Validation Scripts**: Comprehensive data integrity checking for image relationships
+
 ## 🎨 What This System Does
 
 ### For Artists
 
 - **Register for the exhibition** with personal and banking details
 - **Submit artwork entries** with detailed descriptions, materials, and dimensions
-- **Upload images** of their artwork via Cloudinary integration
+- **Upload multiple images** (up to 3 per entry) with primary image designation via Cloudinary integration
 - **Manage registration logistics** including bump-in/bump-out schedules and special requirements
 - **Receive email confirmations** with registration summaries and payment instructions
 
@@ -53,7 +60,7 @@ Built with modern web technologies and designed for scalability, this system con
 - **Frontend**: SvelteKit 5 with TypeScript
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Supabase Auth
-- **UI Framework**: Tailwind CSS with Shadcn-svelte components
+- **UI Framework**: Tailwind CSS with bits-ui components (shadcn-svelte style)
 - **Image Storage**: Cloudinary
 - **Email**: Nodemailer with Gmail integration
 - **Deployment**: Netlify
@@ -64,7 +71,7 @@ Built with modern web technologies and designed for scalability, this system con
 ### Registration Workflow
 
 1. **Artist Registration** - Basic contact and banking information
-2. **Entry Submission** - Artwork details with image uploads
+2. **Entry Submission** - Artwork details with multiple image uploads (up to 3 per entry)
 3. **Confirmation** - Review and finalize registration
 4. **Payment** - Integration with payment processing
 5. **Email Confirmation** - Detailed registration summary
@@ -80,8 +87,9 @@ Built with modern web technologies and designed for scalability, this system con
 ### Data Management
 
 - **Historical Data** support for previous exhibitions (2023, 2024)
+- **Multiple Images** support with primary image designation and validation
 - **Image Migration** from Google Drive to Cloudinary
-- **Database Migrations** with Prisma
+- **Database Migrations** with Prisma and data integrity validation
 - **Seed Scripts** for development data
 
 ## 🛠 Development Commands
@@ -103,6 +111,10 @@ pnpm check                 # Type checking
 pnpm lint                  # ESLint
 pnpm format                # Prettier formatting
 
+# Scripts
+npx tsx scripts/script-name.ts  # Run TypeScript scripts
+npx tsx scripts/validate-primary-images.ts  # Validate image data integrity
+
 # Versioning
 pnpm bump:patch            # Bump patch version
 pnpm bump:minor            # Bump minor version
@@ -114,15 +126,15 @@ pnpm bump:major            # Bump major version
 ```
 src/
 ├── lib/
-│   ├── components/         # Reusable UI components
+│   ├── components/         # Reusable UI components (including multiple image management)
 │   ├── server/            # Server-side utilities
 │   └── data/              # Historical JSON data
 ├── routes/
 │   ├── (app)/             # Main application routes
 │   ├── (auth)/            # Authentication routes
-│   └── api/               # API endpoints
-├── scripts/               # Data migration and utility scripts
-└── prisma/                # Database schema and migrations
+│   └── api/               # API endpoints (including image management)
+├── scripts/               # Data migration and utility scripts (validation, migration)
+└── prisma/                # Database schema and migrations (including primary image table)
 ```
 
 ## 🔧 Configuration
