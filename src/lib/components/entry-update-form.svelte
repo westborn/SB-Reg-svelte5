@@ -39,7 +39,7 @@
 			});
 		},
 		onResult({ result }: { result: any }) {
-			console.log('Action result', result);
+			// console.log('Action result', result);
 			if (result.type != 'success') {
 				toast.error('Failed to update entry');
 				return;

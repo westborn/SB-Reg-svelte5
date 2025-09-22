@@ -63,7 +63,7 @@ const confirmUpdate = async (event: RequestEvent) => {
 			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
-		console.log('Confirm updated successfully', updatedRegistration, updatedArtist);
+		// console.log('Confirm updated successfully', updatedRegistration, updatedArtist);
 	} catch (error) {
 		console.error(`${event.route.id}`, error);
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);

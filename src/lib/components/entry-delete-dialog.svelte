@@ -18,7 +18,7 @@
 		validators: zodClient(entryDeleteSchemaUI),
 		id: `deleteEntryForm`,
 		onResult({ result }: { result: any }) {
-			console.log('Action result', result);
+			// console.log('Action result', result);
 			if (result.type != 'success') {
 				toast.error('Failed to delete entry');
 				myState.entryDeleteDialogOpen = false;

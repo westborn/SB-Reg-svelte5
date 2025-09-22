@@ -61,7 +61,7 @@ const entryUpdate = async (event: RequestEvent) => {
 		return message(formValidationResult, 'Error processing update data.', { status: 400 });
 	}
 
-	console.log('About to update entry with ID:', idToUpdate);
+	// console.log('About to update entry with ID:', idToUpdate);
 	// Get the submission from the database
 	try {
 		const submissionFromDB = await getSubmission(user as User);
@@ -95,7 +95,7 @@ const entryUpdate = async (event: RequestEvent) => {
 			for (const imageToRemove of imagesToRemove) {
 				try {
 					await deleteImage(imageToRemove.id, entryFromDB.id);
-					console.log('Removed image:', imageToRemove.id);
+					// console.log('Removed image:', imageToRemove.id);
 				} catch (error) {
 					console.error('Error removing image:', error);
 				}
@@ -112,7 +112,7 @@ const entryUpdate = async (event: RequestEvent) => {
 								entryId: entryFromDB.id
 							}
 						});
-						console.log('Added image to entry:', imageToAdd.id);
+						// console.log('Added image to entry:', imageToAdd.id);
 					} catch (error) {
 						console.error('Error adding image to entry:', error);
 					}
@@ -152,7 +152,7 @@ const entryUpdate = async (event: RequestEvent) => {
 			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
-		console.log('Entry updated successfully', updatedEntry);
+		// console.log('Entry updated successfully', updatedEntry);
 	} catch (error) {
 		console.error(`${event.route.id}`, error);
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -264,7 +264,7 @@ const entryCreate = async (event: RequestEvent) => {
 							entryId: newEntry.id
 						}
 					});
-					console.log('Linked image to entry:', workingImage.id);
+					// console.log('Linked image to entry:', workingImage.id);
 				} catch (error) {
 					console.error('Error linking image to entry:', error);
 				}
@@ -346,7 +346,7 @@ const entryDelete = async (event: RequestEvent) => {
 		return message(formValidationResult, 'No ID provided for delete - aborting delete.', { status: 400 });
 	}
 	const idToDelete = parseInt(idAsString);
-	console.log('Deleting entry with id:', idToDelete);
+	// console.log('Deleting entry with id:', idToDelete);
 
 	const { user } = await event.locals.V1safeGetSession();
 	try {
@@ -372,7 +372,7 @@ const entryDelete = async (event: RequestEvent) => {
 		return fail(500, withFiles({ formValidationResult }));
 	}
 	// Return the updated submission
-	console.log('completed entry delete');
+	// console.log('completed entry delete');
 	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
 	return returnData;
@@ -423,7 +423,7 @@ const imageDeleteAction = async (event: RequestEvent) => {
 
 	try {
 		const result = await deleteImage(imageId, entryId);
-		console.log('Image deleted successfully', result);
+		// console.log('Image deleted successfully', result);
 	} catch (error) {
 		console.error(`${event.route.id} - Error deleting image:`, error);
 		return message(formValidationResult, error instanceof Error ? error.message : 'Error deleting image');
