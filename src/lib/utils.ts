@@ -209,7 +209,12 @@ export class ApiService<T = any> {
 		this.baseURL = baseURL;
 		this.retryCount = retryCount;
 	}
-	private async request(endpoint: string, method: string, data: any, options = {}): Promise<T> {
+	private async request(
+		endpoint: string,
+		method: string,
+		data: any,
+		options: { headers?: Record<string, string> } = {}
+	): Promise<T> {
 		let attempts = 0;
 		while (attempts < this.retryCount) {
 			try {
@@ -218,7 +223,7 @@ export class ApiService<T = any> {
 					method,
 					headers: {
 						'Content-Type': 'application/json',
-						...options.headers
+						...(options.headers ?? {})
 					},
 					body: data ? JSON.stringify(data) : null
 				};
@@ -247,19 +252,4 @@ export class ApiService<T = any> {
 	public sendPost(endpoint: string, data: any, options = {}) {
 		return this.request(endpoint, 'POST', data, options);
 	}
-}
-export function createApiStore(): Writable<ApiResponse<any>> {
-	const { subscribe, set } = writable<ApiResponse<any>>({ loading: false, data: null, error: null });
-	return {
-		subscribe,
-		fetchData: async (apiInstance: ApiService, method: string, endpoint: string, data: any, options = {}) => {
-			set({ loading: true, data: null, error: null });
-			try {
-				const responseData = await apiInstance[method as keyof ApiService](endpoint, data, options);
-				set({ loading: false, data: responseData, error: null });
-			} catch (error) {
-				set({ loading: false, data: null, error });
-			}
-		}
-	};
 }
