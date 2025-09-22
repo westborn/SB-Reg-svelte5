@@ -105,7 +105,10 @@
 			id: 'thumbnail',
 			cell: (info) => {
 				if (info.row.original.cloudURL == null) return 'No Image';
-				return renderComponent(TableImage, { path: info.row.original.cloudURL });
+				return renderComponent(TableImage, {
+					path: info.row.original.cloudURL,
+					entryId: info.row.original.entryId
+				});
 			}
 		}),
 		columnHelper.accessor('artistName', { header: 'Artist Name' }),
