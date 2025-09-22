@@ -143,13 +143,6 @@ model imageTable {
   - "Remove" button (disabled if only 1 image)
   - "Set as Primary" button on non-primary images
 
-##### `image-gallery.svelte`
-
-- Display component for entry images
-- Thumbnail grid with primary image highlighted
-- Click to view full size
-- Show only up to 3 images in UI (with "..." indicator if more exist)
-
 ##### `image-slot.svelte`
 
 - Individual image slot component

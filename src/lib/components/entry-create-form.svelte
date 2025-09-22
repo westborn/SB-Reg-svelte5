@@ -12,7 +12,7 @@
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte';
-	import { MultipleImageUploadForm, ImageGallery } from '$lib/components';
+	import { MultipleImageUploadForm } from '$lib/components';
 
 	let myState = getRegisterState();
 
