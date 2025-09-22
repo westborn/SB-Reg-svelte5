@@ -2,9 +2,9 @@
 	import { getRegisterState } from '$lib/context.svelte.js';
 	import { Button } from '$lib/components/ui/button';
 
-	interface Props {
+	type Props = {
 		currentEntryId: number;
-	}
+	};
 
 	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
@@ -14,4 +14,6 @@
 	}
 </script>
 
-<Button variant="destructive" onclick={handleOpenDialog}>Delete</Button>
+<Button variant="destructive" size="sm" class="hover:scale-110" onclick={handleOpenDialog}>
+	<span class="text-xs">Delete</span>
+</Button>

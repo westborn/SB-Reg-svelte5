@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getRegisterState } from '$lib/context.svelte.js';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/ui/button';
 
 	type Props = {
 		currentEntryId: number;
@@ -14,6 +14,6 @@
 	}
 </script>
 
-<button class={buttonVariants({ variant: 'outline', size: 'sm' })} onclick={handleOpenDialog}>
+<Button variant="default" size="sm" class="hover:scale-110" onclick={handleOpenDialog}>
 	<span class="text-xs">Edit</span>
-</button>
+</Button>
