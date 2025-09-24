@@ -102,6 +102,18 @@ export const imageTableSchema = z.object({
 export type ImageTable = z.infer<typeof imageTableSchema>;
 
 /////////////////////////////////////////
+// PRIMARY IMAGE TABLE SCHEMA
+/////////////////////////////////////////
+export const primaryImageTableSchema = z.object({
+	id: z.number().int(),
+	entryId: z.number().int(),
+	imageId: z.number().int(),
+	createdAt: z.coerce.date(),
+	updatedAt: z.coerce.date()
+});
+export type PrimaryImageTable = z.infer<typeof primaryImageTableSchema>;
+
+/////////////////////////////////////////
 // ARTIST SCHEMA UI - just the columns that are editable or used in forms
 /////////////////////////////////////////
 // id: z.number().int(),
@@ -182,6 +194,15 @@ export const imageSchemaUI = z.object({
 	originalFileName: z.string()
 });
 export type ImageUI = z.infer<typeof imageSchemaUI>;
+
+/////////////////////////////////////////
+// MULTIPLE IMAGES SCHEMA
+/////////////////////////////////////////
+export const multipleImagesSchema = z.object({
+	images: z.array(imageSchemaUI).min(1).max(3), // UI limit of 3
+	primaryImageId: z.number().int() // ID of the primary image
+});
+export type MultipleImages = z.infer<typeof multipleImagesSchema>;
 
 export const fileUploadSchema = z.object({
 	image: z

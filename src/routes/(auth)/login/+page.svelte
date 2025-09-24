@@ -28,13 +28,15 @@
 		<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 		<Form.Field {form} name="email">
-			<Form.Control let:attrs>
-				<Form.Label>Email Address</Form.Label>
-				<Input autofocus type="text" {...attrs} bind:value={$formData.email} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Email Address</Form.Label>
+					<Input autofocus type="text" {...props} bind:value={$formData.email} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Errors errors={$errors._errors} />
+		<!-- <Form.Errors errors={$errors._errors} /> -->
 		<div class="flex">
 			<Form.Button disabled={$delayed}>
 				Login

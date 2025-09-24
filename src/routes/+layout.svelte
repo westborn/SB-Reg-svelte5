@@ -9,7 +9,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { EXHIBITION_YEAR, REGISTRATIONS_OPEN } from '$lib/constants.js';
-	import { TailwindIndicator } from '$lib/components';
+	import { TailwindIndicator, EntryUpdateDialog, EntryDeleteDialog } from '$lib/components';
 
 	let { children, data } = $props();
 	let { artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm, supabase, session, user } = data;
@@ -73,6 +73,9 @@ TAILWINDCSSVERSION: ${__TAILWINDCSSVERSION__}`);
 	}}
 />
 {@render children()}
+<!-- Global Entry Update Dialog - Single instance to prevent duplicate form IDs -->
+<EntryUpdateDialog />
+<EntryDeleteDialog />
 {#if dev}
 	<TailwindIndicator />
 {/if}

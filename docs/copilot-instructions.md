@@ -11,7 +11,7 @@ This is a **SvelteKit 5** application managing artist registrations and artwork 
 - **Frontend**: SvelteKit 5 with TypeScript
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Supabase Auth
-- **UI**: Tailwind CSS + Shadcn-svelte components
+- **UI**: Tailwind CSS + bits-ui components (shadcn-svelte style)
 - **Images**: Cloudinary integration
 - **Email**: Nodemailer with Gmail
 - **Package Manager**: pnpm
@@ -24,6 +24,7 @@ This is a **SvelteKit 5** application managing artist registrations and artwork 
 - `registrationTable`: Annual registration records
 - `entryTable`: Individual artwork submissions
 - `imageTable`: Artwork images via Cloudinary
+- `primaryImageTable`: Primary image designation for entries
 - `locationTable`: Exhibition placement info
 
 ### Route Structure
@@ -53,11 +54,12 @@ This is a **SvelteKit 5** application managing artist registrations and artwork 
 ```typescript
 // Svelte imports
 import { goto } from '$app/navigation';
-import { page } from '$app/stores';
+import { page } from '$app/state'; // Note: uses $app/state in Svelte 5
 
 // Library imports
 import * as Card from '$lib/components/ui/card/index.js';
 import { EXHIBITION_YEAR } from '$lib/constants';
+import { Button } from '$lib/components/ui/button';
 
 // Prisma/DB
 import { prisma } from '$lib/server/prisma';
@@ -171,6 +173,13 @@ PUBLIC_REGISTRATIONS_OPEN=YES|NO
 
 ## Development Guidelines
 
+### Script Execution
+
+- Use `npx tsx scripts/script-name.ts` to run TypeScript scripts
+- Common scripts include validation, data migration, and seeding
+- Scripts are located in `scripts/` directory
+- Use `pnpm run db:seed` for database seeding
+
 ### When suggesting code:
 
 1. **Use TypeScript** - Full type safety with Prisma-generated types
@@ -211,6 +220,8 @@ PUBLIC_REGISTRATIONS_OPEN=YES|NO
 - Check Prisma schema matches migrations
 - Verify foreign key relationships
 - Use `pnpm studio` for data inspection
+- Use `pnpm run db:migrate` for schema changes
+- Use `pnpm run db:reset` to reset database
 
 ### Authentication Issues
 

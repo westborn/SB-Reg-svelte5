@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EntryAccordion, EntryCreateDialog, EntryCreateForm, EntryUpdateDialog } from '$lib/components';
+	import { EntryAccordion, EntryCreateDialog, EntryCreateForm, EntryUpdateButton } from '$lib/components';
 	import { getStep } from '$lib/stepsState.svelte';
 	import { getRegisterState } from '$lib/context.svelte.js';
 
@@ -52,7 +52,7 @@
 	{#if actionType === entryType.update}
 		<div>
 			<div class="mb-10 mt-10">Update your entry</div>
-			<EntryUpdateDialog {currentEntryId} />
+			<EntryUpdateButton {currentEntryId} />
 		</div>
 	{/if}
 </section>

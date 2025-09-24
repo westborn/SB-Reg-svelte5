@@ -6,11 +6,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { AdminMenu, ThemeToggle } from '$lib/components';
+	import { AdminMenu } from '$lib/components';
 
 	let data = $props();
 	const { navItems, user } = data;
-	const loggedInEmail = user ? user.email : 'full@example.com';
+	const loggedInEmail = user?.email ?? 'Guest';
 	const avatar = loggedInEmail.slice(0, 2);
 
 	let sheetOpen = $state(false);
@@ -24,7 +24,7 @@
 	<nav class="container grid h-14 grid-cols-[1fr_120px] items-center">
 		<!-- Desktop -->
 		<div class="hidden h-14 grid-cols-[200px_2fr] items-center md:grid">
-			<div class=" flex">
+			<div class="flex">
 				<img src="/favicon-32x32.png" alt="Sculpture Bermagui Logo" class="mt-2 h-10" />
 				<h1 class="text-center text-lg text-primary-400">Exhibition Registration</h1>
 			</div>
@@ -40,7 +40,7 @@
 		</div>
 
 		<!-- Mobile -->
-		<div class=" grid h-14 grid-cols-[120px_1fr] items-center md:hidden">
+		<div class="grid h-14 grid-cols-[120px_1fr] items-center md:hidden">
 			<div>
 				<Sheet.Root bind:open={sheetOpen}>
 					<Sheet.Trigger class={buttonVariants({ variant: 'ghost' })}
@@ -53,11 +53,11 @@
 						<div class="mt-10 flex flex-col items-start justify-between text-primary-300">
 							{#each navItems as { label, href }, i}
 								{#if page.url.pathname.startsWith(href)}
-									<Sheet.Trigger asChild>
+									<Sheet.Trigger>
 										<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
 									</Sheet.Trigger>
 								{:else}
-									<Sheet.Trigger asChild>
+									<Sheet.Trigger>
 										<Button
 											class="font-semibold text-primary-300"
 											{href}
@@ -80,23 +80,23 @@
 
 		<div class="flex items-center">
 			<Button href={'/logout'} variant="ghost">Logout</Button>
-			<Tooltip.Root openDelay={0}>
-				<Tooltip.Trigger>
-					<Avatar.Root>
-						<Avatar.Fallback class="uppercase">
-							{avatar}
-						</Avatar.Fallback>
-					</Avatar.Root>
-				</Tooltip.Trigger>
-				<Tooltip.Content>
-					<p>{loggedInEmail}</p>
-					{#if user.isSuperAdmin && page.data.user.proxyEmail}
-						<p><span class="text-xs text-primary">as: {page.data.user.proxyEmail}</span></p>
-					{/if}
-				</Tooltip.Content>
-			</Tooltip.Root>
-			<!-- TODO - do we need a theme toggle? -->
-			<!-- <ThemeToggle></ThemeToggle> -->
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						<Avatar.Root>
+							<Avatar.Fallback class="uppercase">
+								{avatar}
+							</Avatar.Fallback>
+						</Avatar.Root>
+					</Tooltip.Trigger>
+					<Tooltip.Content>
+						<p>{loggedInEmail}</p>
+						{#if user.isSuperAdmin && page.data.user.proxyEmail}
+							<p><span class="text-xs text-primary">as: {page.data.user.proxyEmail}</span></p>
+						{/if}
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 		</div>
 	</nav>
 </header>

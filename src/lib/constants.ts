@@ -30,6 +30,11 @@ export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again lat
 export const GENERIC_ERROR_UNEXPECTED = "Something went wrong. Sorry, we're broken!";
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
+// Multiple Images Constants
+export const MAX_IMAGES_UI_LIMIT = 3; // UI display limit
+export const MIN_IMAGES_PER_ENTRY = 1;
+export const DEFAULT_PRIMARY_IMAGE_INDEX = 0;
+
 export enum REGISTER_ROUTES {
 	REGISTER = '/register/artist',
 	ENTRY = '/register/entry',

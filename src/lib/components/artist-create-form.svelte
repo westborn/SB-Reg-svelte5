@@ -24,7 +24,7 @@
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Artist is now Registered');
-			myState.artistCreateDialogOpen = false; //TODO: this is not working
+			myState.artistCreateDialogOpen = false;
 			return;
 		}
 	});
@@ -38,33 +38,41 @@
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 	<Form.Field {form} name="firstName">
-		<Form.Control let:attrs>
-			<Form.Label>First Name</Form.Label>
-			<Input autofocus type="text" {...attrs} bind:value={$formData.firstName} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>First Name</Form.Label>
+				<Input autofocus type="text" {...props} bind:value={$formData.firstName} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="lastName">
-		<Form.Control let:attrs>
-			<Form.Label>Last Name</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.lastName} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Last Name</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.lastName} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="phone">
-		<Form.Control let:attrs>
-			<Form.Label>Phone</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.phone} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Phone</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.phone} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="postcode">
-		<Form.Control let:attrs>
-			<Form.Label>Postcode (or City)</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.postcode} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Postcode (or City)</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.postcode} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -84,37 +92,42 @@
 				<RadioGroup.Item value="Declined" id="r3" />
 				<Label for="r3">Declined</Label>
 			</div>
-			<RadioGroup.Input name="firstNations" />
 		</RadioGroup.Root>
 	</Form.Field>
 
 	<p class="pt-4 text-sm text-muted-foreground">(You can add this bank stuff later if you like...)</p>
 
 	<Form.Field {form} name="bankAccountName">
-		<Form.Control let:attrs>
-			<Form.Label>Bank Account Name</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankAccountName} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Bank Account Name</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankAccountName} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="bankBSB">
-		<Form.Control let:attrs>
-			<Form.Label>Account BSB</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankBSB} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Account BSB</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankBSB} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="bankAccount">
-		<Form.Control let:attrs>
-			<Form.Label>Account Number</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankAccount} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Account Number</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankAccount} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Errors errors={$errors._errors} />
+	<!-- <Form.Errors errors={$errors._errors} /> -->
 	<Form.Button disabled={$delayed}>
 		Create Registration?
 		{#if $delayed}

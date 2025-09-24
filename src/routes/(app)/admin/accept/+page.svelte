@@ -32,9 +32,6 @@
 	import { TableImage } from '$lib/components';
 	import MySwitch from './mySwitch.svelte';
 
-	// the data is picked up from the page store so it can be used in the table
-	const { data } = $props();
-
 	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 	let updateAcceptedError = $state('');
 
@@ -54,7 +51,10 @@
 			}
 		} catch (err) {
 			console.log('updateAccepted-err' + err);
-			updateAcceptedError = err.message;
+			updateAcceptedError =
+				typeof err === 'object' && err !== null && 'message' in err
+					? (err as { message: string }).message
+					: String(err);
 		}
 		exhibits[index].accepted = !exhibits[index].accepted;
 		return;
@@ -105,7 +105,10 @@
 			id: 'thumbnail',
 			cell: (info) => {
 				if (info.row.original.cloudURL == null) return 'No Image';
-				return renderComponent(TableImage, { path: info.row.original.cloudURL });
+				return renderComponent(TableImage, {
+					path: info.row.original.cloudURL,
+					entryId: info.row.original.entryId
+				});
 			}
 		}),
 		columnHelper.accessor('artistName', { header: 'Artist Name' }),
@@ -187,8 +190,10 @@
 		<div class="flex items-center justify-between">
 			<h4 class="text-xl font-bold text-primary">Accept/Reject Exhibits</h4>
 			<DropdownMenu.Root>
-				<DropdownMenu.Trigger asChild let:builder>
-					<Button variant="outline" size="sm" class="ml-auto flex h-8" builders={[builder]}>Columns?</Button>
+				<DropdownMenu.Trigger>
+					{#snippet child({ props })}
+						<Button {...props} variant="outline" size="sm" class="ml-auto flex h-8">Columns?</Button>
+					{/snippet}
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					<DropdownMenu.Label>Toggle columns</DropdownMenu.Label>
@@ -265,45 +270,45 @@
 				bind:page={currentPage}
 				count={table.getRowCount()}
 				perPage={table.getState().pagination.pageSize}
-				let:pages
-				let:currentPage
 			>
-				<Pagination.Content class="gap-0.5 sm:gap-1">
-					<Pagination.Item>
-						<Pagination.PrevButton
-							class="px-2 [&>span]:sr-only"
-							disabled={!table.getCanPreviousPage()}
-							on:click={() => table.previousPage()}
-						/>
-					</Pagination.Item>
-					{#each pages as page (page.key)}
-						{#if page.type === 'ellipsis'}
-							<Pagination.Item>
-								<Pagination.Ellipsis class="w-4 sm:w-9" />
-							</Pagination.Item>
-						{:else}
-							<Pagination.Item>
-								<Pagination.Link
-									size="default"
-									class="min-w-3 max-w-14 px-3 sm:px-4"
-									{page}
-									isActive={currentPage === page.value}
-									onclick={() => table.setPageIndex(page.value - 1)}
-								>
-									{page.value}
-								</Pagination.Link>
-							</Pagination.Item>
-						{/if}
-					{/each}
-					<Pagination.Item>
-						<Pagination.NextButton
-							class="px-2 [&>span]:sr-only"
-							disabled={!table.getCanNextPage()}
-							on:click={() => table.nextPage()}
-						/>
-					</Pagination.Item>
-					<Pagination.Item></Pagination.Item>
-				</Pagination.Content>
+				{#snippet children({ pages, currentPage })}
+					<Pagination.Content class="gap-0.5 sm:gap-1">
+						<Pagination.Item>
+							<Pagination.PrevButton
+								class="px-2 [&>span]:sr-only"
+								disabled={!table.getCanPreviousPage()}
+								onclick={() => table.previousPage()}
+							/>
+						</Pagination.Item>
+						{#each pages as page (page.key)}
+							{#if page.type === 'ellipsis'}
+								<Pagination.Item>
+									<Pagination.Ellipsis class="w-4 sm:w-9" />
+								</Pagination.Item>
+							{:else}
+								<Pagination.Item>
+									<Pagination.Link
+										size="default"
+										class="min-w-3 max-w-14 px-3 sm:px-4"
+										{page}
+										isActive={currentPage === page.value}
+										onclick={() => table.setPageIndex(page.value - 1)}
+									>
+										{page.value}
+									</Pagination.Link>
+								</Pagination.Item>
+							{/if}
+						{/each}
+						<Pagination.Item>
+							<Pagination.NextButton
+								class="px-2 [&>span]:sr-only"
+								disabled={!table.getCanNextPage()}
+								onclick={() => table.nextPage()}
+							/>
+						</Pagination.Item>
+						<Pagination.Item></Pagination.Item>
+					</Pagination.Content>
+				{/snippet}
 			</Pagination.Root>
 		</div>
 	</div>

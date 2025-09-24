@@ -26,24 +26,28 @@
 	</div>
 	<form method="POST" use:enhance class="w-full space-y-4">
 		<Form.Field {form} name="email">
-			<Form.Control let:attrs>
-				<Form.Label>Email Address</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.email} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Email Address</Form.Label>
+					<Input type="text" {...props} bind:value={$formData.email} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 		<Form.Field {form} name="token">
-			<Form.Control let:attrs>
-				<Form.Label
-					>6 Digit Token
-					<span class="py-4 text-xs text-muted-foreground">(that we sent to your email address)</span>
-				</Form.Label>
-				<Input autofocus type="text" {...attrs} bind:value={$formData.token} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label
+						>6 Digit Token
+						<span class="py-4 text-xs text-muted-foreground">(that we sent to your email address)</span>
+					</Form.Label>
+					<Input autofocus type="text" {...props} bind:value={$formData.token} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Form.Errors errors={$errors._errors} />
+		<!-- <Form.Errors errors={$errors._errors} /> -->
 		<Form.Button disabled={$delayed}>
 			Verify email address
 			{#if $delayed}

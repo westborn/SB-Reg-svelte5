@@ -6,6 +6,13 @@
 	import { EntryCreateForm } from '$lib/components';
 
 	const myState = getRegisterState();
+
+	// Clear working images when dialog opens
+	$effect(() => {
+		if (myState.entryCreateDialogOpen) {
+			myState.clearWorkingImages();
+		}
+	});
 </script>
 
 <Dialog.Root bind:open={myState.entryCreateDialogOpen}>

@@ -67,7 +67,18 @@ async function sendRegistrationConfirmationEmail({ submission, user }: { submiss
 		console.error('Failed to get entries data');
 		return new Response(JSON.stringify({ message: 'Error Getting Submission -Entries' }), { status: 500 });
 	}
-	const entriesHTML = makeEntriesHTML(entriesData);
+	const entriesHTML = makeEntriesHTML(
+		entriesData.map((entry) => ({
+			inOrOut: entry.inOrOut ?? '',
+			title: entry.title ?? '',
+			description: entry.description ?? '',
+			material: entry.material ?? '',
+			dimensions: entry.dimensions ?? '',
+			specialRequirements: entry.specialRequirements ?? '',
+			price: entry.price ?? '',
+			images: entry.images ?? []
+		}))
+	);
 	const costOfRegistration = 20 + Number(entriesData.length) * 20;
 	const numberOfEntries = entriesData.length === 1 ? `1 entry` : `${entriesData.length} entries`;
 	const headerHTML = `<p style="color: #1d4ed8; font-size: 30px;"> <br/>
@@ -170,8 +181,8 @@ function makeEntriesHTML(entriesData: Entry[]): string {
 }
 
 /* Generates HTML table rows based on field-value pairs. */
-function makeTableRows(fields: [string, keyof Entry][], data: Entry | Submission): string {
-	return fields.map(([name, key]) => createTableRow(name, data[key])).join('');
+function makeTableRows<T extends Record<string, any>>(fields: [string, keyof T][] | string[][], data: T): string {
+	return fields.map(([name, key]) => createTableRow(name, key ? (data?.[key as keyof T] ?? '') : '')).join('');
 }
 
 function createTableRow(name: string, value: string | number): string {

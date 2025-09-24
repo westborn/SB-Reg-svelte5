@@ -11,8 +11,8 @@
 	import { toast } from 'svelte-sonner';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
-	import { getRegisterState, updateWorkingImage } from '$lib/context.svelte';
-	import { ImageUploadForm, OptimisedImage } from '$lib/components';
+	import { getRegisterState } from '$lib/context.svelte';
+	import { MultipleImageUploadForm } from '$lib/components';
 
 	type Props = {
 		currentEntryId: number;
@@ -20,25 +20,33 @@
 
 	let { currentEntryId }: Props = $props();
 	let myState = getRegisterState();
-	updateWorkingImage(null);
+
+	// Use the entry ID from global state to ensure we're editing the correct entry
+	let editingEntryId = $derived(myState.currentEditingEntryId ?? currentEntryId);
 
 	const form = superForm(myState.entryForm, {
-		id: `entryUpdateForm`,
+		id: `entryUpdateForm-${currentEntryId}`,
 		validators: zodClient(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
-			// pass the image that we accepted, into this form's data when they save the new entry
-			jsonData({ ...$formData, image: JSON.stringify(myState.workingImage), idToUpdate: currentEntryId });
+			// pass the images that we accepted, into this form's data when they save the updated entry
+			const imagesWithPrimary = myState.getImagesWithPrimary();
+			jsonData({
+				...$formData,
+				images: JSON.stringify(imagesWithPrimary.images),
+				primaryImageId: imagesWithPrimary.primaryImageId,
+				idToUpdate: editingEntryId
+			});
 		},
 		onResult({ result }: { result: any }) {
-			console.log('Action result', result);
+			// console.log('Action result', result);
 			if (result.type != 'success') {
 				toast.error('Failed to update entry');
 				return;
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success('Entry Updated');
-			myState.entryUpdateDialogOpen = false; //TODO: is this working??
+			myState.entryUpdateDialogOpen = false;
 			return;
 		}
 	});
@@ -46,53 +54,47 @@
 	const { form: formData, enhance, delayed, errors } = form;
 
 	// get the form field values from the submission object using the id that was passed in
-	const entry = myState?.submission?.registrations[0].entries.find((entry) => entry.id === currentEntryId);
-	if (entry) {
-		({
-			id: $formData.id,
-			inOrOut: $formData.inOrOut,
-			description: $formData.description,
-			material: $formData.material,
-			specialRequirements: $formData.specialRequirements,
-			title: $formData.title
-		} = entry);
-		$formData.price = entry.price ? entry.price / 100 : 0;
-		//split the dimensions string into the three fields
-		const dimensions = entry?.dimensions?.split('x') || [];
-		[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
-		//set the working image to the current image if there is one
-		if (entry.images[0]) {
-			updateWorkingImage({ ...entry.images[0], artistId: myState.submission?.registrations[0].artistId as number });
+	let entry = $derived(myState?.submission?.registrations[0].entries.find((entry) => entry.id === editingEntryId));
+
+	// Initialize form data when entry is first available
+	let lastEntryId = $state<number | null>(null);
+
+	$effect(() => {
+		// Only reinitialize if we're looking at a different entry
+		if (entry && entry.id !== lastEntryId) {
+			({
+				id: $formData.id,
+				inOrOut: $formData.inOrOut,
+				description: $formData.description,
+				material: $formData.material,
+				specialRequirements: $formData.specialRequirements,
+				title: $formData.title
+			} = entry);
+			$formData.price = entry.price ? entry.price / 100 : 0;
+			//split the dimensions string into the three fields
+			const dimensions = entry?.dimensions?.split('x') || [];
+			[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
+			lastEntryId = entry.id;
 		}
-	}
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm">
+<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm-{currentEntryId}">
 	<!-- stop the form from submitting on enter key press -->
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 	<Form.Field {form} name="title">
-		<Form.Control let:attrs>
-			<Form.Label>Title for this Exhibit</Form.Label>
-			<Input autofocus type="text" {...attrs} bind:value={$formData.title} required />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Title for this Exhibit</Form.Label>
+				<Input autofocus type="text" {...props} bind:value={$formData.title} required />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
-	{#if myState.workingImage?.cloudURL}
-		<div class="self-center">
-			<OptimisedImage
-				path={myState.workingImage?.cloudURL ? myState.workingImage?.cloudURL : '/dummy_160x160_ffffff_cccccc.png'}
-				alt="Current Image"
-				width={128}
-				height={128}
-				class="h-32 w-32 overflow-hidden rounded object-contain"
-			/>
-		</div>
-	{/if}
-
-	<ImageUploadForm buttonText={'Replace Image?'} />
+	<MultipleImageUploadForm />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
 		<Form.Legend class="mb-2">Entry Category?</Form.Legend>
@@ -105,22 +107,25 @@
 				<RadioGroup.Item value="Indoor" id="r2" />
 				<Label for="r2">Indoor</Label>
 			</div>
-			<RadioGroup.Input name="inOrOut" />
 		</RadioGroup.Root>
 	</Form.Field>
 
 	<Form.Field {form} name="price">
-		<Form.Control let:attrs>
-			<Form.Label>Price (in whole dollars)</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.price} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Price (in whole dollars)</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.price} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="material">
-		<Form.Control let:attrs>
-			<Form.Label>Material used in this piece</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.material} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Material used in this piece</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.material} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -130,46 +135,56 @@
 	</p>
 	<div class="grid grid-cols-3 gap-4">
 		<Form.Field {form} name="dimLength">
-			<Form.Control let:attrs>
-				<Form.Label>Length</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.dimLength} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Length</Form.Label>
+					<Input type="text" {...props} bind:value={$formData.dimLength} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="dimWidth">
-			<Form.Control let:attrs>
-				<Form.Label>Width</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.dimWidth} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Width</Form.Label>
+					<Input type="text" {...props} bind:value={$formData.dimWidth} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="dimHeight">
-			<Form.Control let:attrs>
-				<Form.Label>Height</Form.Label>
-				<Input type="text" {...attrs} bind:value={$formData.dimHeight} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Height</Form.Label>
+					<Input type="text" {...props} bind:value={$formData.dimHeight} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 	</div>
 	<Form.Field {form} name="specialRequirements">
-		<Form.Control let:attrs>
-			<Form.Label>Any special requirements?</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.specialRequirements} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Any special requirements?</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.specialRequirements} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="description">
-		<Form.Control let:attrs>
-			<Form.Label>Description for the catalogue (25 words)</Form.Label>
-			<Textarea {...attrs} class="resize-none" bind:value={$formData.description as string} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Description for the catalogue (25 words)</Form.Label>
+				<Textarea {...props} class="resize-none" bind:value={$formData.description as string} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Errors errors={$errors._errors} />
+	<!-- <Form.Errors errors={$errors._errors} /> -->
 	<Form.Button disabled={$delayed}>
 		Save Updated Entry?
 		{#if $delayed}

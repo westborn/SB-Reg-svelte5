@@ -118,7 +118,11 @@
 			}
 		} catch (err) {
 			console.log('registerComplete-err' + err);
-			errorMessage = err.message;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			} else {
+				errorMessage = String(err);
+			}
 		}
 
 		return { result: 'success', data: null };
@@ -144,8 +148,8 @@
 		const response = await sendCompleteToServer(squarePaymentResponse.payment.receiptUrl);
 		// console.log('completeRegistration' + response)
 		if (response.result === 'error') {
-			errorMessage = response.data;
-			handleUnexpectedError(errorMessage);
+			errorMessage = String(response.data);
+			handleUnexpectedError(new Error(errorMessage));
 		} else {
 			fetchingData = false;
 			// currentRegistration.set(response.data.registration)
@@ -169,7 +173,7 @@
 			token = await tokenize(card);
 		} catch (e) {
 			errorMessage = 'Card details not correct - try again';
-			console.error(e.message);
+			console.error(e instanceof Error ? e.message : e);
 			fetchingData = false;
 			return;
 		}
@@ -210,8 +214,8 @@
 			console.log('handlePaymentSubmission-err' + err);
 			currentState = validStates.PAYMENTERROR;
 			errorMessage = 'Payment failed';
-			handleUnexpectedError(err);
-			throw new Error(err);
+			handleUnexpectedError(err instanceof Error ? err : new Error(String(err)));
+			throw err instanceof Error ? err : new Error(String(err));
 		}
 	}
 

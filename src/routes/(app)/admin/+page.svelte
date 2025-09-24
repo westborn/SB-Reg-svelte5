@@ -122,15 +122,10 @@
 		}
 	}
 
-	const years = [
-		{ value: '2025', label: '2025' },
-		{ value: '2024', label: '2024' },
-		{ value: '2023', label: '2023' },
-		{ value: '2022', label: '2022' }
-	];
+	const years = ['2026', '2025', '2024', '2023', '2022'];
 
 	let getCatalogueError = $state('');
-	let selectedYear = $state({ value: '2025', label: '2025' });
+	let selectedYear = $state(EXHIBITION_YEAR);
 	let catalogueData = $state([]);
 	async function getCatalogue() {
 		getCatalogueError = '';
@@ -140,7 +135,7 @@
 				headers: {
 					'content-type': 'application/json'
 				},
-				body: JSON.stringify({ entryYear: selectedYear.value })
+				body: JSON.stringify({ entryYear: selectedYear })
 			});
 			if (result.status != 200) {
 				const error = await result.json();
@@ -151,7 +146,10 @@
 			handleDownload('catalogue', catalogueData);
 		} catch (err) {
 			console.log('registerComplete-err' + err);
-			getCatalogueError = err.message;
+			getCatalogueError =
+				typeof err === 'object' && err !== null && 'message' in err
+					? (err as { message: string }).message
+					: String(err);
 		}
 		return;
 	}
@@ -219,26 +217,20 @@
 		<hr class="mt-4" />
 		<h4 class="text-lg font-semibold">Download a Catalogue CSV</h4>
 		<p class="mt-4">
-			Generate a CSV file of the <span class="font-semibold text-red-500">{selectedYear.value}</span> Catalogue
+			Generate a CSV file of the <span class="font-semibold text-red-500">{selectedYear}</span> Catalogue
 			<Button onclick={() => getCatalogue()}>Download Catalogue</Button>
 		</p>
 		{#if toggleOpenClosedError}
 			<div class="text-red-500">{toggleOpenClosedError}</div>
 		{/if}
 
-		<Select.Root onSelectedChange={(e: any) => (selectedYear = { ...e })} selected={selectedYear}>
-			<Select.Trigger class="w-[120px]">
-				<Select.Value placeholder="Select a year" />
-			</Select.Trigger>
+		<Select.Root type="single" bind:value={selectedYear} name="entryYear">
+			<Select.Trigger class="w-[120px]">Select a year</Select.Trigger>
 			<Select.Content>
-				<Select.Group>
-					<Select.Label>Year</Select.Label>
-					{#each years as year}
-						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
-					{/each}
-				</Select.Group>
+				{#each years as year}
+					<Select.Item value={year}>{year}</Select.Item>
+				{/each}
 			</Select.Content>
-			<Select.Input name="entryYear" />
 		</Select.Root>
 		{#if getCatalogueError}
 			<div class="text-red-500">{getCatalogueError}</div>
