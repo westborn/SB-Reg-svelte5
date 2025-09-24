@@ -63,17 +63,22 @@
 	<MultipleImageUploadForm />
 
 	<Form.Field class="px-2" {form} name="inOrOut">
-		<Form.Legend class="mb-2">Entry Category?</Form.Legend>
-		<RadioGroup.Root class="flex flex-row" bind:value={$formData.inOrOut as string}>
-			<div class="flex items-center space-x-2">
-				<RadioGroup.Item value="Outdoor" id="r1" />
-				<Label for="r1">Outdoor</Label>
-			</div>
-			<div class="flex items-center space-x-2">
-				<RadioGroup.Item value="Indoor" id="r2" />
-				<Label for="r2">Indoor</Label>
-			</div>
-		</RadioGroup.Root>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Legend class="mb-2">Entry Category?</Form.Legend>
+				<RadioGroup.Root class="flex flex-row" bind:value={$formData.inOrOut as string} {...props}>
+					<div class="flex items-center space-x-2">
+						<RadioGroup.Item value="Outdoor" id="r1" />
+						<Label for="r1">Outdoor</Label>
+					</div>
+					<div class="flex items-center space-x-2">
+						<RadioGroup.Item value="Indoor" id="r2" />
+						<Label for="r2">Indoor</Label>
+					</div>
+				</RadioGroup.Root>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="price">

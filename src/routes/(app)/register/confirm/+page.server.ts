@@ -16,7 +16,6 @@ export const load: PageServerLoad = async (event) => {
 
 const confirmUpdate = async (event: RequestEvent) => {
 	const formValidationResult = await superValidate(event, zod(confirmSchemaUI));
-
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Confirm Details are Invalid - please reload and try again, or, call us!!', {
 			status: 400
@@ -40,10 +39,10 @@ const confirmUpdate = async (event: RequestEvent) => {
 		const updatedRegistration = await prisma.registrationTable.update({
 			where: { id: idToUpdate },
 			data: {
-				bumpIn: bumpIn ?? '',
-				bumpOut: bumpOut ?? '',
+				bumpIn: bumpIn ?? null,
+				bumpOut: bumpOut ?? null,
 				crane: crane === 'Yes' ? true : false,
-				displayRequirements: displayRequirements ?? ''
+				displayRequirements: displayRequirements ?? null
 			}
 		});
 		if (!updatedRegistration) {

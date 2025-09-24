@@ -99,21 +99,26 @@
 	</Form.Field>
 
 	<Form.Field class="px-2" {form} name="firstNations">
-		<Form.Legend class="mb-2">Do you identify as Indigenous?</Form.Legend>
-		<RadioGroup.Root class="flex flex-row" bind:value={$formData.firstNations as string}>
-			<div class="flex items-center space-x-2">
-				<RadioGroup.Item value="Yes" id="r1" />
-				<Label for="r1">Yes</Label>
-			</div>
-			<div class="flex items-center space-x-2">
-				<RadioGroup.Item value="No" id="r2" />
-				<Label for="r2">No</Label>
-			</div>
-			<div class="flex items-center space-x-2">
-				<RadioGroup.Item value="Declined" id="r3" />
-				<Label for="r3">Declined</Label>
-			</div>
-		</RadioGroup.Root>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Legend class="mb-2">Do you identify as Indigenous?</Form.Legend>
+				<RadioGroup.Root class="flex flex-row" bind:value={$formData.firstNations as string} {...props}>
+					<div class="flex items-center space-x-2">
+						<RadioGroup.Item value="Yes" id="r1" />
+						<Label for="r1">Yes</Label>
+					</div>
+					<div class="flex items-center space-x-2">
+						<RadioGroup.Item value="No" id="r2" />
+						<Label for="r2">No</Label>
+					</div>
+					<div class="flex items-center space-x-2">
+						<RadioGroup.Item value="Declined" id="r3" />
+						<Label for="r3">Declined</Label>
+					</div>
+				</RadioGroup.Root>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
 	</Form.Field>
 
 	<p class="pt-6 text-sm text-muted-foreground">(You can add this bank stuff later if you like...)</p>
