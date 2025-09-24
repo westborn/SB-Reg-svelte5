@@ -6,7 +6,7 @@ The Sculpture Bermagui Registration System is a modern web application built wit
 
 ## 📈 Current Status
 
-**Version**: 1.5.0  
+**Version**: 1.5.0 (develop branch)
 **Exhibition Year**: 2025 (Automatically calculated)
 
 ### **2025 Registrations now CLOSED**
