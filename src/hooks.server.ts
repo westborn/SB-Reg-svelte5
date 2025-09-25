@@ -59,7 +59,7 @@ const auth: Handle = async ({ event, resolve }) => {
 			user.isAdmin = true;
 			if (isSuperAdmin) {
 				const proxyEmail = event.cookies.get('proxyEmail');
-				user.proxyEmail = proxyEmail ? proxyEmail : 'not set';
+				user.proxyEmail = proxyEmail ? proxyEmail : user.email;
 				user.isSuperAdmin = true;
 			}
 		}
