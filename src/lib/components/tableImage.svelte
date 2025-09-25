@@ -6,12 +6,8 @@
 
 	import OptimisedImage from '$lib/components/optimised-image.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Button } from '$lib/components/ui/button';
-	import { Badge } from '$lib/components/ui/badge';
-	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
+	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import Star from 'lucide-svelte/icons/star';
-	import Camera from 'lucide-svelte/icons/camera';
 	import type { CurrentImage } from '$lib/components/server/registrationDB';
 
 	let { path, entryId }: Props = $props();
@@ -19,9 +15,48 @@
 	let showLargeImage = $state(false);
 	let images = $state<CurrentImage[]>([]);
 	let primaryImageId = $state<number | null>(null);
-	let currentImageIndex = $state(0);
 	let isLoading = $state(false);
-	let hasMultipleImages = $state(false);
+
+	// Carousel API state
+	let api = $state<any>(null);
+	let current = $state(0);
+	let count = $state(0);
+
+	function setCarouselApi(carouselApi: any) {
+		api = carouselApi;
+	}
+
+	$effect(() => {
+		if (!api) return;
+
+		count = api.scrollSnapList().length;
+		current = api.selectedScrollSnap();
+
+		api.on('select', () => {
+			current = api.selectedScrollSnap();
+		});
+	});
+	const processedImages = $derived.by(() => {
+		const validImages = images.filter((img) => img !== null);
+
+		if (!validImages.length || !primaryImageId) {
+			return validImages.map((img) => ({ ...img, isPrimary: false }));
+		}
+
+		// Find primary image
+		const primaryImg = validImages.find((img) => img.id === primaryImageId);
+		if (!primaryImg) {
+			return validImages.map((img) => ({ ...img, isPrimary: false }));
+		}
+
+		// Mark primary image and put it first
+		const markedPrimaryImg = { ...primaryImg, isPrimary: true };
+		const otherImages = validImages
+			.filter((img) => img.id !== primaryImageId)
+			.map((img) => ({ ...img, isPrimary: false }));
+
+		return [markedPrimaryImg, ...otherImages];
+	});
 
 	// Load images when dialog opens
 	const loadImages = async () => {
@@ -34,26 +69,23 @@
 				const data = await response.json();
 				images = (data.images || []).filter(Boolean); // Filter out null images
 				primaryImageId = data.primaryImageId;
-				hasMultipleImages = images.length > 1;
 
-				// Set current image to primary image if it exists
-				if (primaryImageId && images.length > 0) {
+				// Set current image to primary image if it exists (using carousel API)
+				if (primaryImageId && images.length > 0 && api) {
 					const primaryIndex = images.findIndex((img) => img && img.id === primaryImageId);
 					if (primaryIndex !== -1) {
-						currentImageIndex = primaryIndex;
+						api.scrollTo(primaryIndex);
 					}
 				}
 			} else {
 				console.error('Failed to load images:', response.statusText);
 				// Fallback to single image
 				images = [];
-				hasMultipleImages = false;
 			}
 		} catch (error) {
 			console.error('Error loading images:', error);
 			// Fallback to single image
 			images = [];
-			hasMultipleImages = false;
 		} finally {
 			isLoading = false;
 		}
@@ -65,20 +97,6 @@
 			await loadImages();
 		}
 	};
-
-	const nextImage = () => {
-		if (images.length > 1) {
-			currentImageIndex = (currentImageIndex + 1) % images.length;
-		}
-	};
-
-	const prevImage = () => {
-		if (images.length > 1) {
-			currentImageIndex = currentImageIndex === 0 ? images.length - 1 : currentImageIndex - 1;
-		}
-	};
-
-	const currentImage = $derived(images[currentImageIndex] || null);
 </script>
 
 <!-- all cell contents need to be wrapped in <span> tags -->
@@ -92,13 +110,6 @@
 			class="h-20 w-20 overflow-hidden rounded object-contain"
 		/></button
 	>
-
-	<!-- Multiple images indicator (only show after we've loaded images and confirmed multiple) -->
-	{#if entryId && hasMultipleImages && images.length > 1}
-		<div class="absolute right-1 top-1 rounded-full bg-black bg-opacity-70 p-1">
-			<Camera class="h-3 w-3 text-white" />
-		</div>
-	{/if}
 </span>
 
 {#if showLargeImage}
@@ -114,89 +125,63 @@
 						<p class="text-muted-foreground">Loading images...</p>
 					</div>
 				</div>
-			{:else if images.length > 0 && currentImage}
-				<!-- Multiple images carousel -->
+			{:else if processedImages.length > 0}
+				<!-- Carousel implementation -->
 				<div class="space-y-4">
-					<!-- Image display -->
-					<div class="relative">
-						<OptimisedImage
-							path={currentImage.cloudURL}
-							alt={currentImage.originalFileName || 'Entry image'}
-							width={560}
-							height={0}
-							class="rounded"
-						/>
+					<Carousel.Root
+						setApi={setCarouselApi}
+						opts={{
+							align: 'center',
+							loop: true
+						}}
+						class="mx-auto max-w-lg"
+					>
+						<Carousel.Content>
+							{#each processedImages as image, index}
+								<Carousel.Item class="relative">
+									<OptimisedImage
+										path={image.cloudURL}
+										alt={image.originalFileName || 'Entry image'}
+										width={512}
+										height={0}
+										class="rounded"
+									/>
+									<!-- Primary Image Star Indicator -->
+									{#if image.isPrimary}
+										<div class="absolute right-2 top-2 rounded-full bg-yellow-500 p-1 text-white shadow-md">
+											<Star class="h-3 w-3 fill-current" />
+										</div>
+									{/if}
+								</Carousel.Item>
+							{/each}
+						</Carousel.Content>
 
-						<!-- Primary badge -->
-						{#if currentImage.id === primaryImageId}
-							<Badge class="absolute left-2 top-2 bg-primary text-primary-foreground">
-								<Star class="mr-1 h-3 w-3" />
-								Primary
-							</Badge>
+						<!-- Navigation Arrows (only show if multiple images) -->
+						{#if processedImages.length > 1}
+							<Carousel.Previous class="absolute left-2 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/80 hover:bg-white" />
+							<Carousel.Next class="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/80 hover:bg-white" />
 						{/if}
+					</Carousel.Root>
 
-						<!-- Navigation buttons -->
-						{#if images.length > 1}
-							<Button
-								variant="secondary"
-								size="icon"
-								class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white"
-								onclick={prevImage}
-							>
-								<ChevronLeft class="h-4 w-4" />
-							</Button>
-							<Button
-								variant="secondary"
-								size="icon"
-								class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white"
-								onclick={nextImage}
-							>
-								<ChevronRight class="h-4 w-4" />
-							</Button>
-						{/if}
-					</div>
-
-					<!-- Image info and counter -->
-					<div class="space-y-2">
-						{#if images.length > 1}
-							<div class="text-center text-sm text-muted-foreground">
-								Image {currentImageIndex + 1} of {images.length}
-							</div>
-						{/if}
-
-						{#if currentImage.originalFileName}
-							<p class="text-center text-sm font-medium">{currentImage.originalFileName}</p>
-						{/if}
-					</div>
-
-					<!-- Thumbnail navigation for multiple images -->
-					{#if images.length > 1}
-						<div class="flex justify-center space-x-2">
-							{#each images as image, index (image?.id || index)}
-								{#if image}
-									<button
-										class="relative h-16 w-16 overflow-hidden rounded border-2 transition-all {index ===
-										currentImageIndex
-											? 'border-primary'
-											: 'border-muted hover:border-muted-foreground'}"
-										onclick={() => (currentImageIndex = index)}
-									>
-										<OptimisedImage
-											path={image.cloudURL}
-											alt={image.originalFileName || 'Thumbnail'}
-											width={64}
-											height={64}
-											class="h-full w-full object-cover"
-										/>
-										{#if image.id === primaryImageId}
-											<div class="absolute right-0 top-0 rounded-bl bg-primary p-0.5">
-												<Star class="h-2 w-2 text-primary-foreground" />
-											</div>
-										{/if}
-									</button>
-								{/if}
+					<!-- Dot Navigation (only show if multiple images) -->
+					{#if processedImages.length > 1}
+						<div class="flex justify-center gap-1">
+							{#each Array.from({ length: count }) as _, index}
+								<button
+									type="button"
+									onclick={() => api?.scrollTo(index)}
+									class="h-2 w-2 rounded-full transition-colors {index === current
+										? 'bg-primary'
+										: 'bg-muted-foreground/50 hover:bg-muted-foreground/80'}"
+									aria-label={`Go to image ${index + 1}`}
+								></button>
 							{/each}
 						</div>
+					{/if}
+
+					<!-- Image info -->
+					{#if processedImages[current]?.originalFileName}
+						<p class="text-center text-sm font-medium">{processedImages[current].originalFileName}</p>
 					{/if}
 				</div>
 			{:else}

@@ -1,6 +1,25 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {
+	interface CardOptions {
+		style?: {
+			input?: {
+				backgroundColor?: string;
+				fontSize?: string;
+				fontFamily?: string;
+			};
+			'.input-container'?: {
+				borderColor?: string;
+				borderRadius?: string;
+			};
+		};
+	}
+
+	interface Card {
+		attach: (containerId: string) => Promise<any>;
+		tokenize: () => Promise<{ token: string; status: string; errors?: any }>;
+	}
+
 	let Square: {
 		payments: (appId: string, locationId: string) => { card: (options: CardOptions) => Promise<Card> };
 	};
