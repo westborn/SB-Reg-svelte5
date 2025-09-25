@@ -190,12 +190,13 @@
 			{/each}
 		</div>
 
-		<!-- Instructions -->
-		<div class="space-y-1 text-sm text-muted-foreground">
-			<p>• The first image you upload becomes the primary image automatically</p>
-			<p>• Hover over images to set a different primary image or remove them</p>
-			<p>• The primary image will be used as the main photo for your entry</p>
-		</div>
+		{#if images.length > MIN_IMAGES_PER_ENTRY}
+			<!-- Instructions -->
+			<div class="space-y-1 text-sm text-muted-foreground">
+				<p>• The primary image (starred) will be in the catalogue</p>
+				<p>• Hover over image to set a primary or remove image</p>
+			</div>
+		{/if}
 	{/if}
 </div>
 
