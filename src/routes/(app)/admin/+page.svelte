@@ -3,7 +3,7 @@
 	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 	import { EXHIBITION_YEAR, REGISTRATIONS_OPEN } from '$lib/constants.js';
 
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import jsonToCsvExport from 'json-to-csv-export';
 
 	import { page } from '$app/state';
@@ -52,7 +52,7 @@
 		if (proxyExhibit) {
 			return proxyExhibit.closed ? 'Closed' : 'Still Open';
 		} else {
-			return 'No Proxy Found';
+			return 'No Registration for Proxy';
 		}
 	}
 
@@ -191,6 +191,7 @@
 			<div>
 				<div class="w-80 rounded p-4">
 					<input
+						name="email"
 						bind:value={searchTerm}
 						type="search"
 						class="w-full rounded border border-solid border-gray-300 bg-white px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
