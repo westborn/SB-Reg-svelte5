@@ -41,7 +41,7 @@ export const actions = {
 				form
 			});
 		}
-		console.log('login:', data);
+		console.log('login attempt:', form.data.email);
 		redirect(302, `/verify-email?email=${encodeURIComponent(form.data.email)}`);
 	}
 };

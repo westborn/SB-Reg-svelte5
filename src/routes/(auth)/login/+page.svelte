@@ -19,7 +19,7 @@
 
 <AuthPage type="login" {session} {user}>
 	<div class="flex flex-col space-y-2 text-center">
-		<h1 class="text-2xl font-semibold tracking-tight">Login to an existing registration</h1>
+		<h1 class="text-2xl font-semibold tracking-tight">Login to manage your registration</h1>
 		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
