@@ -42,7 +42,7 @@ export const actions = {
 				form
 			});
 		}
-		console.log('signup:', data);
+		console.log('Signup attempt:', form.data.email);
 		redirect(302, `/verify-email?email=${encodeURIComponent(form.data.email)}`);
 	}
 };
