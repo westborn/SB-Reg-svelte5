@@ -111,6 +111,7 @@ export const getSubmission = async ({ isSuperAdmin, proxyEmail, email }: User) =
 							description: true,
 							specialRequirements: true,
 							price: true,
+							sold: true,
 							images: {
 								select: {
 									id: true,
@@ -174,6 +175,7 @@ export const getEntries = async (artistEmail: string) => {
 							description: true,
 							specialRequirements: true,
 							price: true,
+							sold: true,
 							images: {
 								select: {
 									id: true,
@@ -253,7 +255,8 @@ export const getEntry = async (id: number) => {
 			dimensions: true,
 			description: true,
 			specialRequirements: true,
-			price: true
+			price: true,
+			sold: true
 		}
 	});
 	return entry;
