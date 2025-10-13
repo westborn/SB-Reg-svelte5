@@ -60,38 +60,11 @@ model entryTable {
 
 ### Phase 3: Public Display Updates
 
-#### 3.1 Update Catalogue Card Component
-
-- Modify `src/lib/components/catalogue-card.svelte`
-- Add visual "SOLD" indicator overlay or badge
-- Gray out or modify styling for sold items
-- Consider showing crossed-out price or "SOLD" instead of price
-
-#### 3.2 Update Entry Card Component
+#### 3.1 Update Entry Card Component
 
 - Modify `src/lib/components/entry-card.svelte`
 - Add sold indicator for user's own entries
 - Update price display logic for sold items
-
-#### 3.3 Add Sold Items Filtering
-
-- Add filter options to public catalog views
-- Allow users to show/hide sold items
-- Update URL parameters and state management
-
-### Phase 4: User Experience Enhancements
-
-#### 4.1 Visual Design
-
-- Design consistent "SOLD" badge/overlay styling
-- Add appropriate colors and icons using existing Tailwind theme
-- Ensure accessibility with proper contrast and ARIA labels
-
-#### 4.2 Analytics and Reporting
-
-- Track sold vs unsold statistics
-- Add sold status to any reporting features
-- Consider adding sale date tracking (future enhancement)
 
 ## Technical Considerations
 

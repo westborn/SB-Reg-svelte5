@@ -118,13 +118,6 @@
 			enableColumnFilter: false,
 			enableGlobalFilter: false
 		}),
-		columnHelper.accessor('sold', {
-			header: 'Sold',
-			cell: (info) => (info.getValue() ? 'Yes' : 'No'),
-			enableSorting: true,
-			enableColumnFilter: true,
-			enableGlobalFilter: false
-		}),
 		columnHelper.accessor('description', { header: 'Description' }),
 		columnHelper.accessor('material', {
 			header: 'Material',
@@ -229,31 +222,6 @@
 				{/each}
 			</Select.Content>
 		</Select.Root>
-
-		<h4 class="text-xl font-bold text-primary">Sold Status</h4>
-		<Select.Root
-			type="single"
-			onValueChange={(value) => {
-				const soldColumn = table.getColumn('sold');
-				if (soldColumn) {
-					if (value === 'all') {
-						soldColumn.setFilterValue(undefined);
-					} else if (value === 'sold') {
-						soldColumn.setFilterValue(true);
-					} else if (value === 'not-sold') {
-						soldColumn.setFilterValue(false);
-					}
-				}
-			}}
-		>
-			<Select.Trigger class="w-[120px]">Filter sold</Select.Trigger>
-			<Select.Content>
-				<Select.Item value="all">All Items</Select.Item>
-				<Select.Item value="sold">Sold Only</Select.Item>
-				<Select.Item value="not-sold">Available Only</Select.Item>
-			</Select.Content>
-		</Select.Root>
-
 		<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
 	</div>
 </section>
