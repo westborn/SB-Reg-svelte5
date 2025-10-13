@@ -522,6 +522,7 @@ export type Exhibit = {
 	material: string;
 	title: string;
 	price: number;
+	sold: boolean;
 	specialRequirements: string;
 	imageId: number;
 	cloudURL: string;
@@ -563,6 +564,7 @@ export const getExhibits = async ({
 		entry.material,
 		entry.title,
 		entry.price_in_cents as "price",
+		entry.sold,
 		entry.special_requirements as "specialRequirements",
 		image.id as "imageId",
 		image.cloud_url as "cloudURL",
