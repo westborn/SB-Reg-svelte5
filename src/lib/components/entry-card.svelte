@@ -87,8 +87,14 @@
 										alt={`Image ${index + 1} of ${images.length}`}
 										width={160}
 										height={160}
-										class="h-40 w-40 rounded object-cover"
+										class="h-40 w-40 rounded object-cover {entryItem.sold ? 'opacity-60 grayscale' : ''}"
 									/>
+									<!-- Sold Indicator Overlay -->
+									{#if entryItem.sold}
+										<div class="absolute inset-0 flex items-center justify-center">
+											<div class="rounded-md bg-red-600 px-3 py-1 text-sm font-bold text-white shadow-lg">SOLD</div>
+										</div>
+									{/if}
 									<!-- Primary Image Star Indicator -->
 									{#if image.isPrimary}
 										<div class="absolute right-2 top-2 rounded-full bg-yellow-500 p-1 text-white shadow-md">
@@ -127,13 +133,20 @@
 					{/if}
 				{:else}
 					<!-- No image placeholder -->
-					<OptimisedImage
-						path="/dummy_160x160_ffffff_cccccc.png"
-						alt="No Image"
-						width={160}
-						height={160}
-						class="h-40 w-40 overflow-hidden rounded object-contain"
-					/>
+					<div class="relative">
+						<OptimisedImage
+							path="/dummy_160x160_ffffff_cccccc.png"
+							alt="No Image"
+							width={160}
+							height={160}
+							class="h-40 w-40 overflow-hidden rounded object-contain {entryItem.sold ? 'opacity-60 grayscale' : ''}"
+						/>
+						{#if entryItem.sold}
+							<div class="absolute inset-0 flex items-center justify-center">
+								<div class="rounded-md bg-red-600 px-3 py-1 text-sm font-bold text-white shadow-lg">SOLD</div>
+							</div>
+						{/if}
+					</div>
 				{/if}
 			</div>
 			<div class="flex flex-col {variant === 'accordion' ? 'mx-auto' : ''}">

@@ -14,5 +14,5 @@
 | 010 | addSoldIndicator - Plan    | Write a plan to implement sold indicator functionality, details in @docs/plans/addSoldIndicator.md                          | ✅   |
 | 011 | addSoldIndicator - Phase 1 | Database schema updates: Add sold boolean field to entryTable and create migration                                          | ✅   |
 | 012 | addSoldIndicator - Phase 2 | Backend API updates: Update queries and schemas (read-only, no admin update endpoints)                                      | ✅   |
-| 013 | addSoldIndicator - Phase 3 | Public display updates: Update catalogue and entry cards with sold indicators and filtering                                 |      |
+| 013 | addSoldIndicator - Phase 3 | Public display updates: Update catalogue and entry cards with sold indicators and filtering                                 | ✅   |
 | 014 | addSoldIndicator - Phase 4 | User experience enhancements: Visual design and analytics (no admin management interfaces)                                  |      |
