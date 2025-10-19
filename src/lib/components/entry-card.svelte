@@ -87,12 +87,15 @@
 										alt={`Image ${index + 1} of ${images.length}`}
 										width={160}
 										height={160}
-										class="h-40 w-40 rounded object-cover {entryItem.sold ? 'opacity-60 grayscale' : ''}"
+										class="h-40 w-40 rounded object-cover"
 									/>
-									<!-- Sold Indicator Overlay -->
+									<!-- Sold Indicator Tag -->
 									{#if entryItem.sold}
-										<div class="absolute inset-0 flex items-center justify-center">
-											<div class="rounded-md bg-red-600 px-3 py-1 text-sm font-bold text-white shadow-lg">SOLD</div>
+										<div
+											class="absolute bg-red-600 px-2 py-0.5 text-xs font-bold text-white shadow-lg"
+											style="top: 80%; left: 5%; transform: rotate(45deg); transform-origin: center;"
+										>
+											SOLD
 										</div>
 									{/if}
 									<!-- Primary Image Star Indicator -->
@@ -139,11 +142,14 @@
 							alt="No Image"
 							width={160}
 							height={160}
-							class="h-40 w-40 overflow-hidden rounded object-contain {entryItem.sold ? 'opacity-60 grayscale' : ''}"
+							class="h-40 w-40 overflow-hidden rounded object-contain"
 						/>
 						{#if entryItem.sold}
-							<div class="absolute inset-0 flex items-center justify-center">
-								<div class="rounded-md bg-red-600 px-3 py-1 text-sm font-bold text-white shadow-lg">SOLD</div>
+							<div
+								class="absolute bg-red-600 px-3 py-0.5 text-xs font-bold text-white shadow-lg"
+								style="bottom: 60%; left: 30%; transform: rotate(-45deg); transform-origin: center;"
+							>
+								SOLD
 							</div>
 						{/if}
 					</div>
