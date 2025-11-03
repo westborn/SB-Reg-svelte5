@@ -11,3 +11,7 @@
 | 007 | multipleImages - Phase 5   | Integration with entry forms                                                                                                | ✅   |
 | 008 | multipleImages - Phase 6.1 | Database migration script creation and execution                                                                            | ✅   |
 | 009 | multipleImages - Phase 6.2 | Data migration: Create primary image records for all existing entries with images                                           | ✅   |
+| 010 | addSoldIndicator - Plan    | Write a plan to implement sold indicator functionality, details in @docs/plans/addSoldIndicator.md                          | ✅   |
+| 011 | addSoldIndicator - Phase 1 | Database schema updates: Add sold boolean field to entryTable and create migration                                          | ✅   |
+| 012 | addSoldIndicator - Phase 2 | Backend API updates: Update queries and schemas (read-only, no admin update endpoints)                                      | ✅   |
+| 013 | addSoldIndicator - Phase 3 | Public display updates: Update catalogue and entry cards with sold indicators and filtering                                 | ✅   |

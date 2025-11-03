@@ -42,7 +42,7 @@
 	<p class="p-4 text-sm text-muted-foreground">
 		By clicking continue, you agree to our{' '}
 		<a
-			href="https://sculpturebermagui.org.au/wp-content/uploads/2024/10/Exhibiting-at-Sculpture-Bermagui-2025.pdf"
+			href="https://sculpturebermagui.org.au/wp-content/uploads/2025/09/Exhibiting-at-Sculpture-Bermagui-2026.pdf"
 			class="underline underline-offset-4 hover:text-primary"
 		>
 			Terms of Service</a

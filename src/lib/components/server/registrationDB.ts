@@ -111,6 +111,7 @@ export const getSubmission = async ({ isSuperAdmin, proxyEmail, email }: User) =
 							description: true,
 							specialRequirements: true,
 							price: true,
+							sold: true,
 							images: {
 								select: {
 									id: true,
@@ -174,6 +175,7 @@ export const getEntries = async (artistEmail: string) => {
 							description: true,
 							specialRequirements: true,
 							price: true,
+							sold: true,
 							images: {
 								select: {
 									id: true,
@@ -253,7 +255,8 @@ export const getEntry = async (id: number) => {
 			dimensions: true,
 			description: true,
 			specialRequirements: true,
-			price: true
+			price: true,
+			sold: true
 		}
 	});
 	return entry;
@@ -522,6 +525,7 @@ export type Exhibit = {
 	material: string;
 	title: string;
 	price: number;
+	sold: boolean;
 	specialRequirements: string;
 	imageId: number;
 	cloudURL: string;
@@ -563,6 +567,7 @@ export const getExhibits = async ({
 		entry.material,
 		entry.title,
 		entry.price_in_cents as "price",
+		entry.sold,
 		entry.special_requirements as "specialRequirements",
 		image.id as "imageId",
 		image.cloud_url as "cloudURL",

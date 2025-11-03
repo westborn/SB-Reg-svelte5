@@ -89,6 +89,15 @@
 										height={160}
 										class="h-40 w-40 rounded object-cover"
 									/>
+									<!-- Sold Indicator Tag -->
+									{#if entryItem.sold}
+										<div
+											class="absolute bg-red-600 px-2 py-0.5 text-xs font-bold text-white shadow-lg"
+											style="top: 80%; left: 5%; transform: rotate(45deg); transform-origin: center;"
+										>
+											SOLD
+										</div>
+									{/if}
 									<!-- Primary Image Star Indicator -->
 									{#if image.isPrimary}
 										<div class="absolute right-2 top-2 rounded-full bg-yellow-500 p-1 text-white shadow-md">
@@ -127,13 +136,23 @@
 					{/if}
 				{:else}
 					<!-- No image placeholder -->
-					<OptimisedImage
-						path="/dummy_160x160_ffffff_cccccc.png"
-						alt="No Image"
-						width={160}
-						height={160}
-						class="h-40 w-40 overflow-hidden rounded object-contain"
-					/>
+					<div class="relative">
+						<OptimisedImage
+							path="/dummy_160x160_ffffff_cccccc.png"
+							alt="No Image"
+							width={160}
+							height={160}
+							class="h-40 w-40 overflow-hidden rounded object-contain"
+						/>
+						{#if entryItem.sold}
+							<div
+								class="absolute bg-red-600 px-3 py-0.5 text-xs font-bold text-white shadow-lg"
+								style="bottom: 60%; left: 30%; transform: rotate(-45deg); transform-origin: center;"
+							>
+								SOLD
+							</div>
+						{/if}
+					</div>
 				{/if}
 			</div>
 			<div class="flex flex-col {variant === 'accordion' ? 'mx-auto' : ''}">

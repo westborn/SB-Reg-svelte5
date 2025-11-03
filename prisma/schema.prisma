@@ -60,6 +60,7 @@ model entryTable {
   inOrOut             EntryType          @map("in_or_out")
   material            String?
   price               Int                @map("price_in_cents")
+  sold                Boolean            @default(false)
   specialRequirements String?            @map("special_requirements")
   title               String
   createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamp(6)

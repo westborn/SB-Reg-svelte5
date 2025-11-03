@@ -78,6 +78,7 @@ export const entryTableSchema = z.object({
 	enterMajorPrize: boolean(),
 	material: z.string().nullable(),
 	price: z.number().int().nullable(),
+	sold: z.boolean(),
 	specialRequirements: z.string().nullable(),
 	title: z.string(),
 	createdAt: z.coerce.date(),
