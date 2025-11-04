@@ -56,7 +56,7 @@
 			<br />
 			Please note that your registration will not be complete until payment has been received.
 			<a
-				href="https://sculpturebermagui.org.au/wp-content/uploads/2023/11/Exhibiting-at-Sculpture-Bermagui-2024.pdf"
+				href="https://sculpturebermagui.org.au/wp-content/uploads/2025/09/Exhibiting-at-Sculpture-Bermagui-2026.pdf"
 				class="text-blue-600 underline hover:text-blue-700 hover:underline"
 				target="_blank"
 				rel="noopener noreferrer">Artists Terms and Conditions</a

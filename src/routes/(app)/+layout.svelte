@@ -6,8 +6,7 @@
 	const navItems = [
 		// { label: 'View Registration and a very long senetence that nwont let anything', href: '/view' },
 		{ label: 'View Registration', href: '/view' },
-		{ label: 'Update Registration', href: '/register' },
-		{ label: 'Gallery', href: '/gallery' }
+		{ label: 'Update Registration', href: '/register' }
 	];
 </script>
 

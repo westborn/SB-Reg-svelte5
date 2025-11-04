@@ -25,7 +25,7 @@
 			}
 			myState.submission = result?.data?.updatedSubmission;
 			toast.success(' Registration Updated');
-			myState.confirmDialogOpen = false; //TODO: is this working??
+			myState.confirmDialogOpen = false;
 			return;
 		}
 	});
@@ -56,87 +56,107 @@
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 	<Form.Field {form} name="displayRequirements">
-		<Form.Control let:attrs>
-			<Form.Label>Any special requirements for the display area</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.displayRequirements} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Any special requirement e.g. does your artwork need a flat area</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.displayRequirements} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field class="px-2" {form} name="bumpIn">
-		<Form.Legend class="mb-2">When/if you require Bump In assistance?</Form.Legend>
-		<RadioGroup.Root class="ml-6" bind:value={$formData.bumpIn as string}>
-			<div class="flex">
-				<RadioGroup.Item value="Thursday morning 6 March" id="bi1" />
-				<Label for="bi1">Thursday morning 6 March</Label>
-			</div>
-			<div class="flex">
-				<RadioGroup.Item value="Thursday afternoon 6 March" id="bi2" />
-				<Label for="bi2">Thursday afternoon 6 March</Label>
-			</div>
-			<div class="flex">
-				<RadioGroup.Item value="Friday morning 7 March (until noon)" id="bi3" />
-				<Label for="bi3">Friday morning 7 March (until noon)</Label>
-			</div>
-			<RadioGroup.Input name="bumpIn" />
-		</RadioGroup.Root>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Legend class="mb-2">When will you Bump In your works?</Form.Legend>
+				<RadioGroup.Root class="ml-6" bind:value={$formData.bumpIn as string} {...props}>
+					<div class="flex">
+						<RadioGroup.Item value="Thursday morning 5 March" id="bi1" />
+						<Label for="bi1">Thursday morning 5 March</Label>
+					</div>
+					<div class="flex">
+						<RadioGroup.Item value="Thursday afternoon 5 March" id="bi2" />
+						<Label for="bi2">Thursday afternoon 5 March</Label>
+					</div>
+					<div class="flex">
+						<RadioGroup.Item value="Friday morning 6 March (until noon)" id="bi3" />
+						<Label for="bi3">Friday morning 6 March (until noon)</Label>
+					</div>
+				</RadioGroup.Root>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field class="px-2" {form} name="bumpOut">
-		<Form.Legend class="mb-2">When/if you require Bump Out assistance?</Form.Legend>
-		<RadioGroup.Root class="ml-6" bind:value={$formData.bumpOut as string}>
-			<div class="flex">
-				<RadioGroup.Item value="Sunday afternoon 16 March (after 3pm)" id="bo1" />
-				<Label for="bo1">Sunday afternoon 16 March (after 3pm)</Label>
-			</div>
-			<div class="flex">
-				<RadioGroup.Item value="Monday morning 17 March (9am to noon)" id="bo2" />
-				<Label for="bo2">Monday morning 17 March (9am to noon)</Label>
-			</div>
-			<RadioGroup.Input name="bumpOut" />
-		</RadioGroup.Root>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Legend class="mb-2">When will you pick up your unsold artwork?</Form.Legend>
+				<RadioGroup.Root class="ml-6" bind:value={$formData.bumpOut as string} {...props}>
+					<div class="flex">
+						<RadioGroup.Item value="Sunday afternoon 15 March (after 3pm)" id="bo1" />
+						<Label for="bo1">Sunday afternoon 15 March (after 3pm)</Label>
+					</div>
+					<div class="flex">
+						<RadioGroup.Item value="Monday morning 16 March (9am to noon)" id="bo2" />
+						<Label for="bo2">Monday morning 16 March (9am to noon)</Label>
+					</div>
+				</RadioGroup.Root>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field class="px-2" {form} name="crane">
-		<Form.Legend class="mb-2">Do you need a Crane?</Form.Legend>
-		<RadioGroup.Root class="ml-6 flex flex-row" bind:value={$formData.crane as string}>
-			<div class="flex">
-				<RadioGroup.Item value="Yes" id="c1" />
-				<Label for="c1">Yes</Label>
-			</div>
-			<div class="flex">
-				<RadioGroup.Item value="No" id="c2" />
-				<Label for="c2">No</Label>
-			</div>
-			<RadioGroup.Input name="crane" />
-		</RadioGroup.Root>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Legend class="mb-2">Do you need a Crane?</Form.Legend>
+				<RadioGroup.Root class="ml-6 flex flex-row" bind:value={$formData.crane as string} {...props}>
+					<div class="flex">
+						<RadioGroup.Item value="Yes" id="c1" />
+						<Label for="c1">Yes</Label>
+					</div>
+					<div class="flex">
+						<RadioGroup.Item value="No" id="c2" />
+						<Label for="c2">No</Label>
+					</div>
+				</RadioGroup.Root>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="bankAccountName">
-		<Form.Control let:attrs>
-			<Form.Label>Bank Account Name</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankAccountName} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Bank Account Name</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankAccountName} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="bankBSB">
-		<Form.Control let:attrs>
-			<Form.Label>Account BSB</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankBSB} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Account BSB</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankBSB} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
 	<Form.Field {form} name="bankAccount">
-		<Form.Control let:attrs>
-			<Form.Label>Account Number</Form.Label>
-			<Input type="text" {...attrs} bind:value={$formData.bankAccount} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Account Number</Form.Label>
+				<Input type="text" {...props} bind:value={$formData.bankAccount} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Errors errors={$errors._errors} />
+	<!-- <Form.Errors errors={$errors._errors} /> -->
 	<Form.Button disabled={$delayed}>
 		Save?
 		{#if $delayed}

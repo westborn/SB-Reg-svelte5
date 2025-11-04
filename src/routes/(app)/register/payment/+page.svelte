@@ -45,15 +45,26 @@
 	let costOfRegistrationInCents = $derived(costOfRegistration * 100);
 	let registrationPaid = $derived(myState?.submission?.registrations[0].closed ? ' (Paid)' : '');
 
-	type Card = {
-		attach: (containerId: string) => Promise<any>;
-		tokenize: () => Promise<{ token: string; status: string; errors?: JSON }>;
-	};
 	let card: Card;
 
 	onMount(async () => {
 		if (myState.submission) {
 			fetchingData = true;
+
+			// Wait for Square.js to be fully loaded
+			let attempts = 0;
+			const maxAttempts = 50; // 5 seconds maximum wait
+
+			while (!Square && attempts < maxAttempts) {
+				await new Promise((resolve) => setTimeout(resolve, 100));
+				attempts++;
+			}
+
+			if (!Square) {
+				errorMessage = 'Payment system failed to load. Please refresh the page or try a different browser.';
+				fetchingData = false;
+				return;
+			}
 
 			const originalStyle = {
 				input: {
@@ -65,23 +76,33 @@
 				}
 			};
 
-			if (!Square) {
-				throw new Error('Square.js failed to load properly');
-			}
 			errorMessage = '';
-			const payments = Square.payments(appId, locationId);
-			console.log('adding payment container');
 
-			// INIT CARD
 			try {
+				const payments = Square.payments(appId, locationId);
+				console.log('adding payment container');
+
+				// INIT CARD
 				card = await payments.card({
 					style: originalStyle
 				});
 				await card.attach('#card-container');
 			} catch (e) {
-				// TODO: error handling
-				errorMessage = 'Initializing card failed - please try again later';
-				console.error(errorMessage);
+				console.error('Card initialization error:', e);
+
+				// Check if it's a network blocking issue
+				if (
+					e instanceof Error &&
+					(e.message.includes('ERR_BLOCKED_BY_CLIENT') ||
+						e.message.includes('Failed to fetch') ||
+						e.message.includes('NetworkError'))
+				) {
+					errorMessage =
+						'Payment processing is being blocked. Please disable ad blockers, privacy extensions, or try a different browser.';
+				} else {
+					errorMessage = 'Failed to initialize payment form. Please refresh the page and try again.';
+				}
+				fetchingData = false;
 				return;
 			}
 			fetchingData = false;
@@ -118,7 +139,11 @@
 			}
 		} catch (err) {
 			console.log('registerComplete-err' + err);
-			errorMessage = err.message;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			} else {
+				errorMessage = String(err);
+			}
 		}
 
 		return { result: 'success', data: null };
@@ -144,8 +169,8 @@
 		const response = await sendCompleteToServer(squarePaymentResponse.payment.receiptUrl);
 		// console.log('completeRegistration' + response)
 		if (response.result === 'error') {
-			errorMessage = response.data;
-			handleUnexpectedError(errorMessage);
+			errorMessage = String(response.data);
+			handleUnexpectedError(new Error(errorMessage));
 		} else {
 			fetchingData = false;
 			// currentRegistration.set(response.data.registration)
@@ -168,8 +193,17 @@
 		try {
 			token = await tokenize(card);
 		} catch (e) {
-			errorMessage = 'Card details not correct - try again';
-			console.error(e.message);
+			console.error('Tokenization error:', e);
+			if (
+				e instanceof Error &&
+				(e.message.includes('ERR_BLOCKED_BY_CLIENT') ||
+					e.message.includes('Failed to fetch') ||
+					e.message.includes('NetworkError'))
+			) {
+				errorMessage = 'Payment blocked by browser. Please disable ad blockers and try again.';
+			} else {
+				errorMessage = 'Card details not correct - try again';
+			}
 			fetchingData = false;
 			return;
 		}
@@ -210,8 +244,8 @@
 			console.log('handlePaymentSubmission-err' + err);
 			currentState = validStates.PAYMENTERROR;
 			errorMessage = 'Payment failed';
-			handleUnexpectedError(err);
-			throw new Error(err);
+			handleUnexpectedError(err instanceof Error ? err : new Error(String(err)));
+			throw err instanceof Error ? err : new Error(String(err));
 		}
 	}
 
@@ -280,7 +314,20 @@
 			</p>
 		</div>
 		{#if errorMessage}
-			<p class="mt-6 text-red-500">{errorMessage}</p>
+			<div class="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+				<p class="font-medium text-red-700">{errorMessage}</p>
+				{#if errorMessage.includes('blocked')}
+					<div class="mt-2 text-sm text-red-600">
+						<p>Try these steps:</p>
+						<ul class="mt-1 list-inside list-disc space-y-1">
+							<li>Disable ad blockers (uBlock Origin, AdBlock Plus, etc.)</li>
+							<li>Disable privacy extensions</li>
+							<li>Try an incognito/private window</li>
+							<li>Try a different browser</li>
+						</ul>
+					</div>
+				{/if}
+			</div>
 		{:else}
 			<p class="mt-6">&nbsp</p>
 		{/if}

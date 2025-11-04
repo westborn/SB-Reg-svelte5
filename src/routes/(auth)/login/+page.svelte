@@ -19,7 +19,7 @@
 
 <AuthPage type="login" {session} {user}>
 	<div class="flex flex-col space-y-2 text-center">
-		<h1 class="text-2xl font-semibold tracking-tight">Login to an existing registration</h1>
+		<h1 class="text-2xl font-semibold tracking-tight">Login to manage your registration</h1>
 		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -28,13 +28,15 @@
 		<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 		<Form.Field {form} name="email">
-			<Form.Control let:attrs>
-				<Form.Label>Email Address</Form.Label>
-				<Input autofocus type="text" {...attrs} bind:value={$formData.email} />
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Email Address</Form.Label>
+					<Input autofocus type="text" {...props} bind:value={$formData.email} />
+				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Errors errors={$errors._errors} />
+		<!-- <Form.Errors errors={$errors._errors} /> -->
 		<div class="flex">
 			<Form.Button disabled={$delayed}>
 				Login

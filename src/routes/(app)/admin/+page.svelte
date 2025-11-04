@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { dev } from '$app/environment';
 	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
-	import { REGISTRATIONS_OPEN } from '$lib/constants.js';
+	import { EXHIBITION_YEAR, REGISTRATIONS_OPEN } from '$lib/constants.js';
 
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import jsonToCsvExport from 'json-to-csv-export';
 
 	import { page } from '$app/state';
@@ -52,7 +52,7 @@
 		if (proxyExhibit) {
 			return proxyExhibit.closed ? 'Closed' : 'Still Open';
 		} else {
-			return 'No Proxy Found';
+			return 'No Registration for Proxy';
 		}
 	}
 
@@ -122,15 +122,10 @@
 		}
 	}
 
-	const years = [
-		{ value: '2025', label: '2025' },
-		{ value: '2024', label: '2024' },
-		{ value: '2023', label: '2023' },
-		{ value: '2022', label: '2022' }
-	];
+	const years = ['2026', '2025', '2024', '2023', '2022'];
 
 	let getCatalogueError = $state('');
-	let selectedYear = $state({ value: '2025', label: '2025' });
+	let selectedYear = $state(EXHIBITION_YEAR);
 	let catalogueData = $state([]);
 	async function getCatalogue() {
 		getCatalogueError = '';
@@ -140,7 +135,7 @@
 				headers: {
 					'content-type': 'application/json'
 				},
-				body: JSON.stringify({ entryYear: selectedYear.value })
+				body: JSON.stringify({ entryYear: selectedYear })
 			});
 			if (result.status != 200) {
 				const error = await result.json();
@@ -151,7 +146,10 @@
 			handleDownload('catalogue', catalogueData);
 		} catch (err) {
 			console.log('registerComplete-err' + err);
-			getCatalogueError = err.message;
+			getCatalogueError =
+				typeof err === 'object' && err !== null && 'message' in err
+					? (err as { message: string }).message
+					: String(err);
 		}
 		return;
 	}
@@ -159,7 +157,8 @@
 	const textList = [
 		['Environment:', `dev:${dev} meta.env.MODE:${import.meta.env.MODE}`],
 		['Running in ', `"${PUBLIC_SQUARE_ENVIRONMENT}" mode`],
-		['Registrations are ', REGISTRATIONS_OPEN ? 'OPEN' : 'CLOSED'],
+		['Registrations are', `${REGISTRATIONS_OPEN ? 'OPEN' : 'CLOSED'}`],
+		['Current Year is', `${EXHIBITION_YEAR}`],
 		['NAME:', __NAME__],
 		['VERSION:', __VERSION__],
 		['GITHUBURL ', __GITHUBURL__],
@@ -192,6 +191,7 @@
 			<div>
 				<div class="w-80 rounded p-4">
 					<input
+						name="email"
 						bind:value={searchTerm}
 						type="search"
 						class="w-full rounded border border-solid border-gray-300 bg-white px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
@@ -218,26 +218,20 @@
 		<hr class="mt-4" />
 		<h4 class="text-lg font-semibold">Download a Catalogue CSV</h4>
 		<p class="mt-4">
-			Generate a CSV file of the <span class="font-semibold text-red-500">{selectedYear.value}</span> Catalogue
+			Generate a CSV file of the <span class="font-semibold text-red-500">{selectedYear}</span> Catalogue
 			<Button onclick={() => getCatalogue()}>Download Catalogue</Button>
 		</p>
 		{#if toggleOpenClosedError}
 			<div class="text-red-500">{toggleOpenClosedError}</div>
 		{/if}
 
-		<Select.Root onSelectedChange={(e: any) => (selectedYear = { ...e })} selected={selectedYear}>
-			<Select.Trigger class="w-[120px]">
-				<Select.Value placeholder="Select a year" />
-			</Select.Trigger>
+		<Select.Root type="single" bind:value={selectedYear} name="entryYear">
+			<Select.Trigger class="w-[120px]">Select a year</Select.Trigger>
 			<Select.Content>
-				<Select.Group>
-					<Select.Label>Year</Select.Label>
-					{#each years as year}
-						<Select.Item value={year.value} label={year.label}>{year.label}</Select.Item>
-					{/each}
-				</Select.Group>
+				{#each years as year}
+					<Select.Item value={year}>{year}</Select.Item>
+				{/each}
 			</Select.Content>
-			<Select.Input name="entryYear" />
 		</Select.Root>
 		{#if getCatalogueError}
 			<div class="text-red-500">{getCatalogueError}</div>
