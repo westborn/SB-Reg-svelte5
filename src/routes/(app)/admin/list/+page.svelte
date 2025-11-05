@@ -39,17 +39,6 @@
 
 	let exhibits: Exhibit[] = $derived(page.data.exhibits?.slice(0, 999) ?? []);
 
-	const years = ['2026', '2025', '2024', '2023', '2022'];
-
-	let selectedYear = $state(EXHIBITION_YEAR);
-
-	function handleSelectYear(event: any) {
-		selectedYear = { ...event };
-		const newURL = new URL(page.url);
-		newURL.searchParams?.set('year', selectedYear);
-		goto(newURL);
-	}
-
 	const columnHelper = createColumnHelper<Exhibit>();
 	const columns = [
 		columnHelper.accessor('exhibitNumber', {
@@ -212,18 +201,7 @@
 </script>
 
 <section class="mx-auto mt-2">
-	<div class="flex items-center justify-start gap-3">
-		<h4 class="text-xl font-bold text-primary">Year</h4>
-		<Select.Root type="single" bind:value={selectedYear} name="registrationYear">
-			<Select.Trigger class="w-[120px]">Select a year</Select.Trigger>
-			<Select.Content>
-				{#each years as year}
-					<Select.Item value={year}>{year}</Select.Item>
-				{/each}
-			</Select.Content>
-		</Select.Root>
-		<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
-	</div>
+	<p class="text-md font-bold">{table.getRowCount()} exhibits</p>
 </section>
 
 <div class="grid place-items-center">
