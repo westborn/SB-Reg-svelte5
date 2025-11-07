@@ -44,6 +44,7 @@ export async function POST(event: RequestEvent) {
 }
 
 interface Entry {
+	id: number;
 	inOrOut: string;
 	title: string;
 	description: string;
@@ -52,6 +53,11 @@ interface Entry {
 	specialRequirements: string;
 	price: number | string;
 	images: Image[];
+	primaryImage?: {
+		image: {
+			cloudURL: string;
+		};
+	} | null;
 }
 
 interface Image {
@@ -69,6 +75,7 @@ async function sendRegistrationConfirmationEmail({ submission, user }: { submiss
 	}
 	const entriesHTML = makeEntriesHTML(
 		entriesData.map((entry) => ({
+			id: entry.id,
 			inOrOut: entry.inOrOut ?? '',
 			title: entry.title ?? '',
 			description: entry.description ?? '',
@@ -76,7 +83,8 @@ async function sendRegistrationConfirmationEmail({ submission, user }: { submiss
 			dimensions: entry.dimensions ?? '',
 			specialRequirements: entry.specialRequirements ?? '',
 			price: entry.price ?? '',
-			images: entry.images ?? []
+			images: entry.images ?? [],
+			primaryImage: entry.primaryImage ?? null
 		}))
 	);
 	const costOfRegistration = 20 + Number(entriesData.length) * 20;
@@ -157,10 +165,13 @@ function makeEntriesHTML(entriesData: Entry[]): string {
 	];
 
 	const entryHTML = entriesData
-		.map(
-			(entry, idx) =>
-				`<hr>
-			<p style="color: #1d4ed8; font-size: 20px;">Entry # ${idx + 1}<br/>
+		.map((entry) => {
+			const primaryImageURL =
+				entry.primaryImage?.image?.cloudURL ||
+				'https://sculpturebermagui.org.au/wp-content/uploads/2024/10/no-image-provided.png';
+
+			return `<hr>
+			<p style="color: #1d4ed8; font-size: 20px;">Entry # ${entry.id}<br/>
 			<table style="font-family:'Arial';border-collapse:collapse;border-spacing:0;"><tbody>
 			${makeTableRows(entryFields, {
 				...entry,
@@ -171,10 +182,10 @@ function makeEntriesHTML(entriesData: Entry[]): string {
 			})}
 			</tbody></table>
 			<br/>
-			<img src="${entry?.images[0]?.cloudURL ? entry.images[0].cloudURL : 'https://sculpturebermagui.org.au/wp-content/uploads/2024/10/no-image-provided.png'}" width="200">
+			<img src="${primaryImageURL}" width="200">
 			<br/>
-			`
-		)
+			`;
+		})
 		.join('');
 
 	return entryHTML;

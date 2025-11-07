@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
+	import * as Card from '$lib/components/ui/card/index.js';
+
 	import { handleError, handleUnexpectedError, processResponse, apiResponse } from '$lib/utils.ts';
 
 	import { PUBLIC_SQUARE_APP_ID, PUBLIC_SQUARE_LOCATION_ID } from '$env/static/public';
@@ -47,8 +49,23 @@
 
 	let card: Card;
 
+	if (myState.submission && myState.submission?.firstNations === 'Yes') {
+		// No payment required - complete registration immediately
+		processIndigenousEntry();
+	}
+
+	async function processIndigenousEntry() {
+		const response = await sendCompleteToServer('Indigenous Entry - No Payment Required');
+		if (response.result === 'error') {
+			errorMessage = String(response.data);
+			handleUnexpectedError(new Error(errorMessage));
+		}
+		goto('/view');
+		return;
+	}
+
 	onMount(async () => {
-		if (myState.submission) {
+		if (myState.submission && myState.submission?.firstNations !== 'Yes') {
 			fetchingData = true;
 
 			// Wait for Square.js to be fully loaded
@@ -122,7 +139,7 @@
 		}
 	}
 
-	let sendCompleteToServer = async (receiptURL: string) => {
+	async function sendCompleteToServer(receiptURL: string) {
 		errorMessage = '';
 		try {
 			const result = await fetch(`/api/registerComplete`, {
@@ -147,7 +164,7 @@
 		}
 
 		return { result: 'success', data: null };
-	};
+	}
 
 	async function readyToPay() {
 		//try to make the CC  payment
@@ -282,6 +299,12 @@
 	//     versionToken: '9oVj8WymLtKNjFrVyRducOkPvOW98wIlUrOQCdZTUZX6o'
 	//   }
 	// }
+
+	const textList = $derived([
+		['First Name:', myState?.submission?.firstName ?? ''],
+		['Surname:', myState?.submission?.lastName ?? ''],
+		['Email:', myState?.submission?.email ?? '']
+	]);
 </script>
 
 <section class="container mx-auto max-w-prose px-3">
@@ -295,71 +318,78 @@
 		</button>
 	{:else}
 		<div class="mt-4 text-base">
-			<div class="mt-6 grid grid-cols-[13ch_1fr] items-center">
-				<div>
-					<p>First Name:</p>
-					<p>{myState.submission?.firstName}</p>
-				</div>
-				<div>
-					<p>Surname:</p>
-					<p>{myState.submission?.lastName}</p>
-				</div>
-				<div>
-					<p>Email:</p>
-					<p>{myState.submission?.email}</p>
-				</div>
-			</div>
+			<Card.Root>
+				<Card.Header class="p-2 sm:px-6">
+					<Card.Title class="text-xl">Registration Payment</Card.Title>
+				</Card.Header>
+				<Card.Content class="p-2 sm:px-6">
+					<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
+						{#each textList as [textItem, textValue]}
+							{@render TextList(textItem, textValue)}
+						{/each}
+					</div></Card.Content
+				>
+			</Card.Root>
+		</div>
+		{#if myState.submission.firstNations === 'Yes'}
+			<p class="mt-4 text-sm italic text-green-600">First Nations discount applied.</p>
+		{:else}
 			<p class="mt-6 text-xl text-red-400">
 				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}{registrationPaid}
 			</p>
-		</div>
-		{#if errorMessage}
-			<div class="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
-				<p class="font-medium text-red-700">{errorMessage}</p>
-				{#if errorMessage.includes('blocked')}
-					<div class="mt-2 text-sm text-red-600">
-						<p>Try these steps:</p>
-						<ul class="mt-1 list-inside list-disc space-y-1">
-							<li>Disable ad blockers (uBlock Origin, AdBlock Plus, etc.)</li>
-							<li>Disable privacy extensions</li>
-							<li>Try an incognito/private window</li>
-							<li>Try a different browser</li>
-						</ul>
-					</div>
-				{/if}
-			</div>
-		{:else}
-			<p class="mt-6">&nbsp</p>
-		{/if}
+			{#if errorMessage}
+				<div class="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+					<p class="font-medium text-red-700">{errorMessage}</p>
+					{#if errorMessage.includes('blocked')}
+						<div class="mt-2 text-sm text-red-600">
+							<p>Try these steps:</p>
+							<ul class="mt-1 list-inside list-disc space-y-1">
+								<li>Disable ad blockers (uBlock Origin, AdBlock Plus, etc.)</li>
+								<li>Disable privacy extensions</li>
+								<li>Try an incognito/private window</li>
+								<li>Try a different browser</li>
+							</ul>
+						</div>
+					{/if}
+				</div>
+			{:else}
+				<p class="mt-6">&nbsp</p>
+			{/if}
 
-		{#if currentState === validStates.COMMENCING || currentState === validStates.PAYMENTERROR}
-			<div class="mt-6 max-w-prose px-3">
-				<!-- this is the container that gets the Credit Card fields dropped into it by Square -->
-				<div id="card-container" class="w-100 mx-auto"></div>
-				<button
-					onclick={readyToPay}
-					disabled={fetchingData}
-					class="mt-8 inline-block w-auto rounded-lg bg-red-400 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-200 active:shadow-lg disabled:cursor-not-allowed"
-					>Pay Registration of ${costOfRegistration}</button
-				>
-			</div>
-		{/if}
+			{#if currentState === validStates.COMMENCING || currentState === validStates.PAYMENTERROR}
+				<div class="mt-6 max-w-prose px-3">
+					<!-- this is the container that gets the Credit Card fields dropped into it by Square -->
+					<div id="card-container" class="w-100 mx-auto"></div>
+					<button
+						onclick={readyToPay}
+						disabled={fetchingData}
+						class="mt-8 inline-block w-auto rounded-lg bg-red-400 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-200 active:shadow-lg disabled:cursor-not-allowed"
+						>Pay Registration of ${costOfRegistration}</button
+					>
+				</div>
+			{/if}
 
-		{#if currentState === validStates.COMPLETING}
-			<div class="flex flex-col items-center justify-center">
-				<a
-					href={apiResponse?.lastStatus?.response?.payment?.receiptUrl}
-					class="text-blue-600 underline hover:text-blue-700 hover:underline"
-					target="_blank"
-					rel="noopener noreferrer">Click here for your receipt</a
-				>
-				<button
-					onclick={() => finishRegistration()}
-					disabled={fetchingData}
-					class="mt-2 inline-block rounded-lg bg-primary-400 px-7 py-2 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-primary-500 hover:shadow-lg focus:bg-primary-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primary-200 active:shadow-lg"
-					>Registration is now Complete</button
-				>
-			</div>
+			{#if currentState === validStates.COMPLETING}
+				<div class="flex flex-col items-center justify-center">
+					<a
+						href={apiResponse?.lastStatus?.response?.payment?.receiptUrl}
+						class="text-blue-600 underline hover:text-blue-700 hover:underline"
+						target="_blank"
+						rel="noopener noreferrer">Click here for your receipt</a
+					>
+					<button
+						onclick={() => finishRegistration()}
+						disabled={fetchingData}
+						class="mt-2 inline-block rounded-lg bg-primary-400 px-7 py-2 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-primary-500 hover:shadow-lg focus:bg-primary-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primary-200 active:shadow-lg"
+						>Registration is now Complete</button
+					>
+				</div>
+			{/if}
 		{/if}
 	{/if}
 </section>
+
+{#snippet TextList(textItem: string, textValue: string)}
+	<p class="text-sm">{textItem}</p>
+	<p class="text-sm font-semibold">{textValue}&nbsp</p>
+{/snippet}
