@@ -16,7 +16,7 @@
 
 <Dialog.Root bind:open={myState.confirmDialogOpen}>
 	{#if !completedBankDetails}
-		<Dialog.Trigger class={buttonVariants({ variant: 'destructive' })}>Enter Bank Details!</Dialog.Trigger>
+		<Dialog.Trigger class={buttonVariants({ variant: 'destructive' })}>Click to enter Bank Details!</Dialog.Trigger>
 	{:else}
 		<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update these Details?</Dialog.Trigger>
 	{/if}

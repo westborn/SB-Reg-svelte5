@@ -45,6 +45,7 @@
 		<p class="mt-6 text-xl text-red-500">
 			Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
 		</p>
+
 		<p class="text-base">
 			You are about to pay the registration fee by Credit or Debit card.
 			<br />
@@ -69,6 +70,9 @@
 			>By clicking here I CONFIRM that all details are correct<br />
 			<span class="text-base">and I have read the "Artists Terms & Conditions"</span><br />
 		</button>
+		{#if myState.submission.firstNations === 'Yes'}
+			<p class="my-3 text-sm font-bold italic">No is payment required for Indigenous Artist entries</p>
+		{/if}
 	{:else}
 		<p class="text-sm text-muted-foreground">
 			First you need to register for the exhibition,<br /> and provide some basic details so we can contact you.
