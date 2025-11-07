@@ -43,6 +43,17 @@
 
 		isUploading = true;
 
+		// Check if it's a HEIC file and show appropriate message
+		const isHEIC =
+			selectedFile.type === 'image/heic' ||
+			selectedFile.type === 'image/heif' ||
+			selectedFile.name.toLowerCase().endsWith('.heic') ||
+			selectedFile.name.toLowerCase().endsWith('.heif');
+
+		if (isHEIC) {
+			toast.info('Converting HEIC image to web format...');
+		}
+
 		try {
 			// Create FormData for the API call
 			const formData = new FormData();
@@ -74,10 +85,12 @@
 				myState.setPrimaryImage(result.image.id);
 			}
 
-			toast.success('Image uploaded successfully');
+			const successMessage = isHEIC ? 'HEIC image converted and uploaded successfully' : 'Image uploaded successfully';
+			toast.success(successMessage);
 		} catch (error) {
 			console.error('Upload error:', error);
-			toast.error('Failed to upload image');
+			const errorMessage = isHEIC ? 'Failed to convert and upload HEIC image' : 'Failed to upload image';
+			toast.error(errorMessage);
 		} finally {
 			isUploading = false;
 		}
@@ -201,4 +214,10 @@
 </div>
 
 <!-- Hidden file input -->
-<input bind:this={fileInputRef} type="file" accept="image/*" onchange={handleFileSelect} class="hidden" />
+<input
+	bind:this={fileInputRef}
+	type="file"
+	accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif"
+	onchange={handleFileSelect}
+	class="hidden"
+/>
