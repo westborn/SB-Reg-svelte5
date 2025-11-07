@@ -2,9 +2,9 @@ import { getExhibits } from '$lib/components/server/registrationDB';
 import { EXHIBITION_YEAR } from '$lib/constants';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async (event) => {
+export const load: PageServerLoad = async () => {
 	//console.log(`${event.route.id} - LOAD - START`);
-	const entryYear = event.url.searchParams.get('year') ?? EXHIBITION_YEAR;
+	const entryYear = EXHIBITION_YEAR;
 	try {
 		const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
 		return { exhibits };
