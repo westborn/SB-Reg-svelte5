@@ -209,6 +209,13 @@ export const fileUploadSchema = z.object({
 	image: z
 		.instanceof(File, { message: 'Please upload a file.' })
 		.refine((f) => f.size < MAX_IMAGE_SIZE, 'Upload must be less than 5Mb!')
+		.refine((f) => {
+			const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+			const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
+			const hasValidType = validTypes.includes(f.type);
+			const hasValidExtension = validExtensions.some((ext) => f.name.toLowerCase().endsWith(ext));
+			return hasValidType || hasValidExtension;
+		}, 'Please upload a valid image file (JPEG, PNG, WebP, or HEIC)')
 });
 export type FileUpload = z.infer<typeof fileUploadSchema>;
 
