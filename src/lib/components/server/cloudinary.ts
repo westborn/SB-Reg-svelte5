@@ -42,14 +42,33 @@ export async function uploadImageToCloudinary(
 		// handle case where image is undefined
 		return Promise.reject(new Error('Image not provided'));
 	}
+
 	const arrayBuffer = await image.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
+
+	// Prepare upload options with HEIC conversion support
+	const uploadOptions: any = { upload_preset: preset };
+
+	// Check if file is HEIC/HEIF format and convert to JPEG
+	const isHEIC =
+		image.type === 'image/heic' ||
+		image.type === 'image/heif' ||
+		image.name.toLowerCase().endsWith('.heic') ||
+		image.name.toLowerCase().endsWith('.heif');
+
+	if (isHEIC) {
+		// Convert HEIC to JPEG with good quality
+		uploadOptions.format = 'jpg';
+		uploadOptions.quality = 'auto:good';
+		console.log(`Converting HEIC image "${image.name}" to JPEG format`);
+	}
+
 	return new Promise((resolve, reject) => {
-		cloudinary.v2.uploader.upload_stream({ upload_preset: preset }, onDone).end(buffer);
+		cloudinary.v2.uploader.upload_stream(uploadOptions, onDone).end(buffer);
 
 		function onDone(error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) {
 			if (error) {
-				console.error(error);
+				console.error('Cloudinary upload error:', error);
 				return reject({ success: false, error });
 			}
 			return resolve({ success: true, result } as CloudinaryUploadResponse);
