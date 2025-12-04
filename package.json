@@ -77,7 +77,7 @@
 		"@supabase/ssr": "^0.5.2",
 		"@supabase/supabase-js": "^2.48.1",
 		"@sveltejs/vite-plugin-svelte": "4.0.0",
-		"cloudinary": "^2.5.1",
+		"cloudinary": "^2.8.0",
 		"clsx": "^2.1.1",
 		"cmdk-sv": "^0.0.18",
 		"json-to-csv-export": "^3.1.0",
