@@ -54,7 +54,9 @@
 	const { form: formData, enhance, delayed, errors } = form;
 
 	// get the form field values from the submission object using the id that was passed in
-	let entry = $derived(myState?.submission?.registrations[0].entries.find((entry) => entry.id === editingEntryId));
+	let entry = $derived(
+		myState?.submission?.registrations[0].entries.find((entry: { id: number }) => entry.id === editingEntryId)
+	);
 
 	// Initialize form data when entry is first available
 	let lastEntryId = $state<number | null>(null);
