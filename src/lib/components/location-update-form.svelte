@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input';
@@ -13,7 +13,7 @@
 
 	const form = superForm(locationForm, {
 		id: `locationForm-${formOccurence}`,
-		validators: zodClient(locationSchemaUI),
+		validators: zod4Client(locationSchemaUI),
 		resetForm: false,
 		dataType: 'json',
 		onSubmit({ formData, cancel, jsonData }) {

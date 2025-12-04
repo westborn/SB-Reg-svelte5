@@ -3,7 +3,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { tokenSchema } from '$lib/zod-schemas.js';
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
 	import { page } from '$app/state';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
@@ -11,7 +11,7 @@
 	let { data } = $props();
 	let { session, user } = data;
 	const form = superForm(data.form, {
-		validators: zodClient(tokenSchema)
+		validators: zod4Client(tokenSchema)
 	});
 	const { form: formData, enhance, errors, delayed } = form;
 	const url = page.url;

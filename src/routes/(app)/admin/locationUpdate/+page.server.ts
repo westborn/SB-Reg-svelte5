@@ -1,4 +1,4 @@
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { prisma } from '$lib/components/server/prisma';
 
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async () => {
 			exhibits: exhibits.sort(
 				(a, b) => (a.exhibitNumber || '999').localeCompare(b.exhibitNumber || '999') || a.entryId - b.entryId
 			),
-			locationForm: await superValidate(zod(locationSchemaUI))
+			locationForm: await superValidate(zod4(locationSchemaUI))
 		};
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async () => {
 
 const locationUpdate = async (event: RequestEvent) => {
 	const newlocationSchemaUI = locationSchemaUI.extend({ entryId: z.number() });
-	const formValidationResult = await superValidate(event, zod(newlocationSchemaUI));
+	const formValidationResult = await superValidate(event, zod4(newlocationSchemaUI));
 	if (!formValidationResult.valid) {
 		console.log('locationUpdate - formValidationResult:', formValidationResult);
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {

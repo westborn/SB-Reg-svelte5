@@ -2,7 +2,7 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	import { getRegisterState, RegisterState } from '$lib/context.svelte';
 	import { entryDeleteSchemaUI } from '$lib/zod-schemas';
@@ -15,7 +15,7 @@
 	let deletingEntryId = $derived(myState.currentEditingEntryId);
 
 	const form = superForm(myState.entryDeleteForm, {
-		validators: zodClient(entryDeleteSchemaUI),
+		validators: zod4Client(entryDeleteSchemaUI),
 		id: `deleteEntryForm`,
 		onResult({ result }: { result: any }) {
 			// console.log('Action result', result);

@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from '../entry/$types';
 import type { RequestEvent } from '../entry/$types';
 
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
@@ -15,7 +15,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 const confirmUpdate = async (event: RequestEvent) => {
-	const formValidationResult = await superValidate(event, zod(confirmSchemaUI));
+	const formValidationResult = await superValidate(event, zod4(confirmSchemaUI));
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Confirm Details are Invalid - please reload and try again, or, call us!!', {
 			status: 400

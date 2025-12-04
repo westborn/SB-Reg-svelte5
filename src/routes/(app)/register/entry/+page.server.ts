@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import type { RequestEvent } from './$types';
 
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
@@ -31,7 +31,7 @@ const entryUpdate = async (event: RequestEvent) => {
 		primaryImageId: z.number().nullable(),
 		idToUpdate: z.number()
 	});
-	const formValidationResult = await superValidate(event, zod(updateImagesSchema));
+	const formValidationResult = await superValidate(event, zod4(updateImagesSchema));
 
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -169,7 +169,7 @@ const entryCreate = async (event: RequestEvent) => {
 		images: z.string().nullable(),
 		primaryImageId: z.number().nullable()
 	});
-	const formValidationResult = await superValidate(event, zod(newImagesSchema));
+	const formValidationResult = await superValidate(event, zod4(newImagesSchema));
 
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Entry is Invalid - please reload and try again, or, call us!!', {
@@ -292,7 +292,7 @@ const entryCreate = async (event: RequestEvent) => {
 const imageUpload = async (event: RequestEvent) => {
 	//console.log(`${event.route.id} - imageUpload - ACTION`);
 
-	const formValidationResult = await superValidate(event, zod(fileUploadSchema));
+	const formValidationResult = await superValidate(event, zod4(fileUploadSchema));
 	if (!formValidationResult.valid) {
 		return fail(400, withFiles({ formValidationResult }));
 	}
@@ -335,7 +335,7 @@ const imageUpload = async (event: RequestEvent) => {
 const entryDelete = async (event: RequestEvent) => {
 	//console.log(`${event.route.id} - entryDelete - ACTION`);
 
-	const formValidationResult = await superValidate(event, zod(entryDeleteSchemaUI));
+	const formValidationResult = await superValidate(event, zod4(entryDeleteSchemaUI));
 	if (!formValidationResult.valid) {
 		return fail(400, formValidationResult);
 	}
@@ -384,7 +384,7 @@ const setPrimaryImageAction = async (event: RequestEvent) => {
 		imageId: z.number().int()
 	});
 
-	const formValidationResult = await superValidate(event, zod(setPrimaryImageSchema));
+	const formValidationResult = await superValidate(event, zod4(setPrimaryImageSchema));
 
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Invalid data for setting primary image', { status: 400 });
@@ -412,7 +412,7 @@ const imageDeleteAction = async (event: RequestEvent) => {
 		entryId: z.number().int()
 	});
 
-	const formValidationResult = await superValidate(event, zod(imageDeleteSchema));
+	const formValidationResult = await superValidate(event, zod4(imageDeleteSchema));
 
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Invalid data for deleting image', { status: 400 });

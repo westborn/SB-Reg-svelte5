@@ -3,14 +3,14 @@
 	import { Input } from '$lib/components/ui/input';
 	import { signupSchema } from '$lib/zod-schemas.js';
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let { data } = $props();
 	let { session, user } = data;
 	const form = superForm(data.form, {
-		validators: zodClient(signupSchema)
+		validators: zod4Client(signupSchema)
 	});
 
 	const { form: formData, enhance, errors, delayed } = form;
