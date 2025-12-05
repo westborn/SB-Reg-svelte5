@@ -11,7 +11,7 @@ import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 
 const { paymentsApi } = new Client({
 	accessToken: SECRET_SQUARE_ACCESS_TOKEN,
-	environment: PUBLIC_SQUARE_ENVIRONMENT as Environment
+	environment: PUBLIC_SQUARE_ENVIRONMENT.toLowerCase() === 'production' ? Environment.Production : Environment.Sandbox
 });
 
 export async function POST({ request }) {
