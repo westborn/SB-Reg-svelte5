@@ -22,13 +22,10 @@
 	import * as Pagination from '$lib/components/ui/pagination';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import * as Select from '$lib/components/ui/select';
 
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
 	import { TableImage } from '$lib/components';
-	import { EXHIBITION_YEAR } from '$lib/constants';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
 	import { createTableState } from '$lib/tableState.svelte.js';
