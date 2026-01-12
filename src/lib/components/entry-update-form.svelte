@@ -9,6 +9,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { toast } from 'svelte-sonner';
+	import { untrack } from 'svelte';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte';
@@ -24,8 +25,11 @@
 	// Use the entry ID from global state to ensure we're editing the correct entry
 	let editingEntryId = $derived(myState.currentEditingEntryId ?? currentEntryId);
 
+	// Capture initial currentEntryId for form ID (doesn't need to be reactive)
+	const formIdSuffix = untrack(() => currentEntryId);
+
 	const form = superForm(myState.entryForm, {
-		id: `entryUpdateForm-${currentEntryId}`,
+		id: `entryUpdateForm-${formIdSuffix}`,
 		validators: zod4Client(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
@@ -82,7 +86,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm-{currentEntryId}">
+<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm-{formIdSuffix}">
 	<!-- stop the form from submitting on enter key press -->
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 

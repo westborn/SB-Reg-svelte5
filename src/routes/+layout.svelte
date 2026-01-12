@@ -5,14 +5,22 @@
 	import { dev } from '$app/environment';
 	import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 	import { setRegisterState } from '$lib/context.svelte.js';
+	import { untrack } from 'svelte';
 
-	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { EXHIBITION_YEAR, REGISTRATIONS_OPEN } from '$lib/constants.js';
 	import { TailwindIndicator, EntryUpdateDialog, EntryDeleteDialog } from '$lib/components';
 
 	let { children, data } = $props();
-	let { artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm, supabase, session, user } = data;
+
+	// Use untrack to capture initial values without reactivity warnings
+	const artistForm = untrack(() => data.artistForm);
+	const entryForm = untrack(() => data.entryForm);
+	const entryDeleteForm = untrack(() => data.entryDeleteForm);
+	const confirmForm = untrack(() => data.confirmForm);
+	const imageUploadForm = untrack(() => data.imageUploadForm);
+	const supabase = untrack(() => data.supabase);
+	const session = untrack(() => data.session);
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {

@@ -7,19 +7,24 @@
 	import AuthPage from '../auth-page.svelte';
 	import { page } from '$app/state';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
+	import { untrack } from 'svelte';
 
-	let { data } = $props();
-	let { session, user } = data;
-	const form = superForm(data.form, {
-		validators: zod4Client(tokenSchema)
-	});
+	const { data } = $props();
+
+	// superForm needs initial data only, use untrack to avoid reactivity warning
+	const form = superForm(
+		untrack(() => data.form),
+		{
+			validators: zod4Client(tokenSchema)
+		}
+	);
 	const { form: formData, enhance, errors, delayed } = form;
 	const url = page.url;
 	const validatingEmail = url.searchParams.get('email');
 	$formData.email = validatingEmail ?? '';
 </script>
 
-<AuthPage type="verify-email" {session} {user}>
+<AuthPage type="verify-email" session={data.session} user={data.user}>
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Verify your account</h1>
 		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
