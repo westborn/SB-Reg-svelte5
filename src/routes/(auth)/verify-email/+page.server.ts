@@ -1,7 +1,7 @@
 import { tokenSchema } from '$lib/zod-schemas';
 import { fail, redirect } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
@@ -10,7 +10,7 @@ export const load: PageServerLoad = async (event) => {
 	return {
 		session,
 		user,
-		form: await superValidate(zod(tokenSchema))
+		form: await superValidate(zod4(tokenSchema))
 	};
 };
 
@@ -20,7 +20,7 @@ export const actions = {
 		const { user } = await V1safeGetSession();
 		if (user) redirect(302, '/');
 
-		const form = await superValidate(event, zod(tokenSchema));
+		const form = await superValidate(event, zod4(tokenSchema));
 		if (!form.valid) {
 			return fail(400, {
 				form

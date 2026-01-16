@@ -1,19 +1,25 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { toast } from 'svelte-sonner';
+	import { untrack } from 'svelte';
 
 	import { locationSchemaUI } from '$lib/zod-schemas';
 
 	let { locationForm, exhibitNumber, entryId, formOccurence, updateLocationOnSuccess } = $props();
 
-	const form = superForm(locationForm, {
-		id: `locationForm-${formOccurence}`,
-		validators: zodClient(locationSchemaUI),
+	// Capture initial values for form initialization (don't need to be reactive)
+	const initialLocationForm = untrack(() => locationForm);
+	const formIdSuffix = untrack(() => formOccurence);
+	const initialExhibitNumber = untrack(() => exhibitNumber);
+
+	const form = superForm(initialLocationForm, {
+		id: `locationForm-${formIdSuffix}`,
+		validators: zod4Client(locationSchemaUI),
 		resetForm: false,
 		dataType: 'json',
 		onSubmit({ formData, cancel, jsonData }) {
@@ -47,7 +53,7 @@
 	});
 
 	const { form: formData, enhance, delayed } = form;
-	$formData.location = exhibitNumber;
+	$formData.location = initialExhibitNumber;
 
 	let disableUpdateButton = $state(true);
 </script>

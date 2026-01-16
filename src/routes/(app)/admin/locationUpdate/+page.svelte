@@ -1,10 +1,14 @@
 <script lang="ts">
 	import LocationUpdateForm from '$lib/components/location-update-form.svelte';
 	import type { Exhibit } from '$lib/components/server/registrationDB.js';
+	import { untrack } from 'svelte';
 
 	const { data } = $props();
-	const { locationForm } = data;
-	const acceptedExhibits = data.exhibits?.filter((exhibit: Exhibit) => exhibit.accepted);
+
+	// Use untrack to capture initial values without reactivity warnings
+	const locationForm = untrack(() => data.locationForm);
+	const acceptedExhibits = untrack(() => data.exhibits?.filter((exhibit: Exhibit) => exhibit.accepted));
+
 	let exhibits = $state(acceptedExhibits || []);
 
 	let updateError = $state('');

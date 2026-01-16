@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -18,7 +18,7 @@
 
 	const form = superForm(myState.entryForm, {
 		id: `entryCreateForm`,
-		validators: zodClient(entrySchemaUI),
+		validators: zod4Client(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
 			// pass the images that we accepted, into this form's data when they save the new entry

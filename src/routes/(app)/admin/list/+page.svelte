@@ -22,13 +22,10 @@
 	import * as Pagination from '$lib/components/ui/pagination';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import * as Select from '$lib/components/ui/select';
 
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
 	import { TableImage } from '$lib/components';
-	import { EXHIBITION_YEAR } from '$lib/constants';
 
 	import { convertToDollars, determinePlacement } from '$lib/utils.ts';
 	import { createTableState } from '$lib/tableState.svelte.js';
@@ -46,6 +43,24 @@
 			enableSorting: true,
 			enableColumnFilter: false,
 			enableGlobalFilter: false,
+			sortingFn: (rowA, rowB, columnId) => {
+				const exhibitA = rowA.getValue(columnId) as string | null;
+				const exhibitB = rowB.getValue(columnId) as string | null;
+
+				// If both have exhibitNumber, compare them
+				if (exhibitA && exhibitB) {
+					return exhibitA.localeCompare(exhibitB);
+				}
+
+				// If only one has exhibitNumber, it comes first
+				if (exhibitA && !exhibitB) return -1;
+				if (!exhibitA && exhibitB) return 1;
+
+				// If neither has exhibitNumber, sort by inOrOut
+				const inOrOutA = rowA.original.inOrOut || '';
+				const inOrOutB = rowB.original.inOrOut || '';
+				return inOrOutA.localeCompare(inOrOutB);
+			},
 			cell: (info) => {
 				const placement = determinePlacement(
 					info.getValue(),

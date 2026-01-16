@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -16,7 +16,7 @@
 
 	let form = superForm(myState.artistForm, {
 		id: `artistCreateForm`,
-		validators: zodClient(artistSchemaUI),
+		validators: zod4Client(artistSchemaUI),
 		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
 				toast.error('Failed to Register the Artist');

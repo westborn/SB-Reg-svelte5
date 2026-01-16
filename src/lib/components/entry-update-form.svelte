@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -9,6 +9,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { toast } from 'svelte-sonner';
+	import { untrack } from 'svelte';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte';
@@ -24,9 +25,12 @@
 	// Use the entry ID from global state to ensure we're editing the correct entry
 	let editingEntryId = $derived(myState.currentEditingEntryId ?? currentEntryId);
 
+	// Capture initial currentEntryId for form ID (doesn't need to be reactive)
+	const formIdSuffix = untrack(() => currentEntryId);
+
 	const form = superForm(myState.entryForm, {
-		id: `entryUpdateForm-${currentEntryId}`,
-		validators: zodClient(entrySchemaUI),
+		id: `entryUpdateForm-${formIdSuffix}`,
+		validators: zod4Client(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
 			// pass the images that we accepted, into this form's data when they save the updated entry
@@ -54,7 +58,9 @@
 	const { form: formData, enhance, delayed, errors } = form;
 
 	// get the form field values from the submission object using the id that was passed in
-	let entry = $derived(myState?.submission?.registrations[0].entries.find((entry) => entry.id === editingEntryId));
+	let entry = $derived(
+		myState?.submission?.registrations[0].entries.find((entry: { id: number }) => entry.id === editingEntryId)
+	);
 
 	// Initialize form data when entry is first available
 	let lastEntryId = $state<number | null>(null);
@@ -80,7 +86,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm-{currentEntryId}">
+<form method="POST" action="?/entryUpdate" class="w-full space-y-4" use:enhance id="entryUpdateForm-{formIdSuffix}">
 	<!-- stop the form from submitting on enter key press -->
 	<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 

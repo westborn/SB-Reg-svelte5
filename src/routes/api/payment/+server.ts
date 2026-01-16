@@ -1,5 +1,7 @@
 import { json } from '@sveltejs/kit';
-import { Client, Environment } from 'square';
+// https://github.com/square/square-nodejs-sdk/blob/e66c2d9e32225b800be6d7f15ef9a5d9f5d516aa/README.md
+// TODO: switch to modern SDK when time is available
+import { Client, Environment } from 'square/legacy';
 import { randomUUID } from 'crypto';
 import { SECRET_SQUARE_ACCESS_TOKEN } from '$env/static/private';
 import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
@@ -11,7 +13,7 @@ import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 
 const { paymentsApi } = new Client({
 	accessToken: SECRET_SQUARE_ACCESS_TOKEN,
-	environment: PUBLIC_SQUARE_ENVIRONMENT as Environment
+	environment: PUBLIC_SQUARE_ENVIRONMENT.toLowerCase() === 'production' ? Environment.Production : Environment.Sandbox
 });
 
 export async function POST({ request }) {

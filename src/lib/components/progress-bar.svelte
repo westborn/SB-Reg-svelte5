@@ -4,14 +4,17 @@
 
 	let { steps }: { steps: string[] } = $props();
 
-	let stepsStateArray = steps.map((step) => {
-		return {
-			description: step,
-			completed: false,
-			highlighted: false,
-			selected: false
-		};
-	});
+	// Make stepsStateArray reactive to changes in the steps prop
+	let stepsStateArray = $derived(
+		steps.map((step) => {
+			return {
+				description: step,
+				completed: false,
+				highlighted: false,
+				selected: false
+			};
+		})
+	);
 
 	let displaySteps = $derived(
 		stepsStateArray.map((step, index) => {

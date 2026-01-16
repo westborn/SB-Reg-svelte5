@@ -2,9 +2,12 @@
 	import { REGISTRATIONS_OPEN } from '$lib/constants';
 	import { getRegisterState, updateSubmission } from '$lib/context.svelte.js';
 	import { EntryCard } from '$lib/components';
+	import { untrack } from 'svelte';
 
 	let { data } = $props();
-	let { submission, user } = data;
+
+	// Use untrack to capture initial submission value without reactivity warning
+	const submission = untrack(() => data.submission);
 
 	updateSubmission(submission);
 
@@ -26,7 +29,7 @@
 </script>
 
 <section class="mx-auto mt-2 max-w-[500px] px-3">
-	{#if (REGISTRATIONS_OPEN || user.isSuperAdmin) && myState.artistExists}
+	{#if (REGISTRATIONS_OPEN || data.user.isSuperAdmin) && myState.artistExists}
 		<h3 class="text-xl font-bold text-primary">Registration Information</h3>
 		<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 			{#each textList as [textItem, textValue]}

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Header from '$lib/components/header.svelte';
 	let { children, data } = $props();
-	const { user } = data;
 
 	const navItems = [
 		// { label: 'View Registration and a very long senetence that nwont let anything', href: '/view' },
@@ -10,7 +9,7 @@
 	];
 </script>
 
-<Header {navItems} {user} />
+<Header {navItems} user={data.user} />
 <!-- <section class="flex flex-row items-center justify-between sm:container">
 	<div>
 

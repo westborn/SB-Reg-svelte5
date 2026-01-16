@@ -2,25 +2,16 @@ import { boolean, z } from 'zod';
 import { MAX_IMAGE_SIZE } from '$lib/constants';
 
 export const signupSchema = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
-		.toLowerCase()
+	email: z.email('Email must be a valid email').toLowerCase()
 });
 
 export const tokenSchema = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
-		.toLowerCase(),
+	email: z.email('Email must be a valid email').toLowerCase(),
 	token: z.string().min(6, 'Please enter the token you received in your email.')
 });
 
 export const loginSchema = z.object({
-	email: z
-		.string({ required_error: 'Email is required' })
-		.email({ message: 'Email must be a valid email' })
-		.toLowerCase()
+	email: z.email('Email must be a valid email').toLowerCase()
 });
 
 export const IndigenousSchema = z.enum(['Yes', 'No', 'Declined']);
@@ -121,15 +112,15 @@ export type PrimaryImageTable = z.infer<typeof primaryImageTableSchema>;
 // email: z.string({ required_error: 'Email is required' }).email({ message: 'Email must be a valid email' }),
 export const artistSchemaUI = z.object({
 	firstName: z
-		.string({ required_error: 'First Name is required' })
+		.string()
 		.min(2, { message: 'First Name must be at least 2 characters' })
 		.max(64, { message: 'First Name must be less than 64 characters' }),
 	lastName: z
-		.string({ required_error: 'Last Name is required' })
+		.string()
 		.min(2, { message: 'Last Name must be at least 2 characters' })
 		.max(64, { message: 'Last Name must be less than 64 characters' }),
-	phone: z.string({ required_error: 'Phone number is required' }),
-	postcode: z.string({ required_error: 'Postcode is required' }),
+	phone: z.string().min(1, 'Phone number is required'),
+	postcode: z.string().min(1, 'Postcode is required'),
 	firstNations: z.lazy(() => IndigenousSchema).default('No'),
 	bankAccountName: z.string().nullish(),
 	bankBSB: z.coerce.string().nullish(),
@@ -162,7 +153,7 @@ const maxWords = (max: number) => (val: string) => {
 };
 export const entrySchemaUI = z.object({
 	id: z.number().int(),
-	title: z.string({ required_error: 'Title is required' }),
+	title: z.string().min(1, { message: 'Title is required' }),
 	inOrOut: z.lazy(() => EntryTypeSchema).default('Outdoor'),
 	price: z.coerce
 		.number({ message: 'Just enter numbers please' })

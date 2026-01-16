@@ -1,36 +1,37 @@
 <script lang="ts">
-	import {
-		type CarouselAPI,
-		type CarouselProps,
-		type EmblaContext,
-		setEmblaContext,
-	} from "./context.js";
-	import { cn } from "$lib/utils.js";
+	import { type CarouselAPI, type CarouselProps, type EmblaContext, setEmblaContext } from './context.js';
+	import { cn } from '$lib/utils.js';
+	import { untrack } from 'svelte';
 
 	let {
 		opts = {},
 		plugins = [],
 		setApi = () => {},
-		orientation = "horizontal",
+		orientation = 'horizontal',
 		class: className,
 		children,
 		...restProps
 	}: CarouselProps = $props();
 
+	// Capture initial prop values for state initialization
+	const initialOpts = untrack(() => opts);
+	const initialPlugins = untrack(() => plugins);
+	const initialOrientation = untrack(() => orientation);
+
 	let carouselState = $state<EmblaContext>({
 		api: undefined,
 		scrollPrev,
 		scrollNext,
-		orientation,
+		orientation: initialOrientation,
 		canScrollNext: false,
 		canScrollPrev: false,
 		handleKeyDown,
-		options: opts,
-		plugins,
+		options: initialOpts,
+		plugins: initialPlugins,
 		onInit,
 		scrollSnaps: [],
 		selectedIndex: 0,
-		scrollTo,
+		scrollTo
 	});
 
 	setEmblaContext(carouselState);
@@ -55,16 +56,16 @@
 	$effect(() => {
 		if (carouselState.api) {
 			onSelect(carouselState.api);
-			carouselState.api.on("select", onSelect);
-			carouselState.api.on("reInit", onSelect);
+			carouselState.api.on('select', onSelect);
+			carouselState.api.on('reInit', onSelect);
 		}
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {
-		if (e.key === "ArrowLeft") {
+		if (e.key === 'ArrowLeft') {
 			e.preventDefault();
 			scrollPrev();
-		} else if (e.key === "ArrowRight") {
+		} else if (e.key === 'ArrowRight') {
 			e.preventDefault();
 			scrollNext();
 		}
@@ -82,11 +83,11 @@
 
 	$effect(() => {
 		return () => {
-			carouselState.api?.off("select", onSelect);
+			carouselState.api?.off('select', onSelect);
 		};
 	});
 </script>
 
-<div class={cn("relative", className)} role="region" aria-roledescription="carousel" {...restProps}>
+<div class={cn('relative', className)} role="region" aria-roledescription="carousel" {...restProps}>
 	{@render children?.()}
 </div>
