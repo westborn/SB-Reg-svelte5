@@ -2,9 +2,13 @@
 	import { updateSubmission } from '$lib/context.svelte.ts';
 
 	import { StepNavigation } from '$lib/components/index.js';
+	import { untrack } from 'svelte';
 
 	let { children, data } = $props();
-	let { submission } = data;
+
+	// Use untrack to capture initial submission value without reactivity warning
+	const submission = untrack(() => data.submission);
+
 	const myState = updateSubmission(submission);
 	myState.stepsAllowed = true;
 </script>

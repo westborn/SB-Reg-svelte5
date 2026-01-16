@@ -1,4 +1,4 @@
-import { Indigenous, PrismaClient } from '@prisma/client';
+import { EntryType, Indigenous, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -56,11 +56,16 @@ async function makeSubmission() {
 		let entryDB;
 		const entry = entries.find((item) => exhibit.entryId === item.entryId);
 		if (entry) {
+			// ...existing code...
 			const newEntry = {
-				artistId: artistMap.get(exhibit.email),
-				registrationId: registrationMap.get(exhibit.email),
+				artist: {
+					connect: { id: artistMap.get(exhibit.email) }
+				},
+				registration: {
+					connect: { id: registrationMap.get(exhibit.email) }
+				},
 				accepted: true,
-				inOrOut: entry.inOrOut as string,
+				inOrOut: entry.inOrOut as EntryType,
 				title: entry.title as string,
 				material: entry.material as string,
 				dimensions: entry.dimensions as string,
@@ -69,6 +74,7 @@ async function makeSubmission() {
 				enterMajorPrize: entry.enterMajorPrize == 'Yes' ? true : false,
 				price: ((entry.price ?? 0) * 100) as number
 			};
+
 			entryDB = await prisma.entryTable.create({
 				data: newEntry
 			});
@@ -85,7 +91,7 @@ async function makeSubmission() {
 		}
 		// now create image record
 		const image = images.find((item) => exhibit.entryId === item.entryId);
-		if (image) {
+		if (image && entryDB) {
 			const newImage = {
 				artistId: artistMap.get(exhibit.email),
 				registrationId: registrationMap.get(exhibit.email),

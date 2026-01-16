@@ -118,10 +118,10 @@ import type { PageServerLoad } from './$types';
 ```typescript
 // Use superforms with Zod validation
 import { superForm } from 'sveltekit-superforms';
-import { zodClient } from 'sveltekit-superforms/adapters';
+import { zod4Client } from 'sveltekit-superforms/adapters';
 
 const form = superForm(data.form, {
-	validators: zodClient(schema)
+	validators: zod4Client(schema)
 	// ... options
 });
 ```

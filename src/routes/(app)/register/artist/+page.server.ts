@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import type { RequestEvent } from './$types';
 
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 const artistUpdate = async (event: RequestEvent) => {
-	const formValidationResult = await superValidate(event, zod(artistSchemaUI));
+	const formValidationResult = await superValidate(event, zod4(artistSchemaUI));
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
 			status: 400
@@ -49,7 +49,7 @@ const artistUpdate = async (event: RequestEvent) => {
 
 const artistCreate = async (event: RequestEvent) => {
 	//console.log(`${event.route.id} - artistCreate - START`);
-	const formValidationResult = await superValidate(event, zod(artistSchemaUI));
+	const formValidationResult = await superValidate(event, zod4(artistSchemaUI));
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
 			status: 400

@@ -3,20 +3,25 @@
 	import { Input } from '$lib/components/ui/input';
 	import { signupSchema } from '$lib/zod-schemas.js';
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import AuthPage from '../auth-page.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
+	import { untrack } from 'svelte';
 
-	let { data } = $props();
-	let { session, user } = data;
-	const form = superForm(data.form, {
-		validators: zodClient(signupSchema)
-	});
+	const { data } = $props();
+
+	// superForm needs initial data only, use untrack to avoid reactivity warning
+	const form = superForm(
+		untrack(() => data.form),
+		{
+			validators: zod4Client(signupSchema)
+		}
+	);
 
 	const { form: formData, enhance, errors, delayed } = form;
 </script>
 
-<AuthPage type="signup" {session} {user}>
+<AuthPage type="signup" session={data.session} user={data.user}>
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Create an account</h1>
 		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>

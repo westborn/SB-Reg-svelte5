@@ -5,13 +5,13 @@ import { EXHIBITION_YEAR } from '$lib/constants';
 import { z } from 'zod';
 import { artistTableSchema } from '$lib/zod-schemas';
 import { message, superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 
 const emailSchema = z.object({ email: artistTableSchema.shape.email });
 
 export const load: PageServerLoad = async (event) => {
 	//console.log(`${event.route.id} - LOAD - START`);
-	const emailForm = await superValidate(zod(emailSchema), { id: 'emailForm' });
+	const emailForm = await superValidate(zod4(emailSchema), { id: 'emailForm' });
 	const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
 	return { emailForm, exhibits };
 };
@@ -21,7 +21,7 @@ export const actions: Actions = {
 		const { request, cookies, locals } = event;
 		const { user } = await locals.V1safeGetSession();
 
-		const form = await superValidate(request, zod(emailSchema));
+		const form = await superValidate(request, zod4(emailSchema));
 		if (!form.valid) {
 			return message(form, 'Invalid email for artist.');
 		}

@@ -1,6 +1,6 @@
 import { superValidate } from 'sveltekit-superforms';
 import type { LayoutServerLoad } from './$types';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import {
 	artistSchemaUI,
 	entryDeleteSchemaUI,
@@ -13,11 +13,11 @@ export const load: LayoutServerLoad = async (event) => {
 	// console.log(`${event.route.id} - LAYOUTLOAD - START`);
 
 	const [artistForm, entryForm, entryDeleteForm, confirmForm, imageUploadForm] = await Promise.all([
-		superValidate(zod(artistSchemaUI)),
-		superValidate(zod(entrySchemaUI)),
-		superValidate(zod(entryDeleteSchemaUI)),
-		superValidate(zod(confirmSchemaUI)),
-		superValidate(zod(fileUploadSchema))
+		superValidate(zod4(artistSchemaUI)),
+		superValidate(zod4(entrySchemaUI)),
+		superValidate(zod4(entryDeleteSchemaUI)),
+		superValidate(zod4(confirmSchemaUI)),
+		superValidate(zod4(fileUploadSchema))
 	]);
 
 	return {

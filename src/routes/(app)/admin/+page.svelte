@@ -9,9 +9,14 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import { untrack } from 'svelte';
 
-	let { data } = $props();
-	const { emailForm, exhibits: exhibitsFromServer } = data;
+	const { data } = $props();
+
+	// Use untrack to capture initial values without reactivity warnings
+	const emailForm = untrack(() => data.emailForm);
+	const exhibitsFromServer = untrack(() => data.exhibits);
+
 	//don't mutate the original array
 	const exhibits = $state([...exhibitsFromServer].sort((a, b) => a.email.localeCompare(b.email)));
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	import { untrack } from 'svelte';
 
@@ -18,7 +18,7 @@
 
 	let form = superForm(myState.artistForm, {
 		id: `artistUpdateForm-${myState?.submission?.id}`,
-		validators: zodClient(artistSchemaUI),
+		validators: zod4Client(artistSchemaUI),
 		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
 				toast.error('Failed to Update the Registration');
