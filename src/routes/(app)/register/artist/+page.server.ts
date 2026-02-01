@@ -9,6 +9,7 @@ import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants'
 
 import { artistSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, updateArtist, type User } from '$lib/components/server/registrationDB';
+import { logger } from '$lib/server/logger';
 
 const artistUpdate = async (event: RequestEvent) => {
 	const formValidationResult = await superValidate(event, zod4(artistSchemaUI));
@@ -33,7 +34,18 @@ const artistUpdate = async (event: RequestEvent) => {
 		}
 
 		await updateArtist(artist.id, formValidationResult.data);
+
+		// Log successful update
+		await logger.info('Artist updated successfully', {
+			userEmail: artistEmail,
+			artistId: artist.id,
+			routeId: event.route.id
+		});
 	} catch (error) {
+		await logger.error('Artist update failed', error as Error, {
+			userEmail: artistEmail,
+			routeId: event.route.id
+		});
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
@@ -57,8 +69,19 @@ const artistCreate = async (event: RequestEvent) => {
 	const newArtist = { ...formValidationResult.data, email: artistEmail };
 
 	try {
-		await prisma.artistTable.create({ data: newArtist });
+		const createdArtist = await prisma.artistTable.create({ data: newArtist });
+
+		// Log successful creation
+		await logger.info('Artist created successfully', {
+			userEmail: artistEmail,
+			artistId: createdArtist.id,
+			routeId: event.route.id
+		});
 	} catch (error) {
+		await logger.error('Artist creation failed', error as Error, {
+			userEmail: artistEmail,
+			routeId: event.route.id
+		});
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
 

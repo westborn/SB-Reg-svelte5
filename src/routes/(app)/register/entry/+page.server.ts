@@ -26,6 +26,7 @@ import {
 } from '$lib/components/server/registrationDB';
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
 import { getDefaultPrimaryImage } from '$lib/utils/primary-image';
+import { logger } from '$lib/server/logger';
 
 const entryUpdate = async (event: RequestEvent) => {
 	const updateImagesSchema = entrySchemaUI.extend({
@@ -141,10 +142,19 @@ const entryUpdate = async (event: RequestEvent) => {
 				price: (price ?? 0) * 100
 			});
 		});
-	} catch (error) {
-		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-	}
 
+	// Log successful entry update
+	await logger.info('Entry updated successfully', {
+		entryId: idToUpdate,
+		userEmail: user.email,
+		routeId: event.route.id
+	});
+} catch (error) {
+	await logger.error('Entry update failed', error as Error, {
+		entryId: idToUpdate,
+		userEmail: user.email,
+		routeId: event.route.id
+	});
 	// Return the updated submission
 	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
@@ -226,10 +236,18 @@ const entryCreate = async (event: RequestEvent) => {
 				price: (price ?? 0) * 100
 			}
 		});
-	} catch (error) {
-		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
-	}
 
+	// Log successful entry creation
+	await logger.info('Entry created successfully', {
+		entryId: newEntry.id,
+		userEmail: user.email,
+		routeId: event.route.id
+	});
+} catch (error) {
+	await logger.error('Entry creation failed', error as Error, {
+		userEmail: user.email,
+		routeId: event.route.id
+	});
 	// If images were provided, update the images with the new entry details and set primary in transaction
 	if (workingImages && workingImages.length > 0) {
 		await prisma.$transaction(async (tx) => {
@@ -299,9 +317,21 @@ const imageUpload = async (event: RequestEvent) => {
 			originalFileName: formValidationResult.data.image.name
 		} as CurrentImage);
 
+		// Log successful image upload
+		await logger.info('Image uploaded successfully', {
+			imageId: newImage.id,
+			userEmail: user.email,
+			fileName: formValidationResult.data.image.name,
+			routeId: event.route.id
+		});
+
 		const returnData = { formValidationResult, newImage };
 		return withFiles(returnData);
 	} catch (error) {
+		await logger.error('Image upload failed', error as Error, {
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 		return fail(500, withFiles({ formValidationResult }));
 	}
 };
@@ -334,7 +364,19 @@ const entryDelete = async (event: RequestEvent) => {
 		if (!deletedEntry) {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
+
+		// Log successful deletion
+		await logger.info('Entry deleted successfully', {
+			entryId: idToDelete,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 	} catch (error) {
+		await logger.error('Entry deletion failed', error as Error, {
+			entryId: idToDelete,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 		return fail(500, withFiles({ formValidationResult }));
 	}
 	// Return the updated submission
@@ -360,7 +402,21 @@ const setPrimaryImageAction = async (event: RequestEvent) => {
 
 	try {
 		await setPrimaryImage(entryId, imageId);
+
+		// Log successful primary image update
+		await logger.info('Primary image set successfully', {
+			entryId,
+			imageId,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 	} catch (error) {
+		await logger.error('Failed to set primary image', error as Error, {
+			entryId,
+			imageId,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 		return message(formValidationResult, 'Error setting primary image');
 	}
 

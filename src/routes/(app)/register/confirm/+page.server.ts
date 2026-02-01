@@ -8,6 +8,7 @@ import { prisma } from '$lib/components/server/prisma';
 import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
 import { confirmSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, updateArtist, updateRegistration, type User } from '$lib/components/server/registrationDB';
+import { logger } from '$lib/server/logger';
 
 const confirmUpdate = async (event: RequestEvent) => {
 	const formValidationResult = await superValidate(event, zod4(confirmSchemaUI));
@@ -52,7 +53,18 @@ const confirmUpdate = async (event: RequestEvent) => {
 				});
 			}
 		});
+
+		// Log successful confirmation
+		await logger.info('Registration confirmed and updated', {
+			userEmail: artistEmail,
+			registrationId: idToUpdate,
+			routeId: event.route.id
+		});
 	} catch (error) {
+		await logger.error('Registration confirmation failed', error as Error, {
+			userEmail: artistEmail,
+			routeId: event.route.id
+		});
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 

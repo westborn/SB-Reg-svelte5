@@ -4,6 +4,7 @@ import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
 import { sendGoogleEmail } from '$lib/components/server/mailer';
 import { prisma } from '$lib/components/server/prisma';
 import { registrationConfirmationEmail } from '$lib/server/email-templates';
+import { logger } from '$lib/server/logger';
 
 export async function POST(event: RequestEvent) {
 	const { request, locals } = event;
@@ -18,7 +19,11 @@ export async function POST(event: RequestEvent) {
 		// Get the submission from the database
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
-			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
+			await logger.error('Failed to get submission in registerComplete', new Error('No submission found'), {
+				userId: user.id,
+				userEmail: user.email,
+				routeId: event.route.id
+			});
 			return new Response(JSON.stringify({ message: 'Error in registerComplete - no submission' }), { status: 500 });
 		}
 		const result = await sendRegistrationConfirmationEmail({
@@ -34,11 +39,29 @@ export async function POST(event: RequestEvent) {
 			}
 		});
 		if (!updatedRegistration) {
-			console.error('Error Updating Registration closed status');
+			await logger.error('Failed to update registration closed status', new Error('Update registration failed'), {
+				userId: user.id,
+				userEmail: user.email,
+				registrationId: registrationToUpdate,
+				routeId: event.route.id
+			});
 			return new Response(JSON.stringify({ message: 'Error in registerComplete - closed status' }), { status: 500 });
 		}
+
+		// Log successful registration completion
+		await logger.info('Registration completed successfully', {
+			userId: user.id,
+			userEmail: user.email,
+			registrationId: registrationToUpdate,
+			entryCount: submissionFromDB.registrations[0].entries.length,
+			routeId: event.route.id
+		});
 	} catch (e) {
-		console.error(e);
+		await logger.error('Registration completion failed', e as Error, {
+			userId: user.id,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 		return new Response(JSON.stringify({ message: 'Error in registerComplete - Unknown' }), { status: 500 });
 	}
 	return new Response(JSON.stringify({ message: 'success' }), { status: 200 });
@@ -51,7 +74,10 @@ export async function POST(event: RequestEvent) {
 async function sendRegistrationConfirmationEmail({ submission, user }: { submission: Submission; user: User }) {
 	const entriesData = submission?.registrations[0]?.entries;
 	if (!entriesData) {
-		console.error('Failed to get entries data');
+		await logger.error('Failed to get entries data for email', new Error('No entries data'), {
+			userId: user.id,
+			userEmail: user.email
+		});
 		return new Response(JSON.stringify({ message: 'Error Getting Submission -Entries' }), { status: 500 });
 	}
 

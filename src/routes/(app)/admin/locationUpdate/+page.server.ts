@@ -5,6 +5,7 @@ import { prisma } from '$lib/components/server/prisma';
 import { getExhibits, type Exhibit } from '$lib/components/server/registrationDB';
 import { locationSchemaUI } from '$lib/zod-schemas';
 import { EXHIBITION_YEAR, GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
+import { logger } from '$lib/server/logger';
 import type { Actions, PageServerLoad, RequestEvent } from '../$types';
 import { message, superValidate } from 'sveltekit-superforms';
 
@@ -20,6 +21,9 @@ export const load: PageServerLoad = async () => {
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
+		await logger.error('Failed to load exhibits for location update', error, {
+			routeId: '/admin/locationUpdate'
+		});
 		return { error: error.message };
 	}
 };
@@ -56,7 +60,21 @@ const locationUpdate = async (event: RequestEvent) => {
 			update: { exhibitNumber: formValidationResult.data.location },
 			create: { entryId: formValidationResult.data.entryId, exhibitNumber: formValidationResult.data.location }
 		});
+
+		// Log successful location update
+		await logger.info('Location updated successfully', {
+			entryId,
+			exhibitNumber,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 	} catch (error) {
+		await logger.error('Location update failed', error as Error, {
+			entryId,
+			exhibitNumber,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED, {
 			status: 400
 		});
