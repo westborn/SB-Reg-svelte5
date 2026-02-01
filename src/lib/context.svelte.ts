@@ -9,7 +9,8 @@ import type {
 	fileUploadSchema
 } from '$lib/zod-schemas';
 import type { CurrentEntry, CurrentImage, Submission } from '$lib/components/server/registrationDB';
-import { MAX_IMAGES_UI_LIMIT, DEFAULT_PRIMARY_IMAGE_INDEX } from '$lib/constants';
+import { MAX_IMAGES_UI_LIMIT, DEFAULT_PRIMARY_IMAGE_INDEX, BASE_REGISTRATION_COST } from '$lib/constants';
+import { calculateRegistrationCost } from '$lib/utils';
 
 type RegisterInitial = {
 	artistForm: SuperValidated<Infer<typeof artistSchemaUI>>;
@@ -28,6 +29,9 @@ export class RegisterState {
 	registrationCompleted = $derived((this.submission?.registrations?.[0]?.closed ?? false) ? true : false);
 	entriesExist = $derived((this.submission?.registrations?.[0]?.entries?.length ?? 0 > 0) ? true : false);
 	currentEntries = $derived(this.submission?.registrations?.[0]?.entries ?? []);
+	costOfRegistration = $derived(
+		this.currentEntries.length > 0 ? calculateRegistrationCost(this.currentEntries.length) : BASE_REGISTRATION_COST
+	);
 	artistCreateDialogOpen = $state(false);
 	artistUpdateDialogOpen = $state(false);
 	confirmDialogOpen = $state(false);
@@ -54,6 +58,11 @@ export class RegisterState {
 	}
 
 	// Multiple Images Helper Functions
+	/**
+	 * Adds an image to the working images array.
+	 * Automatically sets as primary if it's the first image.
+	 * @throws Error if MAX_IMAGES_UI_LIMIT exceeded
+	 */
 	addWorkingImage(image: CurrentImage) {
 		if (!image) {
 			throw new Error('Image is required');
@@ -71,6 +80,11 @@ export class RegisterState {
 		}
 	}
 
+	/**
+	 * Removes an image from working images.
+	 * Automatically reassigns primary if removing current primary.
+	 * @throws Error if attempting to remove last image
+	 */
 	removeWorkingImage(imageId: number) {
 		if (this.workingImages.length <= 1) {
 			throw new Error('Cannot remove the last remaining image');
@@ -90,6 +104,10 @@ export class RegisterState {
 		this.workingImages = this.workingImages.filter((img) => img?.id !== imageId);
 	}
 
+	/**
+	 * Sets the specified image as the primary image.
+	 * @throws Error if image not found in working images
+	 */
 	setPrimaryImage(imageId: number) {
 		const image = this.workingImages.find((img) => img?.id === imageId);
 		if (!image) {
