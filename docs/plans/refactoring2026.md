@@ -25,7 +25,11 @@ This refactoring plan systematizes the SB-Reg-svelte5 codebase by eliminating in
 
 - Steps 16-20 completed: Removed empty load functions, verified HEIC detection logic centralization, standardized form ID patterns, extracted UI constants, verified admin error response consistency
 
-**Phase 6-10**: Not started
+**Phase 6: Image Handling** ✅ COMPLETE (Feb 1, 2026)
+
+- Steps 21-22 completed: Created primary-image utility module with helper functions, updated RegisterState and server actions to use utilities
+
+**Phase 7-10**: Not started
 
 ---
 
@@ -915,7 +919,7 @@ Apply same error handling pattern from Step 3 to admin routes.
 
 ### Phase 6: Image Handling
 
-#### Step 21: Create Primary Image Utility Module 🟢
+#### Step 21: Create Primary Image Utility Module 🟢 ✅ COMPLETE
 
 **File**: `src/lib/utils/primary-image.ts`
 **Purpose**: Consolidate primary image logic
@@ -958,7 +962,7 @@ export function canRemoveImage(
 
 ---
 
-#### Step 22: Update RegisterState and Server Actions with Utilities 🟢
+#### Step 22: Update RegisterState and Server Actions with Utilities 🟢 ✅ COMPLETE
 
 **Files**: `src/lib/context.svelte.ts`, `src/routes/(app)/register/entry/+page.server.ts`
 **Purpose**: Use primary image utilities
@@ -971,6 +975,7 @@ Replace inline logic with utility functions from Step 21.
 
 - `src/lib/context.svelte.ts`
 - `src/routes/(app)/register/entry/+page.server.ts`
+- `src/lib/components/server/registrationDB.ts`
 
 ---
 

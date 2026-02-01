@@ -1,5 +1,6 @@
 import { prisma } from '$lib/components/server/prisma';
 import { EXHIBITION_YEAR, MIN_IMAGES_PER_ENTRY } from '$lib/constants';
+import { getImagesWithPrimary as getImagesWithPrimaryUtil, getNewPrimaryAfterRemoval } from '$lib/utils/primary-image';
 
 import { EntryType } from '$lib/constants';
 import type { EntryTable, ImageTable, PrimaryImageTable } from '$lib/zod-schemas';
@@ -360,11 +361,8 @@ export const getEntryImagesWithPrimary = async (entryId: number) => {
 
 	if (!entry) return null;
 
-	// Mark primary image in the images array
-	const imagesWithPrimary = entry.images.map((image) => ({
-		...image,
-		isPrimary: entry.primaryImage?.imageId === image.id
-	}));
+	// Use utility to mark primary image in the images array
+	const imagesWithPrimary = getImagesWithPrimaryUtil(entry.images, entry.primaryImage?.imageId || null);
 
 	return {
 		images: imagesWithPrimary,
@@ -409,13 +407,13 @@ export const deleteImage = async (imageId: number, entryId: number) => {
 
 	const isDeletingPrimary = primaryImage?.imageId === imageId;
 
-	// If deleting primary image, reassign primary to first remaining image
+	// If deleting primary image, reassign primary to first remaining image using utility
 	if (isDeletingPrimary) {
-		const remainingImages = entryImages.filter((img) => img.id !== imageId);
-		if (remainingImages.length > 0) {
+		const newPrimaryId = getNewPrimaryAfterRemoval(imageId, entryImages, primaryImage?.imageId || null);
+		if (newPrimaryId) {
 			await prisma.primaryImageTable.update({
 				where: { entryId: entryId },
-				data: { imageId: remainingImages[0].id }
+				data: { imageId: newPrimaryId }
 			});
 		}
 	}

@@ -25,6 +25,7 @@ import {
 	type User
 } from '$lib/components/server/registrationDB';
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
+import { getDefaultPrimaryImage } from '$lib/utils/primary-image';
 
 const entryUpdate = async (event: RequestEvent) => {
 	const updateImagesSchema = entrySchemaUI.extend({
@@ -250,7 +251,7 @@ const entryCreate = async (event: RequestEvent) => {
 			}
 
 			// Set the primary image if specified, otherwise use the first image
-			const imageIdToSetAsPrimary = primaryImageId || workingImages[0]?.id;
+			const imageIdToSetAsPrimary = primaryImageId || getDefaultPrimaryImage(workingImages);
 			if (imageIdToSetAsPrimary) {
 				try {
 					await createPrimaryImageRelation(newEntry.id, imageIdToSetAsPrimary);
