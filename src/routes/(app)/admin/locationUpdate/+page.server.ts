@@ -51,17 +51,11 @@ const locationUpdate = async (event: RequestEvent) => {
 				status: 400
 			});
 		}
-		const upsertResult = await prisma.locationTable.upsert({
+		await prisma.locationTable.upsert({
 			where: { entryId: entryId },
 			update: { exhibitNumber: formValidationResult.data.location },
 			create: { entryId: formValidationResult.data.entryId, exhibitNumber: formValidationResult.data.location }
 		});
-
-		if (!upsertResult) {
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE, {
-				status: 400
-			});
-		}
 	} catch (error) {
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED, {
 			status: 400

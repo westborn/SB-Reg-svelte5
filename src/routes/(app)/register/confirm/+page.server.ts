@@ -7,7 +7,7 @@ import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
 import { confirmSchemaUI } from '$lib/zod-schemas';
-import { getSubmission, type User } from '$lib/components/server/registrationDB';
+import { getSubmission, updateArtist, updateRegistration, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
 	return;
@@ -35,25 +35,27 @@ const confirmUpdate = async (event: RequestEvent) => {
 			formValidationResult.data;
 
 		// Wrap both updates in transaction to ensure atomicity
-		await prisma.$transaction([
-			prisma.registrationTable.update({
-				where: { id: idToUpdate },
-				data: {
-					bumpIn: bumpIn ?? null,
-					bumpOut: bumpOut ?? null,
-					crane: crane === 'Yes' ? true : false,
-					displayRequirements: displayRequirements ?? null
-				}
-			}),
-			prisma.artistTable.update({
+		await prisma.$transaction(async (tx) => {
+			await updateRegistration(idToUpdate, {
+				bumpIn: bumpIn ?? null,
+				bumpOut: bumpOut ?? null,
+				crane: crane === 'Yes' ? true : false,
+				displayRequirements: displayRequirements ?? null
+			});
+
+			const artist = await prisma.artistTable.findUnique({
 				where: { email: artistEmail },
-				data: {
+				select: { id: true }
+			});
+
+			if (artist) {
+				await updateArtist(artist.id, {
 					bankAccountName: bankAccountName ?? '',
 					bankBSB: bankBSB ?? '',
 					bankAccount: bankAccount ?? ''
-				}
-			})
-		]);
+				});
+			}
+		});
 	} catch (error) {
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}

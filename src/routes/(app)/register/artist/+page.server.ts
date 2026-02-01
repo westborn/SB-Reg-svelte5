@@ -8,7 +8,7 @@ import { prisma } from '$lib/components/server/prisma';
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
 
 import { artistSchemaUI } from '$lib/zod-schemas';
-import { getSubmission, type User } from '$lib/components/server/registrationDB';
+import { getSubmission, updateArtist, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
 	return;
@@ -26,14 +26,17 @@ const artistUpdate = async (event: RequestEvent) => {
 	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 
 	try {
-		const result = await prisma.artistTable.update({
+		// Find the artist by email to get their ID
+		const artist = await prisma.artistTable.findUnique({
 			where: { email: artistEmail },
-			data: formValidationResult.data
+			select: { id: true }
 		});
 
-		if (!result) {
+		if (!artist) {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
+
+		await updateArtist(artist.id, formValidationResult.data);
 	} catch (error) {
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
@@ -58,10 +61,7 @@ const artistCreate = async (event: RequestEvent) => {
 	const newArtist = { ...formValidationResult.data, email: artistEmail };
 
 	try {
-		const result = await prisma.artistTable.create({ data: newArtist });
-		if (!result) {
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
+		await prisma.artistTable.create({ data: newArtist });
 	} catch (error) {
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}

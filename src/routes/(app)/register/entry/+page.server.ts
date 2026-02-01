@@ -15,6 +15,7 @@ import {
 	createPrimaryImageRelation,
 	setPrimaryImage,
 	deleteImage,
+	updateEntry,
 	type CurrentImage,
 	type User
 } from '$lib/components/server/registrationDB';
@@ -128,22 +129,15 @@ const entryUpdate = async (event: RequestEvent) => {
 			// put the dimensions into a single string with 'x' separator
 			const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join('x') || '';
 
-			const updatedEntry = await tx.entryTable.update({
-				where: { id: idToUpdate },
-				data: {
-					title: title ?? '',
-					inOrOut: inOrOut === 'Outdoor' ? 'Outdoor' : 'Indoor',
-					material: material ?? '',
-					description: description ?? '',
-					specialRequirements: specialRequirements ?? '',
-					dimensions,
-					price: (price ?? 0) * 100
-				}
+			await updateEntry(idToUpdate, {
+				title: title ?? '',
+				inOrOut: inOrOut === 'Outdoor' ? 'Outdoor' : 'Indoor',
+				material: material ?? '',
+				description: description ?? '',
+				specialRequirements: specialRequirements ?? '',
+				dimensions,
+				price: (price ?? 0) * 100
 			});
-
-			if (!updatedEntry) {
-				return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-			}
 		});
 	} catch (error) {
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -230,9 +224,6 @@ const entryCreate = async (event: RequestEvent) => {
 				price: (price ?? 0) * 100
 			}
 		});
-		if (!newEntry) {
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
 	} catch (error) {
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}

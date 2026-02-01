@@ -3,6 +3,7 @@ import { EXHIBITION_YEAR, MIN_IMAGES_PER_ENTRY } from '$lib/constants';
 
 import { EntryType } from '$lib/constants';
 import type { EntryTable, ImageTable, PrimaryImageTable } from '$lib/zod-schemas';
+import { Prisma } from '@prisma/client';
 
 // Two different ways to add types from a prisma query
 
@@ -500,6 +501,47 @@ export const updatePrimaryImageRelation = async (entryId: number, imageId: numbe
 // 	});
 // };
 
+/////////////////////////////////////////
+// UPDATE HELPER FUNCTIONS (Phase 2, Step 4)
+/////////////////////////////////////////
+
+/**
+ * Updates an artist record with partial data
+ */
+export const updateArtist = async (artistId: number, data: Partial<Prisma.artistTableUpdateInput>) => {
+	return await prisma.artistTable.update({
+		where: { id: artistId },
+		data
+	});
+};
+
+/**
+ * Updates an entry record with partial data
+ */
+export const updateEntry = async (entryId: number, data: Partial<Prisma.entryTableUpdateInput>) => {
+	return await prisma.entryTable.update({
+		where: { id: entryId },
+		data
+	});
+};
+
+/**
+ * Updates a registration record with partial data
+ */
+export const updateRegistration = async (
+	registrationId: number,
+	data: Partial<Prisma.registrationTableUpdateInput>
+) => {
+	return await prisma.registrationTable.update({
+		where: { id: registrationId },
+		data
+	});
+};
+
+/////////////////////////////////////////
+// EXHIBIT QUERIES
+/////////////////////////////////////////
+
 export type Exhibit = {
 	artistId: number;
 	email: string;
@@ -542,49 +584,107 @@ export const getExhibits = async ({
 	offset: number;
 	entryYear: string;
 }): Promise<Exhibit[]> => {
-	const exhibits: Exhibit[] = await prisma.$queryRaw`select
-		artist.id as "artistId",
-		artist.email,
-		artist.last_name as "lastName",
-		artist.first_name as "firstName",
-		concat(artist.first_name, ' ', artist.last_name) as "artistName",
-		artist.phone,
-		artist.postcode,
-		artist.first_nations as "firstNations",
-		artist.bank_account_name as "bankAccountName",
-		artist.bank_bsb as "bankBSB",
-		artist.bank_account as "bankAccount",
-		registration.registration_year as "registrationYear",
-		registration.closed,
-		registration.bump_in as "bumpIn",
-		registration.bump_out as "bumpOut",
-		registration.display_requirements as "displayRequirements",
-		entry.id as "entryId",
-		entry.accepted,
-		entry.description,
-		entry.dimensions,
-		entry.in_or_out as "inOrOut",
-		entry.material,
-		entry.title,
-		entry.price_in_cents as "price",
-		entry.sold,
-		entry.special_requirements as "specialRequirements",
-		image.id as "imageId",
-		image.cloud_url as "cloudURL",
-		CASE WHEN location.exhibit_number is NULL THEN NULL ELSE location.exhibit_number END as "exhibitNumber"
-		from
-		artist
-		join registration on artist.id = registration.artist_id
-		join entry on registration.id = entry.registration_id
-		LEFT OUTER join location on entry.id = location.entry_id
-		LEFT OUTER join primary_image on entry.id = primary_image.entry_id
-		LEFT OUTER join image on primary_image.image_id = image.id
-		where
-		-- -- artist.email = 'epsilonartist@gmail.com' AND
-		registration.registration_year = ${entryYear}
-		order by location.exhibit_number asc, entry.id asc
-		OFFSET ${offset} ROWS
-		LIMIT ${rows}
-		`;
-	return exhibits;
+	const artists = await prisma.artistTable.findMany({
+		where: {
+			registrations: {
+				some: {
+					registrationYear: entryYear,
+					entries: {
+						some: {}
+					}
+				}
+			}
+		},
+		select: {
+			id: true,
+			email: true,
+			firstName: true,
+			lastName: true,
+			phone: true,
+			postcode: true,
+			firstNations: true,
+			bankAccountName: true,
+			bankBSB: true,
+			bankAccount: true,
+			registrations: {
+				where: { registrationYear: entryYear },
+				select: {
+					registrationYear: true,
+					closed: true,
+					bumpIn: true,
+					bumpOut: true,
+					displayRequirements: true,
+					entries: {
+						select: {
+							id: true,
+							accepted: true,
+							description: true,
+							dimensions: true,
+							inOrOut: true,
+							material: true,
+							title: true,
+							price: true,
+							sold: true,
+							specialRequirements: true,
+							primaryImage: {
+								select: {
+									image: {
+										select: {
+											id: true,
+											cloudURL: true
+										}
+									}
+								}
+							},
+							location: {
+								select: {
+									exhibitNumber: true
+								}
+							}
+						},
+						orderBy: [{ location: { exhibitNumber: 'asc' } }, { id: 'asc' }]
+					}
+				}
+			}
+		},
+		skip: offset,
+		take: rows
+	});
+
+	// Transform nested structure to flat Exhibit[] format
+	return artists.flatMap((artist) =>
+		artist.registrations.flatMap((registration) =>
+			registration.entries.map((entry) => ({
+				artistId: artist.id,
+				email: artist.email,
+				lastName: artist.lastName,
+				firstName: artist.firstName,
+				artistName: `${artist.firstName} ${artist.lastName}`,
+				phone: artist.phone,
+				postcode: artist.postcode,
+				firstNations: artist.firstNations,
+				bankAccountName: artist.bankAccountName ?? '',
+				bankBSB: artist.bankBSB ?? '',
+				bankAccount: artist.bankAccount ?? '',
+				registrationYear: registration.registrationYear,
+				closed: registration.closed,
+				bumpIn: registration.bumpIn ?? '',
+				bumpOut: registration.bumpOut ?? '',
+				displayRequirements: registration.displayRequirements ?? '',
+				entryId: entry.id,
+				accepted: entry.accepted,
+				description: entry.description ?? '',
+				dimensions: entry.dimensions ?? '',
+				inOrOut: entry.inOrOut,
+				material: entry.material ?? '',
+				title: entry.title,
+				price: entry.price,
+				sold: entry.sold,
+				specialRequirements: entry.specialRequirements ?? '',
+				imageId: entry.primaryImage?.image?.id ?? 0,
+				cloudURL: entry.primaryImage?.image?.cloudURL ?? '',
+				exhibitNumber: entry.location?.exhibitNumber ?? ''
+			}))
+		)
+	);
 };
