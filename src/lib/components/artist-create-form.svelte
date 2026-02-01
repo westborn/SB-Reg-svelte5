@@ -22,7 +22,9 @@
 				toast.error('Failed to Register the Artist');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success('Artist is now Registered');
 			myState.artistCreateDialogOpen = false;
 			return;

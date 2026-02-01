@@ -6,7 +6,12 @@ import { z } from 'zod';
 import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
 
-import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
+import {
+	GENERIC_ERROR_MESSAGE,
+	GENERIC_ERROR_UNEXPECTED,
+	DIMENSION_SEPARATOR,
+	CLOUDINARY_PRESET_UNATTACHED
+} from '$lib/constants';
 import { entryDeleteSchemaUI, entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
 import {
 	createImage,
@@ -126,8 +131,8 @@ const entryUpdate = async (event: RequestEvent) => {
 
 			const { title, price, inOrOut, material, specialRequirements, description, dimHeight, dimLength, dimWidth } =
 				formValidationResult.data;
-			// put the dimensions into a single string with 'x' separator
-			const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join('x') || '';
+			// put the dimensions into a single string with separator
+			const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join(DIMENSION_SEPARATOR) || '';
 
 			await updateEntry(idToUpdate, {
 				title: title ?? '',
@@ -204,8 +209,8 @@ const entryCreate = async (event: RequestEvent) => {
 	const { title, price, inOrOut, material, specialRequirements, description, dimHeight, dimLength, dimWidth } =
 		formValidationResult.data;
 
-	// put the dimensions into a single string with 'x' separator
-	const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join('x') || '';
+	// put the dimensions into a single string with separator
+	const dimensions = [dimLength, dimWidth, dimHeight].filter((dim) => dim).join(DIMENSION_SEPARATOR) || '';
 
 	let newEntry;
 	try {
@@ -281,7 +286,7 @@ const imageUpload = async (event: RequestEvent) => {
 		}
 
 		// Attempt to upload the image to Cloudinary
-		const uploadResult = await uploadImageToCloudinary(formValidationResult.data.image, 'UnAttachedImages');
+		const uploadResult = await uploadImageToCloudinary(formValidationResult.data.image, CLOUDINARY_PRESET_UNATTACHED);
 		if (!uploadResult.success) {
 			return fail(500, withFiles({ formValidationResult }));
 		}

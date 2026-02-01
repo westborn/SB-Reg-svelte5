@@ -11,7 +11,6 @@
 
 	import { confirmSchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte.js';
-	import { untrack } from 'svelte';
 
 	let myState = getRegisterState();
 
@@ -23,7 +22,9 @@
 				toast.error('Failed to Update the Registration');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success(' Registration Updated');
 			myState.confirmDialogOpen = false;
 			return;
@@ -31,22 +32,23 @@
 	});
 	const { form: formData, enhance, errors, message, delayed } = form;
 
-	// grab the form field values from the submission object
+	// Standard form initialization pattern (Phase 3, Step 9)
+	let relevantData = $derived(myState?.submission?.registrations?.[0]);
+	let lastDataId = $state<number | null>(null);
+
 	$effect(() => {
-		const bumpIn = untrack(() => myState?.submission?.registrations[0].bumpIn);
-		const bumpOut = untrack(() => myState?.submission?.registrations[0].bumpOut);
-		const crane = untrack(() => myState?.submission?.registrations[0].crane);
-		const displayRequirements = untrack(() => myState?.submission?.registrations[0].displayRequirements ?? '');
-		const bankAccountName = untrack(() => myState?.submission?.bankAccountName ?? '');
-		const bankBSB = untrack(() => myState?.submission?.bankBSB ?? '');
-		const bankAccount = untrack(() => myState?.submission?.bankAccount ?? '');
-		$formData.bumpIn = bumpIn;
-		$formData.bumpOut = bumpOut;
-		$formData.crane = crane ? 'Yes' : 'No';
-		$formData.displayRequirements = displayRequirements;
-		$formData.bankAccountName = bankAccountName;
-		$formData.bankBSB = bankBSB;
-		$formData.bankAccount = bankAccount;
+		if (relevantData && relevantData.id !== lastDataId) {
+			Object.assign($formData, {
+				bumpIn: relevantData.bumpIn,
+				bumpOut: relevantData.bumpOut,
+				crane: relevantData.crane ? 'Yes' : 'No',
+				displayRequirements: relevantData.displayRequirements ?? '',
+				bankAccountName: myState?.submission?.bankAccountName ?? '',
+				bankBSB: myState?.submission?.bankBSB ?? '',
+				bankAccount: myState?.submission?.bankAccount ?? ''
+			});
+			lastDataId = relevantData.id;
+		}
 	});
 </script>
 

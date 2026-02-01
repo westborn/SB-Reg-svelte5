@@ -11,13 +11,13 @@
 	import { toast } from 'svelte-sonner';
 
 	import { entrySchemaUI } from '$lib/zod-schemas';
-	import { getRegisterState } from '$lib/context.svelte';
+	import { getRegisterState } from '$lib/context.svelte.js';
 	import { MultipleImageUploadForm } from '$lib/components';
 
 	let myState = getRegisterState();
 
-	const form = superForm(myState.entryForm, {
-		id: `entryCreateForm`,
+	let form = superForm(myState.entryForm, {
+		id: 'entryCreateForm',
 		validators: zod4Client(entrySchemaUI),
 		dataType: 'json',
 		onSubmit({ jsonData }) {
@@ -35,7 +35,9 @@
 				console.log('Create Failed', JSON.stringify(result, null, 2));
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success('Entry Added');
 			myState.entryCreateDialogOpen = false;
 			return;

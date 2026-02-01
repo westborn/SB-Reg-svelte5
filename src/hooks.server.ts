@@ -2,7 +2,7 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createServerClient } from '@supabase/ssr';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { REGISTRATIONS_OPEN } from '$lib/constants';
+import { REGISTRATIONS_OPEN, ADMIN_DOMAIN } from '$lib/constants';
 
 // https://khromov.se/the-comprehensive-guide-to-locals-in-sveltekit/
 // https://joyofcode.xyz/sveltekit-hooks#creating-routes
@@ -53,7 +53,7 @@ const auth: Handle = async ({ event, resolve }) => {
 
 		const userName = user.email.split('@')[0];
 		const userDomain = user.email.split('@')[1];
-		const isAdmin = userDomain === 'sculpturebermagui.org.au';
+		const isAdmin = userDomain === ADMIN_DOMAIN;
 		const isSuperAdmin = superAdmins.includes(userName);
 		if (isAdmin && session && user) {
 			user.isAdmin = true;

@@ -66,3 +66,11 @@ export const STEPS = [
 ];
 import { PUBLIC_REGISTRATIONS_OPEN } from '$env/static/public';
 export const REGISTRATIONS_OPEN = PUBLIC_REGISTRATIONS_OPEN === 'YES' ? true : false;
+
+// Step 8: Extracted constants for Phase 3 refactoring
+export const DIMENSION_SEPARATOR = 'x';
+export const ADMIN_DOMAIN = 'sculpturebermagui.org.au';
+export const BASE_REGISTRATION_COST = 20; // dollars
+export const PER_ENTRY_COST = 20; // dollars
+export const CLOUDINARY_PRESET_UNATTACHED = 'UnAttachedImages';
+export const CLOUDINARY_PRESET_ENTRY = 'EntryImages';

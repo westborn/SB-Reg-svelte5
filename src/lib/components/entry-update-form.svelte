@@ -14,6 +14,7 @@
 	import { entrySchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte';
 	import { MultipleImageUploadForm } from '$lib/components';
+	import { DIMENSION_SEPARATOR } from '$lib/constants';
 
 	type Props = {
 		currentEntryId: number;
@@ -48,7 +49,9 @@
 				toast.error('Failed to update entry');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success('Entry Updated');
 			myState.entryUpdateDialogOpen = false;
 			return;
@@ -62,24 +65,28 @@
 		myState?.submission?.registrations[0].entries.find((entry: { id: number }) => entry.id === editingEntryId)
 	);
 
-	// Initialize form data when entry is first available
+	// Standard form initialization pattern (Phase 3, Step 9)
 	let lastEntryId = $state<number | null>(null);
 
 	$effect(() => {
 		// Only reinitialize if we're looking at a different entry
 		if (entry && entry.id !== lastEntryId) {
-			({
-				id: $formData.id,
-				inOrOut: $formData.inOrOut,
-				description: $formData.description,
-				material: $formData.material,
-				specialRequirements: $formData.specialRequirements,
-				title: $formData.title
-			} = entry);
-			$formData.price = entry.price ? entry.price / 100 : 0;
-			//split the dimensions string into the three fields
-			const dimensions = entry?.dimensions?.split('x') || [];
-			[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
+			// Split the dimensions string into the three fields
+			const dimensions = entry?.dimensions?.split(DIMENSION_SEPARATOR) || [];
+			const [dimLength, dimWidth, dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
+
+			Object.assign($formData, {
+				id: entry.id,
+				inOrOut: entry.inOrOut,
+				description: entry.description,
+				material: entry.material,
+				specialRequirements: entry.specialRequirements,
+				title: entry.title,
+				price: entry.price ? entry.price / 100 : 0,
+				dimLength,
+				dimWidth,
+				dimHeight
+			});
 			lastEntryId = entry.id;
 		}
 	});

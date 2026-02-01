@@ -147,3 +147,34 @@ export const convertToDollars = (price: number | null | undefined, decimals?: nu
 		currency: 'AUD'
 	});
 };
+
+// Step 8: Phase 3 refactoring - Price utility functions
+import { BASE_REGISTRATION_COST, PER_ENTRY_COST } from './constants';
+
+/**
+ * Converts cents to a display string with dollar sign
+ * @param cents - Amount in cents
+ * @returns Formatted string like "$20.00"
+ */
+export function centsToDisplay(cents: number | null): string {
+	if (cents === null) return '$0';
+	return `$${(cents / 100).toFixed(2)}`;
+}
+
+/**
+ * Converts dollar amount to cents
+ * @param dollars - Amount in dollars
+ * @returns Amount in cents (rounded)
+ */
+export function displayToCents(dollars: number): number {
+	return Math.round(dollars * 100);
+}
+
+/**
+ * Calculates the total registration cost based on number of entries
+ * @param entryCount - Number of entries
+ * @returns Total cost in dollars
+ */
+export function calculateRegistrationCost(entryCount: number): number {
+	return BASE_REGISTRATION_COST + entryCount * PER_ENTRY_COST;
+}

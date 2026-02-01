@@ -24,7 +24,9 @@
 				myState.entryDeleteDialogOpen = false;
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success('Entry Deleted');
 			myState.entryDeleteDialogOpen = false;
 		}

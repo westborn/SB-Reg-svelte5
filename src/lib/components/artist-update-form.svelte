@@ -2,8 +2,6 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 
-	import { untrack } from 'svelte';
-
 	import { toast } from 'svelte-sonner';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -24,7 +22,9 @@
 				toast.error('Failed to Update the Registration');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success(' Registration Updated');
 			myState.artistUpdateDialogOpen = false;
 			return;
@@ -32,24 +32,24 @@
 	});
 	const { form: formData, enhance, errors, message, delayed } = form;
 
-	// grab the form field values from the submission object
+	// Standard form initialization pattern (Phase 3, Step 9)
+	let relevantData = $derived(myState?.submission);
+	let lastDataId = $state<number | null>(null);
+
 	$effect(() => {
-		const firstName = untrack(() => myState?.submission?.firstName ?? '');
-		const lastName = untrack(() => myState?.submission?.lastName ?? '');
-		const phone = untrack(() => myState?.submission?.phone ?? '');
-		const postcode = untrack(() => myState?.submission?.postcode ?? '');
-		const firstNations = untrack(() => myState?.submission?.firstNations ?? 'Declined');
-		const bankAccountName = untrack(() => myState?.submission?.bankAccountName ?? '');
-		const bankBSB = untrack(() => myState?.submission?.bankBSB ?? '');
-		const bankAccount = untrack(() => myState?.submission?.bankAccount ?? '');
-		$formData.firstName = firstName;
-		$formData.lastName = lastName;
-		$formData.phone = phone;
-		$formData.postcode = postcode;
-		$formData.firstNations = firstNations;
-		$formData.bankAccountName = bankAccountName;
-		$formData.bankBSB = bankBSB;
-		$formData.bankAccount = bankAccount;
+		if (relevantData && relevantData.id !== lastDataId) {
+			Object.assign($formData, {
+				firstName: relevantData.firstName,
+				lastName: relevantData.lastName,
+				phone: relevantData.phone,
+				postcode: relevantData.postcode,
+				firstNations: relevantData.firstNations,
+				bankAccountName: relevantData.bankAccountName,
+				bankBSB: relevantData.bankBSB,
+				bankAccount: relevantData.bankAccount
+			});
+			lastDataId = relevantData.id;
+		}
 	});
 </script>
 
