@@ -11,7 +11,6 @@ import { artistSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
-	//console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
 
@@ -33,11 +32,9 @@ const artistUpdate = async (event: RequestEvent) => {
 		});
 
 		if (!result) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 	} catch (error) {
-		console.error(`${event.route.id}`, error);
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
@@ -48,7 +45,6 @@ const artistUpdate = async (event: RequestEvent) => {
 };
 
 const artistCreate = async (event: RequestEvent) => {
-	//console.log(`${event.route.id} - artistCreate - START`);
 	const formValidationResult = await superValidate(event, zod4(artistSchemaUI));
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -64,11 +60,9 @@ const artistCreate = async (event: RequestEvent) => {
 	try {
 		const result = await prisma.artistTable.create({ data: newArtist });
 		if (!result) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 	} catch (error) {
-		console.error(`${event.route.id} - `, error);
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
 

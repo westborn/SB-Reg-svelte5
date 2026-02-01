@@ -36,13 +36,11 @@ export const actions = {
 		});
 
 		if (error) {
-			console.log('signup:', error);
 			setError(form, 'email', error.message);
 			return fail(400, {
 				form
 			});
 		}
-		console.log('Signup attempt:', form.data.email);
 		redirect(302, `/verify-email?email=${encodeURIComponent(form.data.email)}`);
 	}
 };

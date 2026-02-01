@@ -2,6 +2,16 @@
 
 This refactoring plan systematizes the SB-Reg-svelte5 codebase by eliminating inconsistencies, reducing duplication, and establishing clear patterns. The plan addresses 10 key areas across **32 consolidated steps** (down from 57), prioritized by risk and severity, with each step designed for incremental implementation and validation.
 
+## Progress Tracking
+
+**Phase 1: Foundation & Safety** ✅ COMPLETE (Feb 1, 2026)
+
+- Steps 1-3 completed: Server helpers, transactions, error handling standardization
+
+**Phase 2-10**: Not started
+
+---
+
 ## Executive Summary
 
 This SvelteKit 5 application demonstrates solid architectural patterns with context-based state management and Svelte 5 runes. However, several areas show inconsistencies, code duplication, and technical debt that would benefit from refactoring. The analysis reveals patterns across **10 key areas** with specific recommendations consolidated into practical implementation steps.
@@ -30,11 +40,17 @@ This SvelteKit 5 application demonstrates solid architectural patterns with cont
 
 ## Priority Overview
 
-### Phase 1: Foundation & Safety (Critical - Do First)
+### Phase 1: Foundation & Safety (Critical - Do First) ✅ **COMPLETED - Feb 1, 2026**
 
 **Steps 1-3**: Transaction handling, error standardization, helper utilities
 **Estimated Time**: 4-6 hours
 **Review Required**: Yes
+
+**Completion Summary:**
+
+- ✅ Step 1: Created `src/lib/server/helpers.ts` with utility functions (`getArtistEmail`, `returnWithUpdatedSubmission`, `isValidUser`, `validateFormWithAuth`)
+- ✅ Step 2: Added transaction handling to critical operations in entry and confirm page server files
+- ✅ Step 3: Removed all console.log and console.error statements from server files (66+ instances removed)
 
 ### Phase 2: Database & Server Layer (High Priority)
 
@@ -94,9 +110,9 @@ This SvelteKit 5 application demonstrates solid architectural patterns with cont
 
 ## Detailed Implementation Steps
 
-### Phase 1: Foundation & Safety (Critical)
+### Phase 1: Foundation & Safety (Critical) ✅ **COMPLETED - Feb 1, 2026**
 
-#### Step 1: Create Server Helpers Module 🔴
+#### Step 1: Create Server Helpers Module 🔴 ✅ COMPLETE
 
 **File**: `src/lib/server/helpers.ts`
 **Purpose**: Centralize common server-side operations
@@ -110,56 +126,52 @@ Create helper functions:
  * Retrieves the effective artist email, considering proxy mode for super admins.
  */
 export async function getArtistEmail(user: User): Promise<string> {
-  return user.isSuperAdmin ? user.proxyEmail : user.email;
+	return user.isSuperAdmin ? user.proxyEmail : user.email;
 }
 
 /**
  * Standard response format for successful form submissions.
  */
-export function returnWithUpdatedSubmission(
-  formValidationResult: SuperValidated<any>,
-  updatedSubmission: Submission
-) {
-  return { formValidationResult, updatedSubmission };
+export function returnWithUpdatedSubmission(formValidationResult: SuperValidated<any>, updatedSubmission: Submission) {
+	return { formValidationResult, updatedSubmission };
 }
 
 /**
  * Type guard for user validation.
  */
 export function isValidUser(user: any): user is User {
-  return user && typeof user.id === 'string' && typeof user.email === 'string';
+	return user && typeof user.id === 'string' && typeof user.email === 'string';
 }
 
 /**
  * Common form validation and auth pattern.
  */
 export async function validateFormWithAuth<T extends AnyZodObject>(
-  event: RequestEvent,
-  schema: T
-): Promise<{
-  formValidationResult: SuperValidated<z.infer<T>>;
-  user: User;
-} | { error: { formValidationResult: SuperValidated<z.infer<T>> } }> {
-  const formValidationResult = await superValidate(event, zod4(schema));
+	event: RequestEvent,
+	schema: T
+): Promise<
+	| {
+			formValidationResult: SuperValidated<z.infer<T>>;
+			user: User;
+	  }
+	| { error: { formValidationResult: SuperValidated<z.infer<T>> } }
+> {
+	const formValidationResult = await superValidate(event, zod4(schema));
 
-  if (!formValidationResult.valid) {
-    return {
-      error: {
-        formValidationResult: message(
-          formValidationResult,
-          'Form validation failed',
-          { status: 400 }
-        )
-      }
-    };
-  }
+	if (!formValidationResult.valid) {
+		return {
+			error: {
+				formValidationResult: message(formValidationResult, 'Form validation failed', { status: 400 })
+			}
+		};
+	}
 
-  const { user } = await event.locals.V1safeGetSession();
-  if (!isValidUser(user)) {
-    throw error(401, 'Unauthorized');
-  }
+	const { user } = await event.locals.V1safeGetSession();
+	if (!isValidUser(user)) {
+		throw error(401, 'Unauthorized');
+	}
 
-  return { formValidationResult, user };
+	return { formValidationResult, user };
 }
 ```
 
@@ -171,7 +183,7 @@ export async function validateFormWithAuth<T extends AnyZodObject>(
 
 ---
 
-#### Step 2: Add Transaction Handling to Critical Operations 🔴
+#### Step 2: Add Transaction Handling to Critical Operations 🔴 ✅ COMPLETE
 
 **Files**: `src/routes/(app)/register/entry/+page.server.ts`, `src/routes/(app)/register/confirm/+page.server.ts`
 **Purpose**: Ensure data consistency in multi-step operations
@@ -185,28 +197,30 @@ Wrap critical multi-step operations in `prisma.$transaction()`:
 ```typescript
 // Wrap entire update operation
 await prisma.$transaction(async (tx) => {
-  // Image deletions
-  if (imagesToDelete.length > 0) {
-    await tx.imageTable.deleteMany({
-      where: { id: { in: imagesToDelete } }
-    });
-  }
+	// Image deletions
+	if (imagesToDelete.length > 0) {
+		await tx.imageTable.deleteMany({
+			where: { id: { in: imagesToDelete } }
+		});
+	}
 
-  // Image updates
-  if (formData.image) {
-    const newImage = await createImage(uploadedImage);
-    await tx.primaryImageTable.upsert({
-      where: { entryId },
-      update: { imageId: newImage.id },
-      create: { entryId, imageId: newImage.id }
-    });
-  }
+	// Image updates
+	if (formData.image) {
+		const newImage = await createImage(uploadedImage);
+		await tx.primaryImageTable.upsert({
+			where: { entryId },
+			update: { imageId: newImage.id },
+			create: { entryId, imageId: newImage.id }
+		});
+	}
 
-  // Entry update
-  await tx.entryTable.update({
-    where: { id: entryId },
-    data: { /* ... */ }
-  });
+	// Entry update
+	await tx.entryTable.update({
+		where: { id: entryId },
+		data: {
+			/* ... */
+		}
+	});
 });
 ```
 
@@ -214,14 +228,18 @@ await prisma.$transaction(async (tx) => {
 
 ```typescript
 await prisma.$transaction([
-  prisma.artistTable.update({
-    where: { id: artistId },
-    data: { /* artist fields */ }
-  }),
-  prisma.registrationTable.update({
-    where: { id: registrationId },
-    data: { /* registration fields */ }
-  })
+	prisma.artistTable.update({
+		where: { id: artistId },
+		data: {
+			/* artist fields */
+		}
+	}),
+	prisma.registrationTable.update({
+		where: { id: registrationId },
+		data: {
+			/* registration fields */
+		}
+	})
 ]);
 ```
 
@@ -240,7 +258,7 @@ await prisma.$transaction([
 
 ---
 
-#### Step 3: Standardize Error Handling & Remove Console Logs 🔴
+#### Step 3: Standardize Error Handling & Remove Console Logs 🔴 ✅ COMPLETE
 
 **Files**: All `+page.server.ts` files
 **Purpose**: Consistent error responses, clean up logging
@@ -281,24 +299,24 @@ Add helper functions:
 
 ```typescript
 export const updateArtist = async (artistId: number, data: Partial<ArtistTable>) => {
-  return await prisma.artistTable.update({
-    where: { id: artistId },
-    data
-  });
+	return await prisma.artistTable.update({
+		where: { id: artistId },
+		data
+	});
 };
 
 export const updateEntry = async (entryId: number, data: Partial<EntryTable>) => {
-  return await prisma.entryTable.update({
-    where: { id: entryId },
-    data
-  });
+	return await prisma.entryTable.update({
+		where: { id: entryId },
+		data
+	});
 };
 
 export const updateRegistration = async (registrationId: number, data: Partial<RegistrationTable>) => {
-  return await prisma.registrationTable.update({
-    where: { id: registrationId },
-    data
-  });
+	return await prisma.registrationTable.update({
+		where: { id: registrationId },
+		data
+	});
 };
 ```
 
@@ -319,23 +337,23 @@ export const updateRegistration = async (registrationId: number, data: Partial<R
 
 ```typescript
 const artistCreate = async (event: RequestEvent) => {
-  const result = await validateFormWithAuth(event, artistSchemaUI);
-  if ('error' in result) return result.error;
-  const { formValidationResult, user } = result;
+	const result = await validateFormWithAuth(event, artistSchemaUI);
+	if ('error' in result) return result.error;
+	const { formValidationResult, user } = result;
 
-  const artistEmail = await getArtistEmail(user);
-  const formData = formValidationResult.data;
+	const artistEmail = await getArtistEmail(user);
+	const formData = formValidationResult.data;
 
-  // ... rest of logic
+	// ... rest of logic
 
-  await updateArtist(artistId, {
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    // ...
-  });
+	await updateArtist(artistId, {
+		firstName: formData.firstName,
+		lastName: formData.lastName
+		// ...
+	});
 
-  const updatedSubmission = await getSubmission(user);
-  return returnWithUpdatedSubmission(formValidationResult, updatedSubmission);
+	const updatedSubmission = await getSubmission(user);
+	return returnWithUpdatedSubmission(formValidationResult, updatedSubmission);
 };
 ```
 
@@ -364,7 +382,7 @@ Apply similar pattern to:
 ```typescript
 const result = await prisma.table.operation();
 if (!result) {
-  return error(500, 'Failed'); // Never executes - Prisma throws
+	return error(500, 'Failed'); // Never executes - Prisma throws
 }
 ```
 
@@ -375,11 +393,13 @@ if (!result) {
 **Add explicit return types**:
 
 ```typescript
-const artistCreate = async (event: RequestEvent): Promise<{
-  formValidationResult: SuperValidated<ArtistUI>;
-  updatedSubmission?: Submission;
+const artistCreate = async (
+	event: RequestEvent
+): Promise<{
+	formValidationResult: SuperValidated<ArtistUI>;
+	updatedSubmission?: Submission;
 }> => {
-  // ...
+	// ...
 };
 ```
 
@@ -398,64 +418,64 @@ Refactor `getExhibits()` function:
 
 ```typescript
 export const getExhibits = async ({
-  rows,
-  offset,
-  entryYear
+	rows,
+	offset,
+	entryYear
 }: {
-  rows: number;
-  offset: number;
-  entryYear: string;
+	rows: number;
+	offset: number;
+	entryYear: string;
 }): Promise<Exhibit[]> => {
-  const artists = await prisma.artistTable.findMany({
-    where: {
-      registrations: {
-        some: {
-          registrationYear: entryYear,
-          entries: {
-            some: {
-              accepted: true
-            }
-          }
-        }
-      }
-    },
-    include: {
-      registrations: {
-        where: { registrationYear: entryYear },
-        include: {
-          entries: {
-            where: { accepted: true },
-            include: {
-              images: true,
-              location: true,
-              primaryImage: {
-                include: {
-                  image: true
-                }
-              }
-            },
-            orderBy: { title: 'asc' }
-          }
-        }
-      }
-    },
-    skip: offset,
-    take: rows
-  });
+	const artists = await prisma.artistTable.findMany({
+		where: {
+			registrations: {
+				some: {
+					registrationYear: entryYear,
+					entries: {
+						some: {
+							accepted: true
+						}
+					}
+				}
+			}
+		},
+		include: {
+			registrations: {
+				where: { registrationYear: entryYear },
+				include: {
+					entries: {
+						where: { accepted: true },
+						include: {
+							images: true,
+							location: true,
+							primaryImage: {
+								include: {
+									image: true
+								}
+							}
+						},
+						orderBy: { title: 'asc' }
+					}
+				}
+			}
+		},
+		skip: offset,
+		take: rows
+	});
 
-  // Transform nested structure to flat Exhibit[] format
-  return artists.flatMap(artist =>
-    artist.registrations.flatMap(registration =>
-      registration.entries.map(entry => ({
-        artistId: artist.id,
-        email: artist.email,
-        lastName: artist.lastName,
-        firstName: artist.firstName,
-        artistName: `${artist.firstName} ${artist.lastName}`,
-        // ... map all fields to Exhibit type
-      }))
-    )
-  );
+	// Transform nested structure to flat Exhibit[] format
+	return artists.flatMap((artist) =>
+		artist.registrations.flatMap((registration) =>
+			registration.entries.map((entry) => ({
+				artistId: artist.id,
+				email: artist.email,
+				lastName: artist.lastName,
+				firstName: artist.firstName,
+				artistName: `${artist.firstName} ${artist.lastName}`
+				// ... map all fields to Exhibit type
+			}))
+		)
+	);
 };
 ```
 
@@ -491,16 +511,16 @@ export const CLOUDINARY_PRESET_ENTRY = 'EntryImages';
 
 ```typescript
 export function centsToDisplay(cents: number | null): string {
-  if (cents === null) return '$0';
-  return `$${(cents / 100).toFixed(2)}`;
+	if (cents === null) return '$0';
+	return `$${(cents / 100).toFixed(2)}`;
 }
 
 export function displayToCents(dollars: number): number {
-  return Math.round(dollars * 100);
+	return Math.round(dollars * 100);
 }
 
 export function calculateRegistrationCost(entryCount: number): number {
-  return BASE_REGISTRATION_COST + (entryCount * PER_ENTRY_COST);
+	return BASE_REGISTRATION_COST + entryCount * PER_ENTRY_COST;
 }
 ```
 
@@ -534,14 +554,14 @@ let relevantData = $derived(myState?.submission);
 let lastDataId = $state<number | null>(null);
 
 $effect(() => {
-  if (relevantData && relevantData.id !== lastDataId) {
-    Object.assign($formData, {
-      field1: relevantData.field1,
-      field2: relevantData.field2,
-      // ... all fields
-    });
-    lastDataId = relevantData.id;
-  }
+	if (relevantData && relevantData.id !== lastDataId) {
+		Object.assign($formData, {
+			field1: relevantData.field1,
+			field2: relevantData.field2
+			// ... all fields
+		});
+		lastDataId = relevantData.id;
+	}
 });
 ```
 
@@ -572,12 +592,12 @@ Add types:
 
 ```typescript
 export type ActionResult<T> = {
-  type: 'success' | 'failure' | 'error';
-  status?: number;
-  data?: {
-    formValidationResult: SuperValidated<T>;
-    updatedSubmission?: Submission;
-  };
+	type: 'success' | 'failure' | 'error';
+	status?: number;
+	data?: {
+		formValidationResult: SuperValidated<T>;
+		updatedSubmission?: Submission;
+	};
 };
 
 export type ArtistActionResult = ActionResult<ArtistUI>;
@@ -631,15 +651,15 @@ Create reusable wrapper:
 
 ```typescript
 let {
-  open = $bindable(),
-  title,
-  description = undefined,
-  children
+	open = $bindable(),
+	title,
+	description = undefined,
+	children
 }: {
-  open: boolean;
-  title: string;
-  description?: string;
-  children: Snippet;
+	open: boolean;
+	title: string;
+	description?: string;
+	children: Snippet;
 } = $props();
 ```
 
@@ -672,9 +692,7 @@ Add to RegisterState class:
 
 ```typescript
 costOfRegistration = $derived(
-  this.currentEntries.length > 0
-    ? calculateRegistrationCost(this.currentEntries.length)
-    : BASE_REGISTRATION_COST
+	this.currentEntries.length > 0 ? calculateRegistrationCost(this.currentEntries.length) : BASE_REGISTRATION_COST
 );
 ```
 
@@ -769,10 +787,10 @@ Keep HEIC detection logic only in `uploadImageToCloudinary()`:
 
 ```typescript
 const isHEIC =
-  image.type === 'image/heic' ||
-  image.type === 'image/heif' ||
-  image.name.toLowerCase().endsWith('.heic') ||
-  image.name.toLowerCase().endsWith('.heif');
+	image.type === 'image/heic' ||
+	image.type === 'image/heif' ||
+	image.name.toLowerCase().endsWith('.heic') ||
+	image.name.toLowerCase().endsWith('.heif');
 ```
 
 Remove any client-side HEIC detection if it exists.
@@ -814,19 +832,19 @@ Add UI constants:
 
 ```typescript
 export const UI_CONSTANTS = {
-  IMAGE_DIMENSIONS: {
-    THUMBNAIL: { width: 160, height: 160 },
-    CARD: { width: 320, height: 320 }
-  },
-  BUTTON_HEIGHTS: {
-    SMALL: 'h-8',
-    MEDIUM: 'h-10',
-    LARGE: 'h-12'
-  },
-  GRID_LAYOUTS: {
-    TWO_COL: 'grid-cols-1 md:grid-cols-2',
-    THREE_COL: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-  }
+	IMAGE_DIMENSIONS: {
+		THUMBNAIL: { width: 160, height: 160 },
+		CARD: { width: 320, height: 320 }
+	},
+	BUTTON_HEIGHTS: {
+		SMALL: 'h-8',
+		MEDIUM: 'h-10',
+		LARGE: 'h-12'
+	},
+	GRID_LAYOUTS: {
+		TWO_COL: 'grid-cols-1 md:grid-cols-2',
+		THREE_COL: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+	}
 };
 ```
 
@@ -867,38 +885,30 @@ Apply same error handling pattern from Step 3 to admin routes.
 Create utility functions:
 
 ```typescript
-export function getImagesWithPrimary(
-  images: CurrentImage[],
-  primaryImageId: number | null
-) {
-  return images.map(image => ({
-    ...image,
-    isPrimary: image.id === primaryImageId
-  }));
+export function getImagesWithPrimary(images: CurrentImage[], primaryImageId: number | null) {
+	return images.map((image) => ({
+		...image,
+		isPrimary: image.id === primaryImageId
+	}));
 }
 
-export function validatePrimaryImage(
-  imageId: number,
-  images: CurrentImage[]
-): boolean {
-  return images.some(img => img.id === imageId);
+export function validatePrimaryImage(imageId: number, images: CurrentImage[]): boolean {
+	return images.some((img) => img.id === imageId);
 }
 
-export function getDefaultPrimaryImage(
-  images: CurrentImage[]
-): number | null {
-  return images.length > 0 && images[0].id ? images[0].id : null;
+export function getDefaultPrimaryImage(images: CurrentImage[]): number | null {
+	return images.length > 0 && images[0].id ? images[0].id : null;
 }
 
 export function canRemoveImage(
-  imageId: number,
-  images: CurrentImage[],
-  primaryImageId: number | null
+	imageId: number,
+	images: CurrentImage[],
+	primaryImageId: number | null
 ): { canRemove: boolean; reason?: string } {
-  if (images.length <= MIN_IMAGES_PER_ENTRY) {
-    return { canRemove: false, reason: 'Cannot remove last image' };
-  }
-  return { canRemove: true };
+	if (images.length <= MIN_IMAGES_PER_ENTRY) {
+		return { canRemove: false, reason: 'Cannot remove last image' };
+	}
+	return { canRemove: true };
 }
 ```
 
@@ -936,16 +946,16 @@ Replace inline logic with utility functions from Step 21.
 Create template functions:
 
 ```typescript
-export function registrationConfirmationEmail(data: {
-  artistName: string;
-  entryCount: number;
-  cost: number;
-}): { subject: string; html: string; text: string } {
-  return {
-    subject: `Registration Confirmation - ${data.artistName}`,
-    html: `...`, // HTML template
-    text: `...`  // Plain text template
-  };
+export function registrationConfirmationEmail(data: { artistName: string; entryCount: number; cost: number }): {
+	subject: string;
+	html: string;
+	text: string;
+} {
+	return {
+		subject: `Registration Confirmation - ${data.artistName}`,
+		html: `...`, // HTML template
+		text: `...` // Plain text template
+	};
 }
 ```
 
@@ -1004,7 +1014,7 @@ Add comprehensive JSDoc to:
  * const artist = await prisma.artistTable.findFirst({ where: { email } });
  */
 export async function getArtistEmail(user: User): Promise<string> {
-  return user.isSuperAdmin ? user.proxyEmail : user.email;
+	return user.isSuperAdmin ? user.proxyEmail : user.email;
 }
 ```
 
@@ -1131,51 +1141,44 @@ Create logger:
 import { prisma } from '$lib/components/server/prisma';
 
 type LogContext = {
-  userId?: string;
-  routeId?: string;
-  [key: string]: any;
+	userId?: string;
+	routeId?: string;
+	[key: string]: any;
 };
 
-async function log(
-  level: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR',
-  message: string,
-  context?: LogContext,
-  error?: Error
-) {
-  try {
-    await prisma.logTable.create({
-      data: {
-        level,
-        message,
-        context: context ? JSON.stringify(context) : null,
-        userId: context?.userId,
-        routeId: context?.routeId,
-        error: error ? JSON.stringify({
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        }) : null
-      }
-    });
-  } catch (logError) {
-    // Fallback to console if database logging fails
-    console.error('Logging failed:', logError);
-    console.error('Original error:', error || message);
-  }
+async function log(level: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR', message: string, context?: LogContext, error?: Error) {
+	try {
+		await prisma.logTable.create({
+			data: {
+				level,
+				message,
+				context: context ? JSON.stringify(context) : null,
+				userId: context?.userId,
+				routeId: context?.routeId,
+				error: error
+					? JSON.stringify({
+							name: error.name,
+							message: error.message,
+							stack: error.stack
+						})
+					: null
+			}
+		});
+	} catch (logError) {
+		// Fallback to console if database logging fails
+		console.error('Logging failed:', logError);
+		console.error('Original error:', error || message);
+	}
 }
 
 export const logger = {
-  debug: (message: string, context?: LogContext) =>
-    log('DEBUG', message, context),
+	debug: (message: string, context?: LogContext) => log('DEBUG', message, context),
 
-  info: (message: string, context?: LogContext) =>
-    log('INFO', message, context),
+	info: (message: string, context?: LogContext) => log('INFO', message, context),
 
-  warn: (message: string, context?: LogContext) =>
-    log('WARN', message, context),
+	warn: (message: string, context?: LogContext) => log('WARN', message, context),
 
-  error: (message: string, error: Error, context?: LogContext) =>
-    log('ERROR', message, context, error)
+	error: (message: string, error: Error, context?: LogContext) => log('ERROR', message, context, error)
 };
 ```
 
@@ -1196,14 +1199,14 @@ Replace remaining error handling with logger:
 
 ```typescript
 try {
-  // ... operation
+	// ... operation
 } catch (error) {
-  await logger.error('Artist update failed', error as Error, {
-    routeId: event.route.id,
-    userId: user.id,
-    artistEmail
-  });
-  return message(formValidationResult, GENERIC_ERROR_MESSAGE, { status: 500 });
+	await logger.error('Artist update failed', error as Error, {
+		routeId: event.route.id,
+		userId: user.id,
+		artistEmail
+	});
+	return message(formValidationResult, GENERIC_ERROR_MESSAGE, { status: 500 });
 }
 ```
 
@@ -1211,9 +1214,9 @@ Add info logging for important operations:
 
 ```typescript
 await logger.info('Registration completed', {
-  routeId: event.route.id,
-  userId: user.id,
-  registrationId
+	routeId: event.route.id,
+	userId: user.id,
+	registrationId
 });
 ```
 

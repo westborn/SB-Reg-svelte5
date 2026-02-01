@@ -9,7 +9,6 @@ import type { Actions, PageServerLoad, RequestEvent } from '../$types';
 import { message, superValidate } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async () => {
-	// console.log(`${event.route.id} - LOAD - START`);
 	try {
 		const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
 		return {
@@ -21,7 +20,6 @@ export const load: PageServerLoad = async () => {
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
-		console.log('error: ', error.message);
 		return { error: error.message };
 	}
 };
@@ -30,7 +28,6 @@ const locationUpdate = async (event: RequestEvent) => {
 	const newlocationSchemaUI = locationSchemaUI.extend({ entryId: z.number() });
 	const formValidationResult = await superValidate(event, zod4(newlocationSchemaUI));
 	if (!formValidationResult.valid) {
-		console.log('locationUpdate - formValidationResult:', formValidationResult);
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
 			status: 400
 		});
@@ -61,13 +58,11 @@ const locationUpdate = async (event: RequestEvent) => {
 		});
 
 		if (!upsertResult) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE, {
 				status: 400
 			});
 		}
 	} catch (error) {
-		console.error(`${event.route.id}`, error);
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED, {
 			status: 400
 		});

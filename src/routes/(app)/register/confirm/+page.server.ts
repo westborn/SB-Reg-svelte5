@@ -10,7 +10,6 @@ import { confirmSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, type User } from '$lib/components/server/registrationDB';
 
 export const load: PageServerLoad = async (event) => {
-	//console.log(`${event.route.id} - LOAD - START`);
 	return;
 };
 
@@ -29,42 +28,33 @@ const confirmUpdate = async (event: RequestEvent) => {
 	try {
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
-			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 		idToUpdate = submissionFromDB.registrations[0].id;
 		const { bumpIn, bumpOut, crane, displayRequirements, bankAccountName, bankBSB, bankAccount } =
 			formValidationResult.data;
 
-		const updatedRegistration = await prisma.registrationTable.update({
-			where: { id: idToUpdate },
-			data: {
-				bumpIn: bumpIn ?? null,
-				bumpOut: bumpOut ?? null,
-				crane: crane === 'Yes' ? true : false,
-				displayRequirements: displayRequirements ?? null
-			}
-		});
-		if (!updatedRegistration) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
-
-		const updatedArtist = await prisma.artistTable.update({
-			where: { email: artistEmail },
-			data: {
-				bankAccountName: bankAccountName ?? '',
-				bankBSB: bankBSB ?? '',
-				bankAccount: bankAccount ?? ''
-			}
-		});
-		if (!updatedArtist) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
-		// console.log('Confirm updated successfully', updatedRegistration, updatedArtist);
+		// Wrap both updates in transaction to ensure atomicity
+		await prisma.$transaction([
+			prisma.registrationTable.update({
+				where: { id: idToUpdate },
+				data: {
+					bumpIn: bumpIn ?? null,
+					bumpOut: bumpOut ?? null,
+					crane: crane === 'Yes' ? true : false,
+					displayRequirements: displayRequirements ?? null
+				}
+			}),
+			prisma.artistTable.update({
+				where: { email: artistEmail },
+				data: {
+					bankAccountName: bankAccountName ?? '',
+					bankBSB: bankBSB ?? '',
+					bankAccount: bankAccount ?? ''
+				}
+			})
+		]);
 	} catch (error) {
-		console.error(`${event.route.id}`, error);
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
