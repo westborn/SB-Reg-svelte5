@@ -1,115 +1,290 @@
-# 2025 Registrations PRD
+# Sculpture Bermagui Registration System - Product Requirements Document
 
-## Product Overview
+## Product Vision
 
-The Sculpture Bermagui Registration System is a web application built with SvelteKit 5 that manages artist registrations and artwork submissions for the annual sculpture exhibition. The system handles the complete lifecycle from artist registration to exhibition management.
+Enable artists to seamlessly register and manage their artwork submissions for the annual Sculpture Bermagui exhibition, while providing administrators with efficient tools to manage the exhibition lifecycle from registration through to installation.
 
-## Current Status
+## Product Goals
 
-**2025 Registrations are now CLOSED** as indicated in the [README.md](README.md).
+1. **Simplify Registration**: Reduce friction in the artist registration and submission process
+2. **Ensure Data Integrity**: Maintain accurate records of artists, artworks, and exhibition logistics
+3. **Enable Self-Service**: Allow artists to manage their own submissions independently
+4. **Support Administration**: Provide administrators with powerful tools for exhibition management
+5. **Scale Annually**: Support recurring exhibitions without data loss or manual migration
 
-## Technology Stack
+## User Personas
 
-- **Frontend**: SvelteKit 5 with TypeScript
-- **UI Components**: bits-ui with shadcn-svelte style components
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: Supabase Auth integration
-- **Styling**: Tailwind CSS with custom color scheme
-- **File Management**: Cloudinary for image storage
+### Primary Artist
 
-## Core Features
+- **Profile**: Visual artist submitting sculpture work for exhibition consideration
+- **Technical Level**: Varies widely (some tech-savvy, some not)
+- **Goals**:
+  - Register quickly and easily
+  - Submit high-quality images of their work
+  - Update their submission before deadline
+  - Track acceptance status
+- **Pain Points**:
+  - Confusion about requirements
+  - Difficulty uploading images
+  - Concerns about pricing their work
 
-### 1. Artist Registration System
+### Returning Artist
 
-- **Artist Profile Management**: Store artist details including contact information, banking details, and First Nations status
-- **Registration Creation**: Annual registration system with configurable years ([`EXHIBITION_YEAR`](src/lib/constants.ts))
-- **Registration Status**: Track open/closed status with admin toggle functionality ([`toggleOpenClosed`](src/routes/api/toggleOpenClosed/+server.ts))
+- **Profile**: Artist who has participated in previous years
+- **Technical Level**: Familiar with the system
+- **Goals**:
+  - Reuse existing profile information
+  - Submit new entries efficiently
+  - View historical submissions
+- **Pain Points**:
+  - Having to re-enter unchanged information
+  - Remembering what they submitted previously
 
-### 2. Artwork Entry Management
+### Exhibition Administrator
 
-- **Entry Creation**: Artists can submit artwork entries with details like title, materials, dimensions, and descriptions
-- **Entry Types**: Support for both indoor and outdoor entries ([`EntryType`](src/lib/constants.ts))
-- **Major Prize Entry**: Option to enter works into major prize competition
-- **Pricing**: Price tracking in cents for artwork sales
+- **Profile**: Volunteer or staff managing the exhibition
+- **Technical Level**: Moderate to high
+- **Goals**:
+  - Review all submissions efficiently
+  - Manage acceptance decisions
+  - Assign exhibit locations
+  - Communicate with artists
+- **Pain Points**:
+  - Time-consuming manual processes
+  - Difficulty tracking incomplete submissions
+  - Managing artists who need assistance
 
-### 3. Image Management
+### Super Administrator
 
-- **Multiple Image Upload**: Support for up to 3 images per entry (UI limit, database supports unlimited)
-- **Primary Image Designation**: One image designated as primary for display purposes
-- **Image Upload**: Integration with Cloudinary for artwork image storage
-- **Image Association**: Link images to specific entries
-- **Image Management**: Users can add, remove, and replace images with validation
+- **Profile**: Technical staff or organizers with full system access
+- **Technical Level**: High
+- **Goals**:
+  - Assist artists with technical issues
+  - Perform bulk operations
+  - Maintain data integrity
+  - Generate reports
+- **Pain Points**:
+  - Needing to log in as different users
+  - Manual data corrections
 
-### 4. Exhibition Management
+## Core User Journeys
 
-- **Location Assignment**: Assign exhibit numbers and locations to accepted entries
-- **Acceptance Status**: Track which entries are accepted for the exhibition
-- **Logistics**: Manage bump-in/bump-out schedules, display requirements, and crane needs
+### Journey 1: First-Time Artist Registration
 
-### 5. Administrative Features
+1. Artist receives email invitation with registration link
+2. Artist creates account via email authentication
+3. Artist completes profile (name, contact, banking, First Nations status)
+4. Artist creates artwork entry with details
+5. Artist uploads 1-3 images per entry
+6. Artist designates primary image for each entry
+7. Artist reviews and confirms submission
+8. System sends confirmation email
 
-- **Super Admin Access**: Proxy functionality for admins to manage other users' registrations
-- **Data Migration**: Scripts for importing historical data from previous years ([2023Upload.ts](src/scripts/2023Upload.ts), [2024Upload.ts](src/scripts/2024Upload.ts))
-- **Exhibition Queries**: Comprehensive queries for accepted exhibits ([`getExhibits`](src/lib/components/server/registrationDB.ts))
+**Success Criteria**: Artist completes registration in < 15 minutes without assistance
 
-## Database Schema
+### Journey 2: Returning Artist Submission
 
-The system uses a multi-table structure:
+1. Artist logs in with existing account
+2. System pre-fills profile information
+3. Artist updates any changed details
+4. Artist creates new entries for current year
+5. Artist reuses or uploads new images
+6. Artist confirms submission
+7. System sends confirmation
 
-- **ArtistTable**: Core artist information
-- **RegistrationTable**: Annual registration records
-- **EntryTable**: Individual artwork submissions
-- **ImageTable**: Artwork images
-- **PrimaryImageTable**: Primary image designation for entries
-- **LocationTable**: Exhibition placement information
+**Success Criteria**: Artist completes registration in < 10 minutes
 
-## User Interface
+### Journey 3: Administrator Review & Acceptance
 
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Custom Theme**: Blue-green color scheme with custom CSS variables in [app.pcss](src/app.pcss)
-- **Component Library**: Reusable UI components using bits-ui including:
-  - Dialog components for modals
-  - Sheet components for side panels
-  - Form components with validation
-  - Multiple image upload and management components
-  - Consistent styling across the application
+1. Administrator logs in to admin panel
+2. Views list of all submissions for current year
+3. Reviews artwork details and images
+4. Marks entries as accepted/declined
+5. Assigns exhibit numbers to accepted works
+6. Assigns physical locations
+7. System notifies artists of acceptance status
 
-## Authentication & Authorization
+**Success Criteria**: Administrator can process 50+ submissions efficiently
 
-- **Supabase Integration**: User authentication through Supabase
-- **Role-based Access**: Super admin functionality for managing multiple artist accounts
-- **Email-based Identity**: Primary identification through email addresses
+### Journey 4: Artist Manages Images
 
-## Data Migration & Historical Support
+1. Artist navigates to existing entry
+2. Views current images with primary designation
+3. Uploads additional images (up to limit)
+4. Removes unwanted images
+5. Designates different image as primary
+6. System updates immediately
 
-- **Multi-year Support**: Handle data from 2023, 2024, and 2025 exhibitions
-- **Import Scripts**: Automated scripts for migrating data from previous systems
-- **Image Mapping**: Google Drive to Cloudinary migration support
+**Success Criteria**: Image management is intuitive without instructions
 
-## Configuration
+## Functional Requirements
 
-- **Environment Variables**: Secure configuration through `.env` files
-- **Exhibition Year**: Configurable current exhibition year
-- **Theme Customization**: Easy color scheme updates through CSS variables
+### Registration Management
 
-## Development Features
+- [ ] Support annual registration cycles with configurable exhibition year
+- [ ] Allow artists to register once and submit multiple entries
+- [ ] Enable registration period open/close controls
+- [ ] Track registration completion status
+- [ ] Support both indoor and outdoor entry types
 
-- **Type Safety**: Full TypeScript integration with Prisma-generated types
-- **Code Quality**: ESLint and Prettier configuration
-- **Build System**: Vite-based build with SvelteKit
-- **Database Management**: Prisma migrations and schema management
-- **Validation Scripts**: Data integrity validation for primary images and migration processes
-- **Script Execution**: TypeScript scripts using tsx for maintenance and validation tasks
+### Artist Profile
 
-## Privacy & Legal
+- [ ] Store essential artist information (name, email, phone, location)
+- [ ] Support First Nations identification with privacy option
+- [ ] Collect banking details for artwork sales
+- [ ] Allow profile updates throughout registration period
 
-- **Terms of Service**: Links to organization's terms and privacy policy
-- **Data Protection**: Secure handling of artist personal and banking information
+### Artwork Entry
 
-## Future Considerations
+- [ ] Support multiple entries per artist
+- [ ] Require title, entry type, and pricing
+- [ ] Collect optional fields: materials, dimensions, description, special requirements
+- [ ] Limit description to 30 words
+- [ ] Enable entry for major prize consideration
+- [ ] Allow entry updates before registration close
 
-- The system is designed to handle annual exhibitions with year-based configuration
-- Extensible architecture for adding new features and exhibition types
-- Scalable database design for growing artist and artwork collections
-- Multiple images feature completed with room for UI expansion beyond 3-image limit
-- Database supports unlimited images per entry for future enhancements
+### Image Management
+
+- [ ] Support 1-3 images per entry (UI limit)
+- [ ] Allow image upload from common formats (JPEG, PNG, WebP, HEIC)
+- [ ] Enforce 5MB file size limit
+- [ ] Designate one primary image per entry
+- [ ] Support image reordering and replacement
+- [ ] Maintain minimum 1 image per entry
+
+### Exhibition Logistics
+
+- [ ] Collect bump-in/bump-out preferences
+- [ ] Track accommodation, crane, and transport needs
+- [ ] Allow special display requirements
+
+### Administrative Functions
+
+- [ ] View all registrations for current year
+- [ ] Filter and search submissions
+- [ ] Accept/decline entries
+- [ ] Assign exhibit numbers and locations
+- [ ] Proxy as artist to provide support (super admin only)
+- [ ] Generate exhibition reports
+
+## Non-Functional Requirements
+
+### Performance
+
+- Image uploads complete in < 30 seconds on average connection
+- Page loads in < 2 seconds
+- Support 100+ concurrent users during registration period
+
+### Security
+
+- Email-based authentication with secure tokens
+- Role-based access control (Artist, Admin, Super Admin)
+- Banking information stored securely
+- HTTPS for all connections
+
+### Reliability
+
+- 99.5% uptime during registration periods
+- Database backups daily
+- Graceful error handling with user-friendly messages
+
+### Usability
+
+- Mobile-responsive design
+- Accessible to WCAG 2.1 AA standards
+- Clear error messages and validation
+- Consistent UI across all pages
+
+### Maintainability
+
+- Type-safe codebase with TypeScript
+- Automated database migrations
+- Comprehensive error logging
+- Documentation for all major features
+
+## Out of Scope (For Current Version)
+
+- Artist portfolio pages or galleries
+- Public voting or judging system
+- Online payment processing for registration fees
+- Email marketing and campaign management
+- Mobile native applications
+- Multi-language support
+- Real-time collaboration features
+- Integration with third-party ticketing systems
+
+## Success Metrics
+
+### User Adoption
+
+- 90%+ of invited artists complete registration
+- < 5% require administrator assistance
+- 80%+ returning artist rate year-over-year
+
+### System Performance
+
+- < 2% error rate during registration period
+- Average registration completion time < 15 minutes
+- Zero data loss incidents
+
+### Business Impact
+
+- 30% reduction in administrative time vs. previous system
+- 100% accurate artist and artwork data
+- Improved artist satisfaction (measured via survey)
+
+## Future Enhancements
+
+### Phase 2 (Next Exhibition)
+
+- Email notifications for registration status changes
+- Artist dashboard with submission history
+- Batch operations for administrators
+- Advanced search and filtering
+
+### Phase 3 (Future)
+
+- Public gallery of accepted works
+- QR code generation for exhibit labels
+- Sales tracking and payment processing
+- Artist analytics and insights
+
+### Phase 4 (Long-term)
+
+- Mobile applications (iOS/Android)
+- Integration with exhibition website
+- Community features (comments, likes)
+- Multi-exhibition support for other organizations
+
+## Technical Constraints
+
+- Must support modern browsers (last 2 versions)
+- Must work on mobile devices (iOS Safari, Android Chrome)
+- Must integrate with existing Cloudinary account
+- Must use PostgreSQL database
+- Must support HEIC image format
+- Database must support cascade deletion for data integrity
+
+## Assumptions
+
+1. Artists have reliable internet access
+2. Artists can receive and access email
+3. Exhibition dates are known 6+ months in advance
+4. Registration period is 2-4 weeks minimum
+5. Administrators have basic technical skills
+6. Budget allows for Cloudinary and hosting costs
+
+## Dependencies
+
+- Supabase for authentication
+- Cloudinary for image hosting
+- Email service (Gmail) for notifications
+- PostgreSQL database hosting
+- Web hosting with Node.js support
+
+---
+
+**Document Version**: 1.0  
+**Last Updated**: December 2025  
+**Owner**: Sculpture Bermagui Technical Team  
+**Review Cycle**: Annually after each exhibition
