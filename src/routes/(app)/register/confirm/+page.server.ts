@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from '../entry/$types';
+import type { Actions } from '../entry/$types';
 import type { RequestEvent } from '../entry/$types';
 
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -8,10 +8,6 @@ import { prisma } from '$lib/components/server/prisma';
 import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
 import { confirmSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, updateArtist, updateRegistration, type User } from '$lib/components/server/registrationDB';
-
-export const load: PageServerLoad = async (event) => {
-	return;
-};
 
 const confirmUpdate = async (event: RequestEvent) => {
 	const formValidationResult = await superValidate(event, zod4(confirmSchemaUI));

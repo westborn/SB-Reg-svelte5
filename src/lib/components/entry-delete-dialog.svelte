@@ -16,7 +16,7 @@
 
 	const form = superForm(myState.entryDeleteForm, {
 		validators: zod4Client(entryDeleteSchemaUI),
-		id: `deleteEntryForm`,
+		id: 'deleteEntryForm',
 		onResult({ result }: { result: any }) {
 			// console.log('Action result', result);
 			if (result.type != 'success') {

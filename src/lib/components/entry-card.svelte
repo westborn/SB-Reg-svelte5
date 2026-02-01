@@ -3,6 +3,7 @@
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import { OptimisedImage } from '$lib/components';
 	import { convertToDollars } from '$lib/utils.js';
+	import { UI_CONSTANTS } from '$lib/constants';
 	import Star from 'lucide-svelte/icons/star';
 
 	interface Props {
@@ -85,8 +86,8 @@
 									<OptimisedImage
 										path={image.cloudURL}
 										alt={`Image ${index + 1} of ${images.length}`}
-										width={160}
-										height={160}
+										width={UI_CONSTANTS.IMAGE_DIMENSIONS.THUMBNAIL.width}
+										height={UI_CONSTANTS.IMAGE_DIMENSIONS.THUMBNAIL.height}
 										class="h-40 w-40 rounded object-cover"
 									/>
 									<!-- Sold Indicator Tag -->
@@ -140,8 +141,8 @@
 						<OptimisedImage
 							path="/dummy_160x160_ffffff_cccccc.png"
 							alt="No Image"
-							width={160}
-							height={160}
+							width={UI_CONSTANTS.IMAGE_DIMENSIONS.THUMBNAIL.width}
+							height={UI_CONSTANTS.IMAGE_DIMENSIONS.THUMBNAIL.height}
 							class="h-40 w-40 overflow-hidden rounded object-contain"
 						/>
 						{#if entryItem.sold}

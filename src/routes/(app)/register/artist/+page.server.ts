@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 import type { RequestEvent } from './$types';
 
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -9,10 +9,6 @@ import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants'
 
 import { artistSchemaUI } from '$lib/zod-schemas';
 import { getSubmission, updateArtist, type User } from '$lib/components/server/registrationDB';
-
-export const load: PageServerLoad = async (event) => {
-	return;
-};
 
 const artistUpdate = async (event: RequestEvent) => {
 	const formValidationResult = await superValidate(event, zod4(artistSchemaUI));

@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 import type { RequestEvent } from './$types';
 
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -25,10 +25,6 @@ import {
 	type User
 } from '$lib/components/server/registrationDB';
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
-
-export const load: PageServerLoad = async (event) => {
-	return;
-};
 
 const entryUpdate = async (event: RequestEvent) => {
 	const updateImagesSchema = entrySchemaUI.extend({

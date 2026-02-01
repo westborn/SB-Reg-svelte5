@@ -15,7 +15,7 @@
 	let myState = getRegisterState();
 
 	let form = superForm(myState.artistForm, {
-		id: `artistCreateForm`,
+		id: 'artistCreateForm',
 		validators: zod4Client(artistSchemaUI),
 		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {

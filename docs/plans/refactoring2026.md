@@ -21,7 +21,11 @@ This refactoring plan systematizes the SB-Reg-svelte5 codebase by eliminating in
 
 - Steps 13-15 completed: Derived cost calculation added to RegisterState, components updated to use derived cost, JSDoc comments added to image management helpers
 
-**Phase 5-10**: Not started
+**Phase 5: Code Cleanup & Constants** ✅ COMPLETE (Feb 1, 2026)
+
+- Steps 16-20 completed: Removed empty load functions, verified HEIC detection logic centralization, standardized form ID patterns, extracted UI constants, verified admin error response consistency
+
+**Phase 6-10**: Not started
 
 ---
 
@@ -77,17 +81,31 @@ This SvelteKit 5 application demonstrates solid architectural patterns with cont
 **Estimated Time**: 8-10 hours
 **Review Required**: No (except Step 11)
 
-### Phase 4: State & Context Improvements (Medium Priority)
+### Phase 4: State & Context Improvements (Medium Priority) ✅ **COMPLETED - Feb 1, 2026**
 
 **Steps 13-15**: Derived state, eliminate duplication
 **Estimated Time**: 3-4 hours
 **Review Required**: No
 
-### Phase 5: Code Cleanup & Constants (Low Priority)
+**Completion Summary:**
+
+- ✅ Step 13: Added derived cost calculation to RegisterState class
+- ✅ Step 14: Updated view and complete pages to use derived cost
+- ✅ Step 15: Added JSDoc comments to image management helper methods
+
+### Phase 5: Code Cleanup & Constants (Low Priority) ✅ **COMPLETED - Feb 1, 2026**
 
 **Steps 16-20**: Remove dead code, extract hardcoded values
 **Estimated Time**: 4-5 hours
 **Review Required**: Optional for Step 16
+
+**Completion Summary:**
+
+- ✅ Step 16: Removed empty load functions from artist, entry, and confirm +page.server.ts files
+- ✅ Step 17: Verified HEIC detection logic is properly centralized in cloudinary.ts (client-side detection is only for UI feedback)
+- ✅ Step 18: Standardized form ID patterns - static IDs use single quotes, dynamic IDs use template literals
+- ✅ Step 19: Added UI_CONSTANTS to constants.ts for image dimensions, button heights, and grid layouts; updated entry-card.svelte to use these constants
+- ✅ Step 20: Verified admin error responses already use consistent patterns (message() and standard error constants)
 
 ### Phase 6: Image Handling (Low Priority)
 
