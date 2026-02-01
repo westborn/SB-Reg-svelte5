@@ -96,6 +96,48 @@ const { form: formData, enhance, errors, delayed } = form;
 
 Forms use `method="POST" action="?/actionName" use:enhance`.
 
+#### Form ID Conventions
+
+**Static Form IDs** use single quotes:
+
+```typescript
+let form = superForm(myState.artistForm, {
+	id: 'artistCreateForm', // Single quotes for static IDs
+	validators: zod4Client(artistSchemaUI)
+});
+```
+
+**Dynamic Form IDs** use template literals:
+
+```typescript
+let form = superForm(myState.entryUpdateForm, {
+	id: `entryUpdateForm-${entryId}`, // Template literal for dynamic IDs
+	validators: zod4Client(entrySchemaUI)
+});
+```
+
+This distinction is critical when multiple instances of the same form component exist on the same page (e.g., update forms in accordion lists).
+
+#### Form Reset & Dialog Lifecycle
+
+Forms automatically reset on successful submission via the `onResult` handler:
+
+```typescript
+onResult({ result }) {
+	if (result.type === 'success') {
+		myState.submission = result?.data?.updatedSubmission;
+		toast.success('Success message');
+		myState.dialogOpen = false; // Closing dialog triggers form reset
+	}
+}
+```
+
+The form state is managed through the context system, and closing the dialog automatically resets the form for the next use.
+
+#### dataType: 'json' Usage
+
+Not currently used in this application. All form data is sent as standard `application/x-www-form-urlencoded`. Reserve `dataType: 'json'` for future complex nested object submissions if needed.
+
 ### Server Actions & Error Handling
 
 **Standard Pattern** in `+page.server.ts` files:
@@ -131,6 +173,59 @@ The `EXHIBITION_YEAR` constant in [`constants.ts`](../src/lib/constants.ts) auto
 - After April 1st → next year (since March exhibition)
 
 Use this constant everywhere, never hardcode years.
+
+### Constants Reference
+
+#### Core Business Constants
+
+- **EXHIBITION_YEAR**: Auto-calculated exhibition year based on current date
+- **GENERIC_ERROR_MESSAGE**: Standard user-facing error message
+- **GENERIC_ERROR_UNEXPECTED**: Fallback error for unexpected failures
+
+#### Image Management Constants
+
+- **MAX_IMAGE_SIZE**: 5MB file size limit
+- **MAX_IMAGES_UI_LIMIT**: 3 images per entry (UI display limit)
+- **MIN_IMAGES_PER_ENTRY**: 1 image minimum requirement
+- **DEFAULT_PRIMARY_IMAGE_INDEX**: 0 (first image as default primary)
+
+#### Cloudinary Presets
+
+- **CLOUDINARY_PRESET_UNATTACHED**: For images not yet linked to entries
+- **CLOUDINARY_PRESET_ENTRY**: For images uploaded to specific entries
+
+#### Pricing Constants
+
+- **BASE_REGISTRATION_COST**: $20 base registration fee
+- **PER_ENTRY_COST**: $20 per artwork entry
+- Prices stored in database as cents, converted to dollars for display
+- Use `centsToDisplay()` and `displayToCents()` utility functions
+
+#### UI Constants (UI_CONSTANTS)
+
+```typescript
+UI_CONSTANTS = {
+	IMAGE_DIMENSIONS: {
+		THUMBNAIL: { width: 160, height: 160 },
+		CARD: { width: 320, height: 320 }
+	},
+	BUTTON_HEIGHTS: {
+		SMALL: 'h-8',
+		MEDIUM: 'h-10',
+		LARGE: 'h-12'
+	},
+	GRID_LAYOUTS: {
+		TWO_COL: 'grid-cols-1 md:grid-cols-2',
+		THREE_COL: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+	}
+};
+```
+
+#### Other Constants
+
+- **DIMENSION_SEPARATOR**: 'x' (for displaying dimensions)
+- **ADMIN_DOMAIN**: 'sculpturebermagui.org.au' (admin email domain)
+- **REGISTRATIONS_OPEN**: Boolean from environment variable (feature flag)
 
 ### Multi-Image Management
 

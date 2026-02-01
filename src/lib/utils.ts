@@ -4,6 +4,16 @@ import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
 import { EXHIBITION_YEAR } from './constants';
 
+/**
+ * Combines and merges Tailwind CSS classes using clsx and tailwind-merge.
+ * Intelligently handles conflicting Tailwind classes.
+ *
+ * @param inputs - Class values to combine (strings, objects, arrays)
+ * @returns Merged class string
+ *
+ * @example
+ * cn('px-2 py-1', condition && 'bg-blue-500', { 'text-white': isActive })
+ */
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
@@ -15,6 +25,15 @@ export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, 'childre
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
+/**
+ * Pauses execution for a specified duration.
+ *
+ * @param ms - Milliseconds to sleep
+ * @returns Promise that resolves after the specified time
+ *
+ * @example
+ * await sleep(1000); // Wait 1 second
+ */
 export function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -24,6 +43,19 @@ export function sleep(ms: number) {
 type Callback = (...args: any) => any;
 type Result<R> = [Error, null] | [null, R];
 type MaybeAsyncResult<R> = R extends Promise<infer U> ? Promise<Result<U>> : Result<R>;
+/**
+ * Wraps a callback function to return [error, result] tuple instead of throwing.
+ * Handles both sync and async callbacks.
+ *
+ * @param cb - Callback function to wrap
+ * @param args - Arguments to pass to the callback
+ * @returns Tuple of [Error, null] on error or [null, Result] on success
+ *
+ * @example
+ * const [err, data] = await doublet(fetchData, userId);
+ * if (err) console.error(err);
+ * else console.log(data);
+ */
 export default function doublet<TCallback extends Callback>(
 	cb: TCallback,
 	...args: Parameters<TCallback>
@@ -59,12 +91,24 @@ export const apiResponse = {
 	} as LastStatus
 };
 
+/**
+ * Handles unexpected network errors with standard message.
+ *
+ * @param error - Error object from network failure
+ * @returns User-friendly error message
+ */
 export function handleUnexpectedError(error: Error) {
 	const msg = 'A network error has occurred. Check the apiUrl property to ensure it is set correctly.';
 	console.error(error + ' - ' + msg);
 	return msg;
 }
 
+/**
+ * Processes HTTP error responses and returns appropriate error messages.
+ *
+ * @param lastStatus - Status object containing response details
+ * @returns Formatted error message based on status code
+ */
 export function handleError(lastStatus: LastStatus) {
 	let msg = '';
 	// console.log(lastStatus.status)
@@ -92,6 +136,13 @@ export function handleError(lastStatus: LastStatus) {
 	return msg;
 }
 
+/**
+ * Processes fetch Response objects and extracts JSON or text content.
+ * Updates global apiResponse.lastStatus with response metadata.
+ *
+ * @param response - Fetch Response object
+ * @returns Parsed JSON for successful/400 responses, text for others
+ */
 export async function processResponse(response: Response) {
 	// console.log('processResponse commence:')
 	// Copy reponse properties to lastStatus properties
@@ -108,6 +159,20 @@ export async function processResponse(response: Response) {
 	}
 }
 
+/**
+ * Determines the exhibition placement location based on exhibit number.
+ * Pre-2024: Returns 'indoor' or 'outdoor'.
+ * 2024+: Returns specific location names (Headland, Hotel, etc.) based on number ranges.
+ *
+ * @param exhibitNumberString - Exhibit number as string
+ * @param entryYear - Year of the exhibition entry
+ * @param inOrOut - Indoor or Outdoor designation
+ * @returns Location name or designation
+ *
+ * @example
+ * determinePlacement('150', '2024', 'Outdoor') // Returns 'Headland'
+ * determinePlacement('450', '2024', 'Indoor') // Returns 'Hotel'
+ */
 export function determinePlacement(exhibitNumberString: string, entryYear: string, inOrOut: string) {
 	// console.log(`exhibitNumberString: ${exhibitNumberString}, entryYear: ${entryYear}, inOrOut: ${inOrOut}`);
 	// prior to 2024 just use "indoor" or "outdoor"
@@ -139,6 +204,17 @@ export function determinePlacement(exhibitNumberString: string, entryYear: strin
 	}
 }
 
+/**
+ * Converts price in cents to formatted currency string.
+ *
+ * @param price - Price in cents (or null/undefined)
+ * @param decimals - Number of decimal places (default: 2)
+ * @returns Formatted currency string (e.g., '$50.00') or empty string if no price
+ *
+ * @example
+ * convertToDollars(5000) // Returns '$50.00'
+ * convertToDollars(5000, 0) // Returns '$50'
+ */
 export const convertToDollars = (price: number | null | undefined, decimals?: number) => {
 	if (!price) return '';
 	return (price / 100).toLocaleString('en-AU', {

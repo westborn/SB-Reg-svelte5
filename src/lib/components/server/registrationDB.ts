@@ -70,6 +70,20 @@ export interface Data {
 }
 
 export type Submission = ThenArg<ReturnType<typeof getSubmission>>;
+
+/**
+ * Retrieves complete submission data for an artist including registrations and entries.
+ * Automatically handles proxy email for super admin users.
+ *
+ * @param user - User object containing admin flags and email/proxyEmail
+ * @returns Artist record with all registrations and entries for current exhibition year, or null if not found
+ *
+ * @example
+ * const submission = await getSubmission(user);
+ * if (submission) {
+ *   console.log(`Artist: ${submission.firstName} ${submission.lastName}`);
+ * }
+ */
 export const getSubmission = async ({ isSuperAdmin, proxyEmail, email }: User) => {
 	const artistEmail = isSuperAdmin ? proxyEmail : email;
 	const submission = await prisma.artistTable.findFirst({
@@ -157,6 +171,16 @@ export type ReturnedEntry = ReturnedEntriesEntry & { images: ReturnedEntriesImag
 export type ReturnedEntries = ReturnedEntry[];
 
 export type CurrentRegistration = ThenArg<ReturnType<typeof getEntries>>;
+
+/**
+ * Retrieves all entries for an artist for the current exhibition year.
+ *
+ * @param artistEmail - Email address of the artist
+ * @returns Artist record with registrations and entries, or null if not found
+ *
+ * @example
+ * const entries = await getEntries('artist@example.com');
+ */
 export const getEntries = async (artistEmail: string) => {
 	const entries = await prisma.artistTable.findFirst({
 		where: { email: artistEmail },
@@ -195,6 +219,15 @@ export const getEntries = async (artistEmail: string) => {
 	return entries;
 };
 
+/**
+ * Creates a new registration record for an artist for the current exhibition year.
+ *
+ * @param artistId - ID of the artist
+ * @returns Newly created registration record
+ *
+ * @example
+ * const registration = await createNewRegistration(123);
+ */
 export const createNewRegistration = async (artistId: number) => {
 	const registration = await prisma.registrationTable.create({
 		data: {
@@ -210,6 +243,15 @@ export const createNewRegistration = async (artistId: number) => {
 	return registration;
 };
 
+/**
+ * Creates a new entry record in the database.
+ *
+ * @param workingEntry - Entry data to create
+ * @returns Newly created entry record
+ *
+ * @example
+ * const entry = await entryCreate({ title: 'My Sculpture', ... });
+ */
 export const entryCreate = async (workingEntry: EntryTable) => {
 	const {
 		artistId,
@@ -243,6 +285,16 @@ export const entryCreate = async (workingEntry: EntryTable) => {
 };
 
 export type CurrentEntry = ThenArg<ReturnType<typeof getEntry>>;
+
+/**
+ * Retrieves a single entry by ID.
+ *
+ * @param id - Entry ID
+ * @returns Entry record or null if not found
+ *
+ * @example
+ * const entry = await getEntry(456);
+ */
 export const getEntry = async (id: number) => {
 	const entry = await prisma.entryTable.findFirst({
 		where: { id: id },
@@ -265,6 +317,16 @@ export const getEntry = async (id: number) => {
 };
 
 export type CurrentImage = ThenArg<ReturnType<typeof getImage>>;
+
+/**
+ * Retrieves a single image by ID.
+ *
+ * @param id - Image ID
+ * @returns Image record or null if not found
+ *
+ * @example
+ * const image = await getImage(789);
+ */
 export const getImage = async (id: number) => {
 	const image = await prisma.imageTable.findFirst({
 		where: { id: id },
@@ -282,6 +344,16 @@ export const getImage = async (id: number) => {
 };
 
 export type CurrentEntryImages = ThenArg<ReturnType<typeof getEntryImages>>;
+
+/**
+ * Retrieves all images for a specific entry.
+ *
+ * @param entryId - Entry ID
+ * @returns Array of image records
+ *
+ * @example
+ * const images = await getEntryImages(456);
+ */
 export const getEntryImages = async (entryId: number) => {
 	const images = await prisma.imageTable.findMany({
 		where: { entryId: entryId },
@@ -298,6 +370,15 @@ export const getEntryImages = async (entryId: number) => {
 	return images;
 };
 
+/**
+ * Creates a new image record in the database.
+ *
+ * @param workingImage - Image data including cloudId, cloudURL, etc.
+ * @returns Newly created image record
+ *
+ * @example
+ * const image = await createImage({ cloudId: 'xyz', cloudURL: 'https://...', ... });
+ */
 export const createImage = async (workingImage: CurrentImage) => {
 	const { artistId, registrationId = null, entryId = null, cloudId, cloudURL, originalFileName } = Object(workingImage);
 	const image = await prisma.imageTable.create({
@@ -327,6 +408,20 @@ export const createImage = async (workingImage: CurrentImage) => {
 /////////////////////////////////////////
 
 export type EntryImagesWithPrimary = ThenArg<ReturnType<typeof getEntryImagesWithPrimary>>;
+
+/**
+ * Retrieves all images for an entry with primary image designation.
+ * Maps images with isPrimary flag based on the primaryImage relationship.
+ *
+ * @param entryId - Entry ID
+ * @returns Object containing images array with isPrimary flags and primaryImageId, or null if entry not found
+ *
+ * @example
+ * const result = await getEntryImagesWithPrimary(456);
+ * if (result) {
+ *   const primaryImg = result.images.find(img => img.isPrimary);
+ * }
+ */
 export const getEntryImagesWithPrimary = async (entryId: number) => {
 	const entry = await prisma.entryTable.findUnique({
 		where: { id: entryId },
@@ -370,6 +465,18 @@ export const getEntryImagesWithPrimary = async (entryId: number) => {
 	};
 };
 
+/**
+ * Sets an image as the primary image for an entry.
+ * Updates or creates the primaryImage relationship.
+ *
+ * @param entryId - Entry ID
+ * @param imageId - Image ID to set as primary
+ * @returns True on success
+ * @throws Error if image doesn't belong to the entry
+ *
+ * @example
+ * await setPrimaryImage(456, 789);
+ */
 export const setPrimaryImage = async (entryId: number, imageId: number) => {
 	// Verify the image belongs to this entry
 	const image = await prisma.imageTable.findFirst({
@@ -390,6 +497,22 @@ export const setPrimaryImage = async (entryId: number, imageId: number) => {
 	return true;
 };
 
+/**
+ * Deletes an image from an entry.
+ * Automatically reassigns primary image if deleting the current primary.
+ * Enforces minimum image requirement per entry.
+ *
+ * @param imageId - Image ID to delete
+ * @param entryId - Entry ID the image belongs to
+ * @returns Object indicating if the deleted image was the primary image
+ * @throws Error if attempting to delete the last remaining image
+ *
+ * @example
+ * const result = await deleteImage(789, 456);
+ * if (result.deletedPrimaryImage) {
+ *   console.log('Primary image was deleted and reassigned');
+ * }
+ */
 export const deleteImage = async (imageId: number, entryId: number) => {
 	// Validate that entry has more than minimum required images
 	const entryImages = await prisma.imageTable.findMany({
@@ -426,6 +549,16 @@ export const deleteImage = async (imageId: number, entryId: number) => {
 	return { deletedPrimaryImage: isDeletingPrimary };
 };
 
+/**
+ * Creates a new primary image relationship record.
+ *
+ * @param entryId - Entry ID
+ * @param imageId - Image ID to designate as primary
+ * @returns Newly created primary image relation record
+ *
+ * @example
+ * const relation = await createPrimaryImageRelation(456, 789);
+ */
 export const createPrimaryImageRelation = async (entryId: number, imageId: number) => {
 	const primaryImage = await prisma.primaryImageTable.create({
 		data: {
@@ -443,6 +576,16 @@ export const createPrimaryImageRelation = async (entryId: number, imageId: numbe
 	return primaryImage;
 };
 
+/**
+ * Updates an existing primary image relationship.
+ *
+ * @param entryId - Entry ID
+ * @param imageId - New image ID to designate as primary
+ * @returns Updated primary image relation record
+ *
+ * @example
+ * const relation = await updatePrimaryImageRelation(456, 789);
+ */
 export const updatePrimaryImageRelation = async (entryId: number, imageId: number) => {
 	const primaryImage = await prisma.primaryImageTable.update({
 		where: { entryId: entryId },
@@ -504,7 +647,14 @@ export const updatePrimaryImageRelation = async (entryId: number, imageId: numbe
 /////////////////////////////////////////
 
 /**
- * Updates an artist record with partial data
+ * Updates an artist record with partial data.
+ *
+ * @param artistId - Artist ID
+ * @param data - Partial artist data to update
+ * @returns Updated artist record
+ *
+ * @example
+ * await updateArtist(123, { phone: '0400123456', postcode: '2548' });
  */
 export const updateArtist = async (artistId: number, data: Partial<Prisma.artistTableUpdateInput>) => {
 	return await prisma.artistTable.update({
@@ -514,7 +664,14 @@ export const updateArtist = async (artistId: number, data: Partial<Prisma.artist
 };
 
 /**
- * Updates an entry record with partial data
+ * Updates an entry record with partial data.
+ *
+ * @param entryId - Entry ID
+ * @param data - Partial entry data to update
+ * @returns Updated entry record
+ *
+ * @example
+ * await updateEntry(456, { title: 'New Title', price: 50000 });
  */
 export const updateEntry = async (entryId: number, data: Partial<Prisma.entryTableUpdateInput>) => {
 	return await prisma.entryTable.update({
@@ -524,7 +681,14 @@ export const updateEntry = async (entryId: number, data: Partial<Prisma.entryTab
 };
 
 /**
- * Updates a registration record with partial data
+ * Updates a registration record with partial data.
+ *
+ * @param registrationId - Registration ID
+ * @param data - Partial registration data to update
+ * @returns Updated registration record
+ *
+ * @example
+ * await updateRegistration(789, { closed: true, crane: true });
  */
 export const updateRegistration = async (
 	registrationId: number,
@@ -573,6 +737,18 @@ export type Exhibit = {
 };
 
 //TODO fix issue with non accepted entries in prior years not being filtered out
+/**
+ * Retrieves exhibit data for display in admin tables and catalogues.
+ * Returns flattened data structure with artist, registration, entry, and location info.
+ *
+ * @param rows - Number of rows to return
+ * @param offset - Number of rows to skip (for pagination)
+ * @param entryYear - Exhibition year to filter by
+ * @returns Array of Exhibit objects with complete display data
+ *
+ * @example
+ * const exhibits = await getExhibits({ rows: 50, offset: 0, entryYear: '2026' });
+ */
 export const getExhibits = async ({
 	rows,
 	offset,
