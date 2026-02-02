@@ -143,18 +143,21 @@ const entryUpdate = async (event: RequestEvent) => {
 			});
 		});
 
-	// Log successful entry update
-	await logger.info('Entry updated successfully', {
-		entryId: idToUpdate,
-		userEmail: user.email,
-		routeId: event.route.id
-	});
-} catch (error) {
-	await logger.error('Entry update failed', error as Error, {
-		entryId: idToUpdate,
-		userEmail: user.email,
-		routeId: event.route.id
-	});
+		// Log successful entry update
+		await logger.info('Entry updated successfully', {
+			entryId: idToUpdate,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
+	} catch (error) {
+		await logger.error('Entry update failed', error as Error, {
+			entryId: idToUpdate,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
+		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+	}
+
 	// Return the updated submission
 	const updatedSubmission = await getSubmission(user as User);
 	const returnData = { formValidationResult, updatedSubmission };
@@ -237,17 +240,20 @@ const entryCreate = async (event: RequestEvent) => {
 			}
 		});
 
-	// Log successful entry creation
-	await logger.info('Entry created successfully', {
-		entryId: newEntry.id,
-		userEmail: user.email,
-		routeId: event.route.id
-	});
-} catch (error) {
-	await logger.error('Entry creation failed', error as Error, {
-		userEmail: user.email,
-		routeId: event.route.id
-	});
+		// Log successful entry creation
+		await logger.info('Entry created successfully', {
+			entryId: newEntry.id,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
+	} catch (error) {
+		await logger.error('Entry creation failed', error as Error, {
+			userEmail: user.email,
+			routeId: event.route.id
+		});
+		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
+	}
+
 	// If images were provided, update the images with the new entry details and set primary in transaction
 	if (workingImages && workingImages.length > 0) {
 		await prisma.$transaction(async (tx) => {
@@ -443,7 +449,21 @@ const imageDeleteAction = async (event: RequestEvent) => {
 
 	try {
 		const result = await deleteImage(imageId, entryId);
+
+		// Log successful image deletion
+		await logger.info('Image deleted successfully', {
+			imageId,
+			entryId,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 	} catch (error) {
+		await logger.error('Failed to delete image', error as Error, {
+			imageId,
+			entryId,
+			userEmail: user.email,
+			routeId: event.route.id
+		});
 		return message(formValidationResult, error instanceof Error ? error.message : 'Error deleting image');
 	}
 

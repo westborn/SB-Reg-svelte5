@@ -1,9 +1,9 @@
 /**
  * Test script for the logging infrastructure
- * 
+ *
  * This script tests all logging levels and verifies database persistence.
  * Run with: npx tsx src/scripts/test-logger.ts
- * 
+ *
  * After running, check the log table in Prisma Studio:
  * npx prisma studio
  */
@@ -51,7 +51,8 @@ async function testLogger() {
 		// Test 4: Error logging with Error object
 		console.log('Test 4: ERROR level logging with Error object...');
 		const testError = new Error('Test error message - Simulated failure');
-		testError.stack = 'Error: Test error message\n    at testLogger (/test/logger.ts:45:20)\n    at async main (/test/logger.ts:100:5)';
+		testError.stack =
+			'Error: Test error message\n    at testLogger (/test/logger.ts:45:20)\n    at async main (/test/logger.ts:100:5)';
 		await logger.error('Test error occurred during operation', testError, {
 			routeId: '/test/logger',
 			testType: 'error',
@@ -92,7 +93,7 @@ async function testLogger() {
 
 		// Verify logs were created
 		console.log('📊 Verifying logs in database...\n');
-		
+
 		const logCounts = await prisma.logTable.groupBy({
 			by: ['level'],
 			_count: {
@@ -122,7 +123,9 @@ async function testLogger() {
 		console.log('\n📋 Recent logs (last 10):');
 		recentLogs.forEach((log) => {
 			const timestamp = log.createdAt.toISOString().split('T')[1].split('.')[0];
-			console.log(`  [${timestamp}] ${log.level.padEnd(5)} - ${log.message.substring(0, 60)}${log.message.length > 60 ? '...' : ''}`);
+			console.log(
+				`  [${timestamp}] ${log.level.padEnd(5)} - ${log.message.substring(0, 60)}${log.message.length > 60 ? '...' : ''}`
+			);
 		});
 
 		console.log('\n✅ All tests completed successfully!');
@@ -131,7 +134,6 @@ async function testLogger() {
 		console.log('   2. Check the "log" table for all test entries');
 		console.log('   3. Verify context JSON and error fields are populated');
 		console.log('   4. Try querying logs by level or route\n');
-
 	} catch (error) {
 		console.error('❌ Test failed:', error);
 		throw error;

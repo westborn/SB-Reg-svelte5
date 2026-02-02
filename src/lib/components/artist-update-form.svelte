@@ -30,26 +30,34 @@
 			return;
 		}
 	});
-	const { form: formData, enhance, errors, message, delayed } = form;
+	const { form: formData, enhance, errors, message, delayed, reset } = form;
 
-	// Standard form initialization pattern (Phase 3, Step 9)
-	let relevantData = $derived(myState?.submission);
-	let lastDataId = $state<number | null>(null);
+	// Track when dialog transitions from closed to open to trigger form reset
+	let wasDialogOpen = $state(false);
 
 	$effect(() => {
-		if (relevantData && relevantData.id !== lastDataId) {
-			Object.assign($formData, {
-				firstName: relevantData.firstName,
-				lastName: relevantData.lastName,
-				phone: relevantData.phone,
-				postcode: relevantData.postcode,
-				firstNations: relevantData.firstNations,
-				bankAccountName: relevantData.bankAccountName,
-				bankBSB: relevantData.bankBSB,
-				bankAccount: relevantData.bankAccount
+		// Detect dialog opening transition
+		const isDialogOpen = myState.artistUpdateDialogOpen;
+		const submission = myState.submission;
+
+		if (isDialogOpen && !wasDialogOpen && submission) {
+			// Dialog just opened - reset form with fresh artist data
+			reset({
+				data: {
+					firstName: submission.firstName,
+					lastName: submission.lastName,
+					phone: submission.phone,
+					postcode: submission.postcode,
+					firstNations: submission.firstNations,
+					bankAccountName: submission.bankAccountName ?? '',
+					bankBSB: submission.bankBSB ?? '',
+					bankAccount: submission.bankAccount ?? ''
+				}
 			});
-			lastDataId = relevantData.id;
 		}
+
+		// Update tracked state for next iteration
+		wasDialogOpen = isDialogOpen;
 	});
 </script>
 

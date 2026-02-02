@@ -58,37 +58,44 @@
 		}
 	});
 
-	const { form: formData, enhance, delayed, errors } = form;
+	const { form: formData, enhance, delayed, errors, reset } = form;
 
 	// get the form field values from the submission object using the id that was passed in
 	let entry = $derived(
 		myState?.submission?.registrations[0].entries.find((entry: { id: number }) => entry.id === editingEntryId)
 	);
 
-	// Standard form initialization pattern (Phase 3, Step 9)
-	let lastEntryId = $state<number | null>(null);
+	// Track when dialog transitions from closed to open to trigger form reset
+	let wasDialogOpen = $state(false);
 
 	$effect(() => {
-		// Only reinitialize if we're looking at a different entry
-		if (entry && entry.id !== lastEntryId) {
-			// Split the dimensions string into the three fields
+		// Detect dialog opening transition
+		const isDialogOpen = myState.entryUpdateDialogOpen;
+
+		if (isDialogOpen && !wasDialogOpen && entry) {
+			// Dialog just opened - reset form with fresh entry data
 			const dimensions = entry?.dimensions?.split(DIMENSION_SEPARATOR) || [];
 			const [dimLength, dimWidth, dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
 
-			Object.assign($formData, {
-				id: entry.id,
-				inOrOut: entry.inOrOut,
-				description: entry.description,
-				material: entry.material,
-				specialRequirements: entry.specialRequirements,
-				title: entry.title,
-				price: entry.price ? entry.price / 100 : 0,
-				dimLength,
-				dimWidth,
-				dimHeight
+			// Use reset() to properly update all form state including validation, errors, and tainted flags
+			reset({
+				data: {
+					id: entry.id,
+					title: entry.title,
+					inOrOut: entry.inOrOut,
+					price: entry.price ? entry.price / 100 : 0,
+					material: entry.material ?? '',
+					dimLength: dimLength,
+					dimWidth: dimWidth,
+					dimHeight: dimHeight,
+					specialRequirements: entry.specialRequirements ?? '',
+					description: entry.description ?? ''
+				}
 			});
-			lastEntryId = entry.id;
 		}
+
+		// Update tracked state for next iteration
+		wasDialogOpen = isDialogOpen;
 	});
 </script>
 

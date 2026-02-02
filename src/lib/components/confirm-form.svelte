@@ -30,25 +30,38 @@
 			return;
 		}
 	});
-	const { form: formData, enhance, errors, message, delayed } = form;
+	const { form: formData, enhance, errors, message, delayed, reset } = form;
 
-	// Standard form initialization pattern (Phase 3, Step 9)
-	let relevantData = $derived(myState?.submission?.registrations?.[0]);
-	let lastDataId = $state<number | null>(null);
+	// Track when dialog transitions from closed to open to trigger form reset
+	let wasDialogOpen = $state(false);
 
 	$effect(() => {
-		if (relevantData && relevantData.id !== lastDataId) {
-			Object.assign($formData, {
-				bumpIn: relevantData.bumpIn,
-				bumpOut: relevantData.bumpOut,
-				crane: relevantData.crane ? 'Yes' : 'No',
-				displayRequirements: relevantData.displayRequirements ?? '',
-				bankAccountName: myState?.submission?.bankAccountName ?? '',
-				bankBSB: myState?.submission?.bankBSB ?? '',
-				bankAccount: myState?.submission?.bankAccount ?? ''
+		// Detect dialog opening transition
+		const isDialogOpen = myState.confirmDialogOpen;
+		const registration = myState.submission?.registrations?.[0];
+		const artist = myState.submission;
+
+		if (isDialogOpen && !wasDialogOpen && registration && artist) {
+			// Dialog just opened - reset form with fresh registration and artist data
+			reset({
+				data: {
+					id: registration.id,
+					artistId: registration.artistId,
+					registrationYear: registration.registrationYear ?? '',
+					closed: registration.closed ? 'Yes' : 'No',
+					bumpIn: registration.bumpIn ?? '',
+					bumpOut: registration.bumpOut ?? '',
+					displayRequirements: registration.displayRequirements ?? '',
+					crane: registration.crane ? 'Yes' : 'No',
+					bankAccountName: artist.bankAccountName ?? '',
+					bankBSB: artist.bankBSB ?? '',
+					bankAccount: artist.bankAccount ?? ''
+				}
 			});
-			lastDataId = relevantData.id;
 		}
+
+		// Update tracked state for next iteration
+		wasDialogOpen = isDialogOpen;
 	});
 </script>
 

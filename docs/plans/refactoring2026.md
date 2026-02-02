@@ -662,27 +662,31 @@ export function calculateRegistrationCost(entryCount: number): number {
 
 **Standard pattern to apply**:
 
+Forms are now pre-populated from the server via `+layout.server.ts` using `superValidate(data, schema)`.
+
+For forms that need dynamic updates (like entry-update-form which changes based on selected entry):
+
 ```typescript
-let relevantData = $derived(myState?.submission);
-let lastDataId = $state<number | null>(null);
+let entry = $derived(myState?.submission?.registrations[0].entries.find((entry) => entry.id === editingEntryId));
+let lastEntryId = $state<number | null>(null);
 
 $effect(() => {
-	if (relevantData && relevantData.id !== lastDataId) {
-		Object.assign($formData, {
-			field1: relevantData.field1,
-			field2: relevantData.field2
-			// ... all fields
-		});
-		lastDataId = relevantData.id;
+	if (entry && entry.id !== lastEntryId) {
+		// Update fields individually to trigger Svelte 5 reactivity
+		$formData.field1 = entry.field1;
+		$formData.field2 = entry.field2;
+		// ... all fields
+		lastEntryId = entry.id;
 	}
 });
 ```
 
-Apply to:
+**Note**: Never use `Object.assign()` with `$formData` as it doesn't trigger Svelte 5's fine-grained reactivity.
 
-- `src/lib/components/artist-update-form.svelte`
-- `src/lib/components/entry-update-form.svelte`
-- `src/lib/components/confirm-form.svelte`
+Applied to:
+
+- `src/routes/+layout.server.ts` - Pre-populates artistForm and confirmForm with existing data
+- `src/lib/components/entry-update-form.svelte` - Uses $effect for dynamic entry selection
 
 **Files affected**:
 
