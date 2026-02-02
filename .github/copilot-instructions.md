@@ -163,6 +163,52 @@ export const actions = {
 
 Always log errors with `event.route.id` prefix for debugging.
 
+### Structured Logging
+
+The application includes a centralized logging system that persists logs to the database.
+
+**Standard Pattern** (see [`src/lib/server/logger.ts`](../src/lib/server/logger.ts)):
+
+```typescript
+import { logger } from '$lib/server/logger';
+
+// Info logging
+await logger.info('Registration completed', {
+	userId: user.id,
+	routeId: event.route.id,
+	registrationId: 123
+});
+
+// Error logging
+try {
+	await someOperation();
+} catch (error) {
+	await logger.error('Operation failed', error as Error, {
+		userId: user.id,
+		routeId: event.route.id
+	});
+}
+```
+
+**Log Levels** (configured via `LOG_LEVEL` environment variable):
+
+- `DEBUG`: All messages (development/troubleshooting)
+- `INFO`: INFO, WARN, ERROR (recommended for production)
+- `WARN`: WARN and ERROR only
+- `ERROR`: Only ERROR messages
+- `OFF`: Disable all logging
+
+**Context Fields**:
+
+- `userId`: User ID from authentication
+- `routeId`: SvelteKit route ID
+- `adminAction`: Boolean flag for admin-performed actions
+- `adminEmail`: Admin's actual email (super admin proxy)
+- `targetArtistEmail`: Artist being acted upon (super admin proxy)
+- Custom key-value pairs for additional context
+
+Logs are stored in the `logTable` with indexed fields for efficient querying.
+
 ## Key Business Logic
 
 ### Exhibition Year Calculation
@@ -401,6 +447,7 @@ CLOUDINARY_API_SECRET=
 GMAIL_USER=                       # Nodemailer config
 GMAIL_APP_PASSWORD=
 PUBLIC_REGISTRATIONS_OPEN=YES|NO  # Feature flag
+LOG_LEVEL=INFO                    # Logging level: DEBUG, INFO, WARN, ERROR, OFF
 ```
 
 ## Features

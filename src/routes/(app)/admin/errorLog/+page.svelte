@@ -129,7 +129,7 @@
 										<Table.Head class="w-[90px]">Level</Table.Head>
 										<Table.Head class="w-[160px]">Timestamp</Table.Head>
 										<Table.Head>Message</Table.Head>
-										<Table.Head class="w-[180px]">User</Table.Head>
+										<Table.Head class="w-[180px]">Artist Email</Table.Head>
 									</Table.Row>
 								</Table.Header>
 								<Table.Body>

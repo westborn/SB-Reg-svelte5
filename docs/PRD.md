@@ -199,7 +199,8 @@ Enable artists to seamlessly register and manage their artwork submissions for t
 
 - Type-safe codebase with TypeScript
 - Automated database migrations
-- Comprehensive error logging
+- Comprehensive error logging with configurable levels
+- Structured logging to database for monitoring and debugging
 - Documentation for all major features
 
 ## Out of Scope (For Current Version)

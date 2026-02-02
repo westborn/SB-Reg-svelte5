@@ -1,4 +1,17 @@
 import { prisma } from '$lib/components/server/prisma';
+import { LOG_LEVEL } from '$env/static/private';
+
+/**
+ * Log level hierarchy for filtering logs.
+ * Higher levels include all lower levels.
+ */
+const LOG_LEVELS = {
+	DEBUG: 0,
+	INFO: 1,
+	WARN: 2,
+	ERROR: 3,
+	OFF: 4
+} as const;
 
 /**
  * Context object for structured logging.
@@ -42,6 +55,14 @@ function serializeError(error?: Error): string | null {
 /**
  * Core logging function that persists logs to the database.
  * Falls back to console.error if database logging fails.
+ * Only logs if the message level meets or exceeds the configured LOG_LEVEL.
+ *
+ * LOG_LEVEL values (from least to most restrictive):
+ * - DEBUG: Logs all messages (DEBUG, INFO, WARN, ERROR)
+ * - INFO: Logs INFO, WARN, ERROR
+ * - WARN: Logs WARN, ERROR
+ * - ERROR: Logs only ERROR
+ * - OFF: Disables all logging
  *
  * @param level - Log level (DEBUG, INFO, WARN, ERROR)
  * @param message - Human-readable log message
@@ -53,6 +74,16 @@ function serializeError(error?: Error): string | null {
  * await log('ERROR', 'Database connection failed', { routeId: '/api/data' }, error);
  */
 async function log(level: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR', message: string, context?: LogContext, error?: Error) {
+	// Get configured log level, default to INFO if not set or invalid
+	const configuredLevel = LOG_LEVEL && LOG_LEVEL in LOG_LEVELS ? LOG_LEVEL : 'INFO';
+	const configuredLevelValue = LOG_LEVELS[configuredLevel as keyof typeof LOG_LEVELS];
+	const messageLevelValue = LOG_LEVELS[level];
+
+	// Only log if message level meets or exceeds configured level
+	if (messageLevelValue < configuredLevelValue) {
+		return;
+	}
+
 	try {
 		await prisma.logTable.create({
 			data: {
