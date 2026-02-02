@@ -37,14 +37,26 @@ const artistUpdate = async (event: RequestEvent) => {
 
 		// Log successful update
 		await logger.info('Artist updated successfully', {
+			userId: user.id,
 			userEmail: artistEmail,
 			artistId: artist.id,
-			routeId: event.route.id
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
 		});
 	} catch (error) {
 		await logger.error('Artist update failed', error as Error, {
+			userId: user.id,
 			userEmail: artistEmail,
-			routeId: event.route.id
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
 		});
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
@@ -73,14 +85,26 @@ const artistCreate = async (event: RequestEvent) => {
 
 		// Log successful creation
 		await logger.info('Artist created successfully', {
+			userId: user.id,
 			userEmail: artistEmail,
 			artistId: createdArtist.id,
-			routeId: event.route.id
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
 		});
 	} catch (error) {
 		await logger.error('Artist creation failed', error as Error, {
+			userId: user.id,
 			userEmail: artistEmail,
-			routeId: event.route.id
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
 		});
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}

@@ -9,7 +9,8 @@ import { logger } from '$lib/server/logger';
 import type { Actions, PageServerLoad, RequestEvent } from '../$types';
 import { message, superValidate } from 'sveltekit-superforms';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async (event) => {
+	const { user } = await event.locals.V1safeGetSession();
 	try {
 		const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
 		return {
@@ -22,7 +23,13 @@ export const load: PageServerLoad = async () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
 		await logger.error('Failed to load exhibits for location update', error, {
-			routeId: '/admin/locationUpdate'
+			userId: user?.id,
+			userEmail: user?.email,
+			routeId: '/admin/locationUpdate',
+			...(user?.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email
+			})
 		});
 		return { error: error.message };
 	}
@@ -63,17 +70,23 @@ const locationUpdate = async (event: RequestEvent) => {
 
 		// Log successful location update
 		await logger.info('Location updated successfully', {
+			userId: user.id,
 			entryId,
 			exhibitNumber,
 			userEmail: user.email,
-			routeId: event.route.id
+			routeId: event.route.id,
+			adminAction: true,
+			adminEmail: user.email
 		});
 	} catch (error) {
 		await logger.error('Location update failed', error as Error, {
+			userId: user.id,
 			entryId,
 			exhibitNumber,
 			userEmail: user.email,
-			routeId: event.route.id
+			routeId: event.route.id,
+			adminAction: true,
+			adminEmail: user.email
 		});
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED, {
 			status: 400

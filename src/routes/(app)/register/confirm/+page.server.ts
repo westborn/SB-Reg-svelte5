@@ -56,14 +56,26 @@ const confirmUpdate = async (event: RequestEvent) => {
 
 		// Log successful confirmation
 		await logger.info('Registration confirmed and updated', {
+			userId: user.id,
 			userEmail: artistEmail,
 			registrationId: idToUpdate,
-			routeId: event.route.id
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
 		});
 	} catch (error) {
 		await logger.error('Registration confirmation failed', error as Error, {
+			userId: user.id,
 			userEmail: artistEmail,
-			routeId: event.route.id
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
 		});
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}

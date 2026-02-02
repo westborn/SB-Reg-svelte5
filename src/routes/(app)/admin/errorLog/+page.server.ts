@@ -3,6 +3,7 @@ import { logger } from '$lib/server/logger';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
+	const { user } = await event.locals.V1safeGetSession();
 	try {
 		// Get the most recent 100 log entries, ordered by most recent first
 		const logs = await prisma.logTable.findMany({
@@ -35,6 +36,8 @@ export const load: PageServerLoad = async (event) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
 		await logger.error('Failed to load error logs', error, {
+			userId: user?.id,
+			userEmail: user?.email,
 			routeId: event.route.id
 		});
 		return { error: error.message, logs: [], countsByLevel: { DEBUG: 0, INFO: 0, WARN: 0, ERROR: 0 } };

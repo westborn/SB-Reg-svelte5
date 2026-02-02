@@ -26,7 +26,36 @@ import {
 } from '$lib/components/server/registrationDB';
 import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
 import { getDefaultPrimaryImage } from '$lib/utils/primary-image';
-import { logger } from '$lib/server/logger';
+import { logger, type LogContext } from '$lib/server/logger';
+
+/**
+ * Builds a standardized log context object for entry-related operations.
+ * Automatically includes user tracking and admin proxy information.
+ *
+ * @param user - User object from session
+ * @param artistEmail - Target artist's email (handles proxy mode)
+ * @param routeId - Current route identifier
+ * @param additionalContext - Optional additional context fields to merge
+ * @returns Complete log context object
+ */
+function buildLogContext(
+	user: User,
+	artistEmail: string,
+	routeId: string,
+	additionalContext?: Partial<LogContext>
+): LogContext {
+	return {
+		userId: user.id,
+		userEmail: artistEmail,
+		routeId,
+		...additionalContext,
+		...(user.isSuperAdmin && {
+			adminAction: true,
+			adminEmail: user.email,
+			targetArtistEmail: user.proxyEmail
+		})
+	};
+}
 
 const entryUpdate = async (event: RequestEvent) => {
 	const updateImagesSchema = entrySchemaUI.extend({
@@ -42,6 +71,7 @@ const entryUpdate = async (event: RequestEvent) => {
 		});
 	}
 	const { user } = await event.locals.V1safeGetSession();
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 
 	// extract the images data and entry id that we need to update
 	let workingImages: CurrentImage[] = [];
@@ -144,17 +174,16 @@ const entryUpdate = async (event: RequestEvent) => {
 		});
 
 		// Log successful entry update
-		await logger.info('Entry updated successfully', {
-			entryId: idToUpdate,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.info(
+			'Entry updated successfully',
+			buildLogContext(user, artistEmail, event.route.id, { entryId: idToUpdate })
+		);
 	} catch (error) {
-		await logger.error('Entry update failed', error as Error, {
-			entryId: idToUpdate,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.error(
+			'Entry update failed',
+			error as Error,
+			buildLogContext(user, artistEmail, event.route.id, { entryId: idToUpdate })
+		);
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
@@ -177,6 +206,7 @@ const entryCreate = async (event: RequestEvent) => {
 		});
 	}
 	const { user } = await event.locals.V1safeGetSession();
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 
 	// Process images data if available
 	let workingImages: CurrentImage[] = [];
@@ -241,16 +271,12 @@ const entryCreate = async (event: RequestEvent) => {
 		});
 
 		// Log successful entry creation
-		await logger.info('Entry created successfully', {
-			entryId: newEntry.id,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.info(
+			'Entry created successfully',
+			buildLogContext(user, artistEmail, event.route.id, { entryId: newEntry.id })
+		);
 	} catch (error) {
-		await logger.error('Entry creation failed', error as Error, {
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.error('Entry creation failed', error as Error, buildLogContext(user, artistEmail, event.route.id));
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
@@ -300,6 +326,7 @@ const imageUpload = async (event: RequestEvent) => {
 
 	// Get the submission from the database and make sure we have a registration to attach the entry to
 	const { user } = await event.locals.V1safeGetSession();
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 	try {
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
@@ -324,20 +351,18 @@ const imageUpload = async (event: RequestEvent) => {
 		} as CurrentImage);
 
 		// Log successful image upload
-		await logger.info('Image uploaded successfully', {
-			imageId: newImage.id,
-			userEmail: user.email,
-			fileName: formValidationResult.data.image.name,
-			routeId: event.route.id
-		});
+		await logger.info(
+			'Image uploaded successfully',
+			buildLogContext(user, artistEmail, event.route.id, {
+				imageId: newImage.id,
+				fileName: formValidationResult.data.image.name
+			})
+		);
 
 		const returnData = { formValidationResult, newImage };
 		return withFiles(returnData);
 	} catch (error) {
-		await logger.error('Image upload failed', error as Error, {
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.error('Image upload failed', error as Error, buildLogContext(user, artistEmail, event.route.id));
 		return fail(500, withFiles({ formValidationResult }));
 	}
 };
@@ -355,6 +380,7 @@ const entryDelete = async (event: RequestEvent) => {
 	const idToDelete = parseInt(idAsString);
 
 	const { user } = await event.locals.V1safeGetSession();
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 	try {
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
@@ -372,17 +398,16 @@ const entryDelete = async (event: RequestEvent) => {
 		}
 
 		// Log successful deletion
-		await logger.info('Entry deleted successfully', {
-			entryId: idToDelete,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.info(
+			'Entry deleted successfully',
+			buildLogContext(user, artistEmail, event.route.id, { entryId: idToDelete })
+		);
 	} catch (error) {
-		await logger.error('Entry deletion failed', error as Error, {
-			entryId: idToDelete,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.error(
+			'Entry deletion failed',
+			error as Error,
+			buildLogContext(user, artistEmail, event.route.id, { entryId: idToDelete })
+		);
 		return fail(500, withFiles({ formValidationResult }));
 	}
 	// Return the updated submission
@@ -404,25 +429,23 @@ const setPrimaryImageAction = async (event: RequestEvent) => {
 	}
 
 	const { user } = await event.locals.V1safeGetSession();
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 	const { entryId, imageId } = formValidationResult.data;
 
 	try {
 		await setPrimaryImage(entryId, imageId);
 
 		// Log successful primary image update
-		await logger.info('Primary image set successfully', {
-			entryId,
-			imageId,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.info(
+			'Primary image set successfully',
+			buildLogContext(user, artistEmail, event.route.id, { entryId, imageId })
+		);
 	} catch (error) {
-		await logger.error('Failed to set primary image', error as Error, {
-			entryId,
-			imageId,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.error(
+			'Failed to set primary image',
+			error as Error,
+			buildLogContext(user, artistEmail, event.route.id, { entryId, imageId })
+		);
 		return message(formValidationResult, 'Error setting primary image');
 	}
 
@@ -445,25 +468,23 @@ const imageDeleteAction = async (event: RequestEvent) => {
 	}
 
 	const { user } = await event.locals.V1safeGetSession();
+	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 	const { imageId, entryId } = formValidationResult.data;
 
 	try {
 		const result = await deleteImage(imageId, entryId);
 
 		// Log successful image deletion
-		await logger.info('Image deleted successfully', {
-			imageId,
-			entryId,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.info(
+			'Image deleted successfully',
+			buildLogContext(user, artistEmail, event.route.id, { imageId, entryId })
+		);
 	} catch (error) {
-		await logger.error('Failed to delete image', error as Error, {
-			imageId,
-			entryId,
-			userEmail: user.email,
-			routeId: event.route.id
-		});
+		await logger.error(
+			'Failed to delete image',
+			error as Error,
+			buildLogContext(user, artistEmail, event.route.id, { imageId, entryId })
+		);
 		return message(formValidationResult, error instanceof Error ? error.message : 'Error deleting image');
 	}
 

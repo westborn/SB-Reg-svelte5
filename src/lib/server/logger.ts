@@ -3,12 +3,41 @@ import { prisma } from '$lib/components/server/prisma';
 /**
  * Context object for structured logging.
  * Contains optional user and route information plus custom key-value pairs.
+ *
+ * Note: userId and routeId are extracted to dedicated database columns.
+ * All other fields (including userEmail, adminAction, etc.) remain in the JSON context field.
+ *
+ * Admin tracking fields (added when user.isSuperAdmin is true):
+ * - adminAction: boolean - Marks this as an admin-performed action
+ * - adminEmail: string - The admin's actual email
+ * - targetArtistEmail: string - The artist being acted upon (from proxyEmail)
  */
 export type LogContext = {
 	userId?: string;
+	userEmail?: string;
 	routeId?: string;
+	adminAction?: boolean;
+	adminEmail?: string;
+	targetArtistEmail?: string;
 	[key: string]: any;
 };
+
+/**
+ * Serializes an Error object into a JSON string for database storage.
+ * Captures the error name, message, and stack trace.
+ *
+ * @param error - Error object to serialize
+ * @returns JSON string containing error details, or null if no error provided
+ */
+function serializeError(error?: Error): string | null {
+	if (!error) return null;
+
+	return JSON.stringify({
+		name: error.name,
+		message: error.message,
+		stack: error.stack
+	});
+}
 
 /**
  * Core logging function that persists logs to the database.
@@ -32,13 +61,7 @@ async function log(level: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR', message: string, 
 				context: context ? (context as any) : null,
 				userId: context?.userId,
 				routeId: context?.routeId,
-				error: error
-					? JSON.stringify({
-							name: error.name,
-							message: error.message,
-							stack: error.stack
-						})
-					: null
+				error: serializeError(error)
 			}
 		});
 	} catch (logError) {
