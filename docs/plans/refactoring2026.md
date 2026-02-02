@@ -8,7 +8,7 @@ This refactoring plan systematizes the SB-Reg-svelte5 codebase by eliminating in
 
 - Steps 1-3 completed: Server helpers, transactions, error handling standardization
 
-**Phase 2: Database & Server Layer** ✅ COMPLETE (Feb 1, 2026)
+**Phase 2: Database & Server Layer** ✅ COMPLETE (Feb 2, 2026)
 
 - Steps 4-7 completed: Database helper functions, refactored server actions, removed redundant null checks, converted raw SQL to Prisma API
 
@@ -41,7 +41,10 @@ This refactoring plan systematizes the SB-Reg-svelte5 codebase by eliminating in
 
 - Steps 29-31 completed: Created database logging schema with logTable and LogLevel enum, created centralized logger utility with JSDoc, added comprehensive error and info logging to all server actions
 
-**Phase 10**: Not started
+**Phase 10: UI & Design System** ⚠️ PARTIALLY COMPLETE (Feb 2, 2026)
+
+- Step 32 partially completed: Created UI_CONSTANTS in constants.ts, updated entry-card.svelte to use constants
+- Not completed: Several components still use hardcoded image dimensions (catalogue-card.svelte: 128x128, image-slot.svelte: 200x200, tableImage.svelte: 460/512 widths)
 
 ---
 
@@ -85,11 +88,18 @@ This SvelteKit 5 application demonstrates solid architectural patterns with cont
 - ✅ Step 2: Added transaction handling to critical operations in entry and confirm page server files
 - ✅ Step 3: Removed all console.log and console.error statements from server files (66+ instances removed)
 
-### Phase 2: Database & Server Layer (High Priority)
+### Phase 2: Database & Server Layer (High Priority) ✅ **COMPLETED - Feb 2, 2026**
 
 **Steps 4-7**: Consolidate database operations, remove redundant code
 **Estimated Time**: 6-8 hours
 **Review Required**: Optional
+
+**Completion Summary:**
+
+- ✅ Step 4: Created database helper functions (updateArtist, updateEntry, updateRegistration) in registrationDB.ts
+- ✅ Step 5: Refactored server actions to use helper functions
+- ✅ Step 6: Removed redundant null checks and added explicit return types
+- ✅ Step 7: Refactored getExhibits() from raw SQL to Prisma API with type-safe queries
 
 ### Phase 3: Form & Component Standardization (Medium Priority)
 
@@ -205,11 +215,25 @@ This SvelteKit 5 application demonstrates solid architectural patterns with cont
   - All logging includes: userId/userEmail, routeId, relevant entity IDs, error objects
   - Replaced all remaining console.error calls with structured logger.error calls
 
-### Phase 10: UI & Design System (Low Priority)
+### Phase 10: UI & Design System (Low Priority) ⚠️ **PARTIALLY COMPLETED - Feb 2, 2026**
 
 **Step 32**: Design tokens and UI constants
 **Estimated Time**: 2-3 hours
 **Review Required**: No
+
+**Completion Summary:**
+
+- ✅ Step 32: Created UI_CONSTANTS in constants.ts with IMAGE_DIMENSIONS, BUTTON_HEIGHTS, and GRID_LAYOUTS
+- ✅ Updated entry-card.svelte to use UI_CONSTANTS.IMAGE_DIMENSIONS.THUMBNAIL
+
+**Not Completed:**
+
+- catalogue-card.svelte still uses hardcoded width={128} height={128} (non-standard size)
+- image-slot.svelte still uses hardcoded width={200} height={200} (non-standard size)
+- tableImage.svelte still uses hardcoded width={512} and width={460} (non-standard sizes)
+- Button height constants (h-8, h-10, h-12) defined but not used in components
+- Grid layout constants (TWO_COL, THREE_COL) defined but not found in use
+- Need to either: add non-standard sizes to UI_CONSTANTS, or document why components require specific dimensions
 
 ---
 
@@ -393,7 +417,7 @@ await prisma.$transaction([
 
 ### Phase 2: Database & Server Layer
 
-#### Step 4: Create Database Helper Functions & Consolidate Operations 🟡
+#### Step 4: Create Database Helper Functions & Consolidate Operations 🟡 ✅ COMPLETE
 
 **File**: `src/lib/components/server/registrationDB.ts`
 **Purpose**: Move database operations out of route handlers
@@ -431,7 +455,7 @@ export const updateRegistration = async (registrationId: number, data: Partial<R
 
 ---
 
-#### Step 5: Refactor Server Actions to Use Helpers 🟡
+#### Step 5: Refactor Server Actions to Use Helpers 🟡 ✅ COMPLETE
 
 **Files**: `src/routes/(app)/register/artist/+page.server.ts`, `entry/+page.server.ts`, `confirm/+page.server.ts`
 **Purpose**: Use new database and validation helpers
@@ -475,7 +499,7 @@ Apply similar pattern to:
 
 ---
 
-#### Step 6: Remove Redundant Null Checks & Add Return Types 🟡
+#### Step 6: Remove Redundant Null Checks & Add Return Types 🟡 ✅ COMPLETE
 
 **Files**: All server action files
 **Purpose**: Simplify code, improve type safety
@@ -512,7 +536,7 @@ const artistCreate = async (
 
 ---
 
-#### Step 7: Refactor Raw SQL Query to Prisma API 🟡
+#### Step 7: Refactor Raw SQL Query to Prisma API 🟡 ✅ COMPLETE
 
 **File**: `src/lib/components/server/registrationDB.ts`
 **Purpose**: Type-safe query replacing `$queryRaw`
@@ -877,7 +901,7 @@ removeWorkingImage(imageId: number) {
 
 ### Phase 5: Code Cleanup & Constants
 
-#### Step 16: Remove Empty Load Functions & Dead Code 🟡
+#### Step 16: Remove Empty Load Functions & Dead Code 🟡 ✅ COMPLETE
 
 **Files**: Multiple `+page.server.ts` files
 **Purpose**: Clean up unnecessary code
@@ -894,7 +918,7 @@ Remove load functions that only contain commented code or return nothing:
 
 ---
 
-#### Step 17: Consolidate HEIC Detection 🔴
+#### Step 17: Consolidate HEIC Detection 🔴 ✅ COMPLETE
 
 **File**: `src/lib/components/server/cloudinary.ts`
 **Purpose**: Single source of truth for HEIC handling
@@ -920,7 +944,7 @@ Remove any client-side HEIC detection if it exists.
 
 ---
 
-#### Step 18: Standardize Form ID Generation 🟢
+#### Step 18: Standardize Form ID Generation 🟢 ✅ COMPLETE
 
 **Purpose**: Document and standardize form ID patterns
 **Severity**: Low - Documentation
@@ -939,7 +963,7 @@ Ensure all forms follow this pattern consistently.
 
 ---
 
-#### Step 19: Extract UI Constants 🟢
+#### Step 19: Extract UI Constants 🟢 ✅ COMPLETE
 
 **File**: `src/lib/constants.ts`
 **Purpose**: Design token system
@@ -975,7 +999,7 @@ Update components to use these constants where hardcoded values exist.
 
 ---
 
-#### Step 20: Standardize Admin Error Responses 🟢
+#### Step 20: Standardize Admin Error Responses 🟢 ✅ COMPLETE
 
 **Files**: `src/routes/(app)/admin/accept/+page.server.ts`, `src/routes/(app)/admin/list/+page.server.ts`
 **Purpose**: Consistent error format with main app
@@ -1102,7 +1126,7 @@ Replace inline email HTML with template function calls.
 
 ### Phase 8: Documentation
 
-#### Step 25: Add JSDoc Comments to Helper Functions 🟢
+#### Step 25: Add JSDoc Comments to Helper Functions 🟢 ✅ COMPLETE
 
 **Files**: All utility and helper modules
 **Purpose**: Inline documentation
@@ -1141,7 +1165,7 @@ export async function getArtistEmail(user: User): Promise<string> {
 
 ---
 
-#### Step 26: Update Copilot Instructions - Form Patterns 🟢
+#### Step 26: Update Copilot Instructions - Form Patterns 🟢 ✅ COMPLETE
 
 **File**: `.github/copilot-instructions.md`
 **Purpose**: Document form ID and dataType patterns
@@ -1161,7 +1185,7 @@ Add sections:
 
 ---
 
-#### Step 27: Create Migration Guide 🟢
+#### Step 27: Create Migration Guide 🟢 ✅ COMPLETE
 
 **File**: `docs/guides/refactoring-migration-guide.md`
 **Purpose**: Document pattern changes for developers
@@ -1182,7 +1206,7 @@ Create guide covering:
 
 ---
 
-#### Step 28: Update Constants Documentation 🟢
+#### Step 28: Update Constants Documentation 🟢 ✅ COMPLETE
 
 **File**: `.github/copilot-instructions.md`
 **Purpose**: Document all constants and their usage
@@ -1205,7 +1229,7 @@ Document:
 
 ### Phase 9: Logging Infrastructure
 
-#### Step 29: Create Database Logging Schema 🟢
+#### Step 29: Create Database Logging Schema 🟢 ✅ COMPLETE
 
 **File**: `prisma/schema.prisma`
 **Purpose**: Database-backed logging
@@ -1247,7 +1271,7 @@ Run migration after adding schema.
 
 ---
 
-#### Step 30: Create Centralized Logging Utility 🟢
+#### Step 30: Create Centralized Logging Utility 🟢 ✅ COMPLETE
 
 **File**: `src/lib/server/logger.ts`
 **Purpose**: Structured database logging
@@ -1307,7 +1331,7 @@ export const logger = {
 
 ---
 
-#### Step 31: Add Logging to Server Actions 🟢
+#### Step 31: Add Logging to Server Actions 🟢 ✅ COMPLETE
 
 **Files**: All server actions
 **Purpose**: Consistent error logging with database persistence
@@ -1345,7 +1369,7 @@ await logger.info('Registration completed', {
 
 ### Phase 10: UI & Design System
 
-#### Step 32: Implement UI Constants Across Components 🟢
+#### Step 32: Implement UI Constants Across Components 🟢 ⚠️ PARTIALLY COMPLETE
 
 **Files**: Multiple component files
 **Purpose**: Replace hardcoded values with UI_CONSTANTS
