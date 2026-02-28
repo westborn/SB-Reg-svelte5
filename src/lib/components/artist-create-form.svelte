@@ -15,14 +15,16 @@
 	let myState = getRegisterState();
 
 	let form = superForm(myState.artistForm, {
-		id: `artistCreateForm`,
+		id: 'artistCreateForm',
 		validators: zod4Client(artistSchemaUI),
 		onResult({ result }: { result: any }) {
 			if (result.type != 'success') {
 				toast.error('Failed to Register the Artist');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success('Artist is now Registered');
 			myState.artistCreateDialogOpen = false;
 			return;

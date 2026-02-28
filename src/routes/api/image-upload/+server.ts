@@ -4,6 +4,7 @@ import { uploadImageToCloudinary } from '$lib/components/server/cloudinary';
 import { createImage } from '$lib/components/server/registrationDB';
 import { getSubmission } from '$lib/components/server/registrationDB';
 import type { CurrentImage, User } from '$lib/components/server/registrationDB';
+import { CLOUDINARY_PRESET_UNATTACHED } from '$lib/constants';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
@@ -28,7 +29,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		// Upload to Cloudinary
-		const uploadResult = await uploadImageToCloudinary(file, 'UnAttachedImages');
+		const uploadResult = await uploadImageToCloudinary(file, CLOUDINARY_PRESET_UNATTACHED);
 		if (!uploadResult.success) {
 			console.error('Error uploading image to Cloudinary:', uploadResult);
 			throw error(500, 'Failed to upload image to Cloudinary');

@@ -9,7 +9,15 @@ import type {
 	fileUploadSchema
 } from '$lib/zod-schemas';
 import type { CurrentEntry, CurrentImage, Submission } from '$lib/components/server/registrationDB';
-import { MAX_IMAGES_UI_LIMIT, DEFAULT_PRIMARY_IMAGE_INDEX } from '$lib/constants';
+import { MAX_IMAGES_UI_LIMIT, DEFAULT_PRIMARY_IMAGE_INDEX, BASE_REGISTRATION_COST } from '$lib/constants';
+import { calculateRegistrationCost } from '$lib/utils';
+import {
+	getImagesWithPrimary as getImagesWithPrimaryUtil,
+	validatePrimaryImage,
+	getDefaultPrimaryImage,
+	canRemoveImage as canRemoveImageUtil,
+	getNewPrimaryAfterRemoval
+} from '$lib/utils/primary-image';
 
 type RegisterInitial = {
 	artistForm: SuperValidated<Infer<typeof artistSchemaUI>>;
@@ -28,6 +36,9 @@ export class RegisterState {
 	registrationCompleted = $derived((this.submission?.registrations?.[0]?.closed ?? false) ? true : false);
 	entriesExist = $derived((this.submission?.registrations?.[0]?.entries?.length ?? 0 > 0) ? true : false);
 	currentEntries = $derived(this.submission?.registrations?.[0]?.entries ?? []);
+	costOfRegistration = $derived(
+		this.currentEntries.length > 0 ? calculateRegistrationCost(this.currentEntries.length) : BASE_REGISTRATION_COST
+	);
 	artistCreateDialogOpen = $state(false);
 	artistUpdateDialogOpen = $state(false);
 	confirmDialogOpen = $state(false);
@@ -54,6 +65,11 @@ export class RegisterState {
 	}
 
 	// Multiple Images Helper Functions
+	/**
+	 * Adds an image to the working images array.
+	 * Automatically sets as primary if it's the first image.
+	 * @throws Error if MAX_IMAGES_UI_LIMIT exceeded
+	 */
 	addWorkingImage(image: CurrentImage) {
 		if (!image) {
 			throw new Error('Image is required');
@@ -71,9 +87,16 @@ export class RegisterState {
 		}
 	}
 
+	/**
+	 * Removes an image from working images.
+	 * Automatically reassigns primary if removing current primary.
+	 * @throws Error if attempting to remove last image
+	 */
 	removeWorkingImage(imageId: number) {
-		if (this.workingImages.length <= 1) {
-			throw new Error('Cannot remove the last remaining image');
+		// Validate removal using utility
+		const { canRemove, reason } = canRemoveImageUtil(imageId, this.workingImages, this.primaryImageId);
+		if (!canRemove) {
+			throw new Error(reason || 'Cannot remove image');
 		}
 
 		const imageIndex = this.workingImages.findIndex((img) => img?.id === imageId);
@@ -81,28 +104,27 @@ export class RegisterState {
 			throw new Error('Image not found');
 		}
 
-		// If removing the primary image, set a new primary
-		if (this.primaryImageId === imageId) {
-			const remainingImages = this.workingImages.filter((img) => img?.id !== imageId);
-			this.primaryImageId = remainingImages.length > 0 && remainingImages[0]?.id ? remainingImages[0].id : null;
-		}
+		// Use utility to determine new primary
+		this.primaryImageId = getNewPrimaryAfterRemoval(imageId, this.workingImages, this.primaryImageId);
 
 		this.workingImages = this.workingImages.filter((img) => img?.id !== imageId);
 	}
 
+	/**
+	 * Sets the specified image as the primary image.
+	 * @throws Error if image not found in working images
+	 */
 	setPrimaryImage(imageId: number) {
-		const image = this.workingImages.find((img) => img?.id === imageId);
-		if (!image) {
+		// Use utility to validate image exists
+		if (!validatePrimaryImage(imageId, this.workingImages)) {
 			throw new Error('Image not found in working images');
 		}
 		this.primaryImageId = imageId;
 	}
 
 	getImagesWithPrimary() {
-		const imagesWithPrimary = this.workingImages.map((image) => ({
-			...image,
-			isPrimary: image?.id === this.primaryImageId
-		}));
+		// Use utility to map images with primary flag
+		const imagesWithPrimary = getImagesWithPrimaryUtil(this.workingImages, this.primaryImageId);
 
 		return {
 			images: imagesWithPrimary,
@@ -121,9 +143,9 @@ export class RegisterState {
 			// Set primary image from entry's primary image relationship
 			if (entry.primaryImage?.imageId) {
 				this.primaryImageId = entry.primaryImage.imageId;
-			} else if (entry.images.length > 0) {
-				// Fallback to first image if no primary is set
-				this.primaryImageId = entry.images[0]?.id || null;
+			} else {
+				// Use utility to get default primary image
+				this.primaryImageId = getDefaultPrimaryImage(entry.images);
 			}
 		} else {
 			this.clearWorkingImages();

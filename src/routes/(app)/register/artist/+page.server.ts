@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 import type { RequestEvent } from './$types';
 
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -8,12 +8,8 @@ import { prisma } from '$lib/components/server/prisma';
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
 
 import { artistSchemaUI } from '$lib/zod-schemas';
-import { getSubmission, type User } from '$lib/components/server/registrationDB';
-
-export const load: PageServerLoad = async (event) => {
-	//console.log(`${event.route.id} - LOAD - START`);
-	return;
-};
+import { getSubmission, updateArtist, type User } from '$lib/components/server/registrationDB';
+import { logger } from '$lib/server/logger';
 
 const artistUpdate = async (event: RequestEvent) => {
 	const formValidationResult = await superValidate(event, zod4(artistSchemaUI));
@@ -27,17 +23,41 @@ const artistUpdate = async (event: RequestEvent) => {
 	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
 
 	try {
-		const result = await prisma.artistTable.update({
+		// Find the artist by email to get their ID
+		const artist = await prisma.artistTable.findUnique({
 			where: { email: artistEmail },
-			data: formValidationResult.data
+			select: { id: true }
 		});
 
-		if (!result) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
+		if (!artist) {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
+
+		await updateArtist(artist.id, formValidationResult.data);
+
+		// Log successful update
+		await logger.info('Artist updated successfully', {
+			userId: user.id,
+			userEmail: artistEmail,
+			artistId: artist.id,
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
+		});
 	} catch (error) {
-		console.error(`${event.route.id}`, error);
+		await logger.error('Artist update failed', error as Error, {
+			userId: user.id,
+			userEmail: artistEmail,
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
+		});
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
@@ -48,7 +68,6 @@ const artistUpdate = async (event: RequestEvent) => {
 };
 
 const artistCreate = async (event: RequestEvent) => {
-	//console.log(`${event.route.id} - artistCreate - START`);
 	const formValidationResult = await superValidate(event, zod4(artistSchemaUI));
 	if (!formValidationResult.valid) {
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
@@ -62,13 +81,31 @@ const artistCreate = async (event: RequestEvent) => {
 	const newArtist = { ...formValidationResult.data, email: artistEmail };
 
 	try {
-		const result = await prisma.artistTable.create({ data: newArtist });
-		if (!result) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
+		const createdArtist = await prisma.artistTable.create({ data: newArtist });
+
+		// Log successful creation
+		await logger.info('Artist created successfully', {
+			userId: user.id,
+			userEmail: artistEmail,
+			artistId: createdArtist.id,
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
+		});
 	} catch (error) {
-		console.error(`${event.route.id} - `, error);
+		await logger.error('Artist creation failed', error as Error, {
+			userId: user.id,
+			userEmail: artistEmail,
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
+		});
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
 

@@ -33,13 +33,11 @@ export const actions = {
 		});
 
 		if (error) {
-			console.log('verify-email:', error);
 			setError(form, 'token', error.message);
 			return fail(400, {
 				form
 			});
 		}
-		// console.log('verify-email:', data);
 		redirect(302, '/');
 	}
 };

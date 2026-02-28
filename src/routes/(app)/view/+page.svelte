@@ -13,7 +13,7 @@
 
 	let myState = getRegisterState();
 
-	let costOfRegistration = $derived(myState.currentEntries ? 20 + myState.currentEntries.length * 20 : 20);
+	let costOfRegistration = $derived(myState.costOfRegistration);
 	let numberOfEntries = $derived(
 		myState.currentEntries
 			? myState.currentEntries.length + (myState.currentEntries.length === 1 ? ' entry' : ' entries')

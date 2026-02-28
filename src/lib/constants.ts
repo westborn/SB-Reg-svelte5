@@ -66,3 +66,28 @@ export const STEPS = [
 ];
 import { PUBLIC_REGISTRATIONS_OPEN } from '$env/static/public';
 export const REGISTRATIONS_OPEN = PUBLIC_REGISTRATIONS_OPEN === 'YES' ? true : false;
+
+// Step 8: Extracted constants for Phase 3 refactoring
+export const DIMENSION_SEPARATOR = 'x';
+export const ADMIN_DOMAIN = 'sculpturebermagui.org.au';
+export const BASE_REGISTRATION_COST = 20; // dollars
+export const PER_ENTRY_COST = 20; // dollars
+export const CLOUDINARY_PRESET_UNATTACHED = 'UnAttachedImages';
+export const CLOUDINARY_PRESET_ENTRY = 'EntryImages';
+
+// Step 19: UI Constants for Phase 5 refactoring
+export const UI_CONSTANTS = {
+	IMAGE_DIMENSIONS: {
+		THUMBNAIL: { width: 160, height: 160 },
+		CARD: { width: 320, height: 320 }
+	},
+	BUTTON_HEIGHTS: {
+		SMALL: 'h-8',
+		MEDIUM: 'h-10',
+		LARGE: 'h-12'
+	},
+	GRID_LAYOUTS: {
+		TWO_COL: 'grid-cols-1 md:grid-cols-2',
+		THREE_COL: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+	}
+} as const;

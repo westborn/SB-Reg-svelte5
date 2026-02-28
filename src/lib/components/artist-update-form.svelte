@@ -2,8 +2,6 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 
-	import { untrack } from 'svelte';
-
 	import { toast } from 'svelte-sonner';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
@@ -24,32 +22,42 @@
 				toast.error('Failed to Update the Registration');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success(' Registration Updated');
 			myState.artistUpdateDialogOpen = false;
 			return;
 		}
 	});
-	const { form: formData, enhance, errors, message, delayed } = form;
+	const { form: formData, enhance, errors, message, delayed, reset } = form;
 
-	// grab the form field values from the submission object
+	// Track when dialog transitions from closed to open to trigger form reset
+	let wasDialogOpen = $state(false);
+
 	$effect(() => {
-		const firstName = untrack(() => myState?.submission?.firstName ?? '');
-		const lastName = untrack(() => myState?.submission?.lastName ?? '');
-		const phone = untrack(() => myState?.submission?.phone ?? '');
-		const postcode = untrack(() => myState?.submission?.postcode ?? '');
-		const firstNations = untrack(() => myState?.submission?.firstNations ?? 'Declined');
-		const bankAccountName = untrack(() => myState?.submission?.bankAccountName ?? '');
-		const bankBSB = untrack(() => myState?.submission?.bankBSB ?? '');
-		const bankAccount = untrack(() => myState?.submission?.bankAccount ?? '');
-		$formData.firstName = firstName;
-		$formData.lastName = lastName;
-		$formData.phone = phone;
-		$formData.postcode = postcode;
-		$formData.firstNations = firstNations;
-		$formData.bankAccountName = bankAccountName;
-		$formData.bankBSB = bankBSB;
-		$formData.bankAccount = bankAccount;
+		// Detect dialog opening transition
+		const isDialogOpen = myState.artistUpdateDialogOpen;
+		const submission = myState.submission;
+
+		if (isDialogOpen && !wasDialogOpen && submission) {
+			// Dialog just opened - reset form with fresh artist data
+			reset({
+				data: {
+					firstName: submission.firstName,
+					lastName: submission.lastName,
+					phone: submission.phone,
+					postcode: submission.postcode,
+					firstNations: submission.firstNations,
+					bankAccountName: submission.bankAccountName ?? '',
+					bankBSB: submission.bankBSB ?? '',
+					bankAccount: submission.bankAccount ?? ''
+				}
+			});
+		}
+
+		// Update tracked state for next iteration
+		wasDialogOpen = isDialogOpen;
 	});
 </script>
 

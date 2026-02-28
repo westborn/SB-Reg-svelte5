@@ -5,6 +5,7 @@ import { Client, Environment } from 'square/legacy';
 import { randomUUID } from 'crypto';
 import { SECRET_SQUARE_ACCESS_TOKEN } from '$env/static/private';
 import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
+import { logger } from '$lib/server/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (BigInt.prototype as any).toJSON = function () {
@@ -32,18 +33,25 @@ export async function POST({ request }) {
 			referenceId: reference_id,
 			statementDescriptionIdentifier: 'Sculpture Fee'
 		});
-		console.log('Result from createPayment: ', { result });
+		await logger.warn('Payment created successfully', {
+			routeId: '/api/payment',
+			userEmail: email,
+			amount,
+			referenceId: reference_id,
+			paymentDetails: result.payment
+		});
 		return json(result);
 	} catch (err) {
-		// TODO - log more concise payment errors
-		// if (err instanceof ApiError) {
-		// 	console.log('yep, apierror:')
-		// 	console.log(err.errors[0].detail)
-		// }
-		console.log('error after POST to api/payment');
-		console.log(`err is: ${err}`);
 		const errorObj = err as any;
-		console.log(errorObj.status, JSON.stringify(errorObj?.result, null, 4));
+		await logger.error('Payment creation failed', err as Error, {
+			routeId: '/api/payment',
+			userEmail: email,
+			amount,
+			referenceId: reference_id,
+			errorStatus: errorObj.status,
+			errorResult: errorObj.result,
+			errorDetails: errorObj.errors
+		});
 		const data = JSON.stringify(errorObj.errors, null, 4);
 		const myOptions = { status: 400, statusText: 'It was NOT good!' };
 		const myResponse = new Response(data, myOptions);

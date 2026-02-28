@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from '../entry/$types';
+import type { Actions } from '../entry/$types';
 import type { RequestEvent } from '../entry/$types';
 
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -7,12 +7,8 @@ import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
 import { confirmSchemaUI } from '$lib/zod-schemas';
-import { getSubmission, type User } from '$lib/components/server/registrationDB';
-
-export const load: PageServerLoad = async (event) => {
-	//console.log(`${event.route.id} - LOAD - START`);
-	return;
-};
+import { getSubmission, updateArtist, updateRegistration, type User } from '$lib/components/server/registrationDB';
+import { logger } from '$lib/server/logger';
 
 const confirmUpdate = async (event: RequestEvent) => {
 	const formValidationResult = await superValidate(event, zod4(confirmSchemaUI));
@@ -29,42 +25,58 @@ const confirmUpdate = async (event: RequestEvent) => {
 	try {
 		const submissionFromDB = await getSubmission(user as User);
 		if (!submissionFromDB) {
-			console.error(`${event.route.id} - Getting DB Submission${GENERIC_ERROR_MESSAGE}`);
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 		idToUpdate = submissionFromDB.registrations[0].id;
 		const { bumpIn, bumpOut, crane, displayRequirements, bankAccountName, bankBSB, bankAccount } =
 			formValidationResult.data;
 
-		const updatedRegistration = await prisma.registrationTable.update({
-			where: { id: idToUpdate },
-			data: {
+		// Wrap both updates in transaction to ensure atomicity
+		await prisma.$transaction(async (tx) => {
+			await updateRegistration(idToUpdate, {
 				bumpIn: bumpIn ?? null,
 				bumpOut: bumpOut ?? null,
 				crane: crane === 'Yes' ? true : false,
 				displayRequirements: displayRequirements ?? null
-			}
-		});
-		if (!updatedRegistration) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
+			});
 
-		const updatedArtist = await prisma.artistTable.update({
-			where: { email: artistEmail },
-			data: {
-				bankAccountName: bankAccountName ?? '',
-				bankBSB: bankBSB ?? '',
-				bankAccount: bankAccount ?? ''
+			const artist = await prisma.artistTable.findUnique({
+				where: { email: artistEmail },
+				select: { id: true }
+			});
+
+			if (artist) {
+				await updateArtist(artist.id, {
+					bankAccountName: bankAccountName ?? '',
+					bankBSB: bankBSB ?? '',
+					bankAccount: bankAccount ?? ''
+				});
 			}
 		});
-		if (!updatedArtist) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
-		}
-		// console.log('Confirm updated successfully', updatedRegistration, updatedArtist);
+
+		// Log successful confirmation
+		await logger.info('Registration confirmed and updated', {
+			userId: user.id,
+			userEmail: artistEmail,
+			registrationId: idToUpdate,
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
+		});
 	} catch (error) {
-		console.error(`${event.route.id}`, error);
+		await logger.error('Registration confirmation failed', error as Error, {
+			userId: user.id,
+			userEmail: artistEmail,
+			routeId: event.route.id,
+			...(user.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email,
+				targetArtistEmail: user.proxyEmail
+			})
+		});
 		return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 	}
 
