@@ -64,6 +64,8 @@
 	let selectedRange = $state(initialFilter.rangePreset);
 	let startDate = $state(initialFilter.startDate);
 	let endDate = $state(initialFilter.endDate);
+	let isPreviewSubmitting = $state(false);
+	let isUpdateSubmitting = $state(false);
 
 	function getMidnight(date: Date): Date {
 		const d = new Date(date);
@@ -77,6 +79,16 @@
 		const month = pad(date.getMonth() + 1);
 		const day = pad(date.getDate());
 		return `${year}-${month}-${day}`;
+	}
+
+	function getDefaultCustomRange() {
+		const today = getMidnight(new Date());
+		const start = new Date(today);
+		start.setDate(start.getDate() - 7);
+		return {
+			startDate: toDateInputString(start),
+			endDate: toDateInputString(today)
+		};
 	}
 
 	function formatDisplayDate(date: Date): string {
@@ -160,6 +172,29 @@
 		selectedEntryIds = [];
 	}
 
+	function handlePreviewSubmit() {
+		isPreviewSubmitting = true;
+	}
+
+	function handleUpdateSubmit(event: SubmitEvent) {
+		if (selectedEntryIds.length === 0) {
+			event.preventDefault();
+			return;
+		}
+
+		const label = selectedEntryIds.length === 1 ? 'entry' : 'entries';
+		const confirmed = window.confirm(
+			`Set sold = true for ${selectedEntryIds.length} selected ${label}? This action is not reversible on this screen.`
+		);
+
+		if (!confirmed) {
+			event.preventDefault();
+			return;
+		}
+
+		isUpdateSubmitting = true;
+	}
+
 	$effect(() => {
 		if (!form?.submittedFilter) return;
 		selectedRange = form.submittedFilter.rangePreset;
@@ -170,8 +205,9 @@
 	$effect(() => {
 		if (selectedRange !== 'custom') return;
 		if (startDate && endDate) return;
-		startDate = '2025-03-07';
-		endDate = '2025-03-08';
+		const defaults = getDefaultCustomRange();
+		startDate = defaults.startDate;
+		endDate = defaults.endDate;
 	});
 
 	$effect(() => {
@@ -191,7 +227,7 @@
 <div class="container mx-auto max-w-5xl space-y-6 px-4 py-8">
 	<div>
 		<h1 class="text-3xl font-bold">Admin Sales Update</h1>
-		<p class="mt-2 text-muted-foreground">Phase 5: select matched rows and update entry sold status (`sold = true`).</p>
+		<p class="mt-2 text-muted-foreground">Phase 6: review matches, confirm updates, and mark sold entries safely.</p>
 	</div>
 
 	<Card.Root>
@@ -200,7 +236,7 @@
 			<Card.Description>Select a quick range or custom date range.</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			<form method="POST" action="?/preview" class="space-y-6">
+			<form method="POST" action="?/preview" class="space-y-6" onsubmit={handlePreviewSubmit}>
 				<div class="space-y-3">
 					<Label>Quick range</Label>
 					<RadioGroup.Root name="rangePreset" bind:value={selectedRange} class="grid gap-3 md:grid-cols-4">
@@ -249,12 +285,24 @@
 				{/if}
 
 				<div class="flex items-center gap-3">
-					<Button type="submit">Preview Sales Orders</Button>
-					<p class="text-sm text-muted-foreground">Read-only fetch from Square (no DB updates).</p>
+					<Button type="submit" disabled={isPreviewSubmitting}>
+						{isPreviewSubmitting ? 'Loading Preview…' : 'Preview Sales Orders'}
+					</Button>
+					<p class="text-sm text-muted-foreground">Fetch and classify Square rows (no DB updates in this step).</p>
 				</div>
 			</form>
 		</Card.Content>
 	</Card.Root>
+
+	{#if !form?.preview && !form?.error}
+		<Card.Root>
+			<Card.Content class="pt-6">
+				<p class="text-sm text-muted-foreground">
+					Choose a date range, then preview Square order rows to see matched, unmatched, and excluded results.
+				</p>
+			</Card.Content>
+		</Card.Root>
+	{/if}
 
 	{#if form?.error}
 		<Card.Root>
@@ -353,6 +401,10 @@
 					</div>
 				</div>
 
+				{#if rawOrderRows.length === 0}
+					<p class="pt-2 text-sm text-muted-foreground">No order rows were returned for this date range.</p>
+				{/if}
+
 				{#if rawOrderRows.length > 0}
 					<p class="pt-2 text-sm font-semibold">All Order Rows</p>
 					<div class="overflow-x-auto pt-2">
@@ -429,18 +481,26 @@
 						</Table.Root>
 					</div>
 
-					<form method="POST" action="?/updateSold" class="mt-3 space-y-2">
+					<form method="POST" action="?/updateSold" class="mt-3 space-y-2" onsubmit={handleUpdateSubmit}>
 						<input type="hidden" name="rangePreset" value={form.preview.request.rangePreset} />
 						<input type="hidden" name="startDate" value={form.preview.request.startDate} />
 						<input type="hidden" name="endDate" value={form.preview.request.endDate} />
 						<input type="hidden" name="selectedEntryIds" value={selectedEntryIds.join(',')} />
 						<div class="flex items-center gap-3">
-							<Button type="submit" disabled={selectedEntryIds.length === 0}
-								>Update sold status for selected rows</Button
+							<Button type="submit" disabled={selectedEntryIds.length === 0 || isUpdateSubmitting}
+								>{isUpdateSubmitting ? 'Updating Sold Status…' : 'Update sold status for selected rows'}</Button
 							>
-							<p class="text-xs text-muted-foreground">Server revalidates eligible matches before writing.</p>
+							<p class="text-xs text-muted-foreground">
+								Server revalidates eligible matches before writing. You will be asked to confirm before submit.
+							</p>
 						</div>
 					</form>
+				{/if}
+
+				{#if form.preview.sections.summary.totalLineItems > 0 && matchedRows.length === 0}
+					<p class="pt-4 text-sm text-muted-foreground">
+						No rows are currently eligible for sold updates in this result set.
+					</p>
 				{/if}
 
 				{#if canceledRows.length > 0}

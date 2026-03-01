@@ -15,6 +15,25 @@ type FilterPayload = {
 	endDate: string;
 };
 
+function toDateInputString(date: Date): string {
+	const pad = (n: number) => String(n).padStart(2, '0');
+	return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function getDefaultFilter(): FilterPayload {
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	const start = new Date(today);
+	start.setDate(start.getDate() - 7);
+
+	return {
+		rangePreset: '7',
+		startDate: toDateInputString(start),
+		endDate: toDateInputString(today)
+	};
+}
+
 type ParsedSku = {
 	exhibitNumber: string;
 	artistName: string;
@@ -100,11 +119,7 @@ type SoldUpdateResult = {
 	failedEntries: Array<{ entryId: number; reason: string }>;
 };
 
-const DEFAULT_FILTER: FilterPayload = {
-	rangePreset: '7',
-	startDate: '2025-03-07',
-	endDate: '2025-03-08'
-};
+const DEFAULT_FILTER: FilterPayload = getDefaultFilter();
 
 function isRangePreset(value: string): value is RangePreset {
 	return value === '2' || value === '7' || value === '10' || value === 'custom';
@@ -127,8 +142,7 @@ function buildPlaceholderPreview(filter: FilterPayload): PreviewPayload {
 	return {
 		phase: 1,
 		status: 'placeholder',
-		message:
-			'Phase 1 skeleton only: no Square API fetch or database updates are performed. Phase 2 will connect date filters to order retrieval.',
+		message: 'Preview unavailable. Check filter values and retry.',
 		request: {
 			type: requestType,
 			rangePreset: filter.rangePreset,
@@ -435,7 +449,7 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 
 export const load = async () => {
 	return {
-		phase: 5,
+		phase: 6,
 		filterDefaults: DEFAULT_FILTER,
 		contract: {
 			fetchByQuickRange: {

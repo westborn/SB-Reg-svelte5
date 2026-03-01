@@ -298,17 +298,19 @@ Anything else is classified as `unmatched`, `ambiguous`, `invalidSku`, `ignoredN
 
 ---
 
-## Phase 6 — UX polish + admin navigation
+## Phase 6 — UX polish + admin navigation ✅
 
 **Objective:** Make the workflow operationally smooth.
 
-### Tasks
+### Implemented
 
-- Add Sales entry to admin menu (**pending**)
-- Improve empty states, loading states, and confirmation messaging
-- Ensure clear visual treatment for each outcome bucket
+- Added Sales entry to admin menu
+- Added loading/submit feedback for preview and sold update actions
+- Added empty-state guidance before/after preview where applicable
+- Added confirmation prompt before sold update submission
+- Kept explicit visual treatment for excluded/diagnostic buckets (canceled, invalid, unmatched, etc.)
 
-### Manual checkpoint (expected output)
+### Current outcome
 
 - Sales page is discoverable from admin menu
 - End-to-end flow works: choose range → review results → update sold flags
@@ -328,8 +330,8 @@ Anything else is classified as `unmatched`, `ambiguous`, `invalidSku`, `ignoredN
 - [x] Sold update action sets `sold = true` only
 - [x] Re-running updates is idempotent
 - [x] Errors are user-visible and key operations are logged with context
-- [ ] Admin menu includes Sales link
-- [ ] Update flow has a user confirmation dialog
+- [x] Admin menu includes Sales link
+- [x] Update flow has a user confirmation dialog
 
 ---
 
@@ -356,4 +358,4 @@ Anything else is classified as `unmatched`, `ambiguous`, `invalidSku`, `ignoredN
 - Admin can filter and retrieve Square orders by date range
 - SKU-driven matching and `Not Art` ignore behavior works as defined
 - Admin can mark selected matched entries as sold
-- Manual verification checklist completed successfully (remaining UX/nav items pending)
+- Manual verification checklist completed successfully
