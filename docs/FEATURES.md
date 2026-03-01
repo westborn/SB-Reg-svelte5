@@ -17,7 +17,7 @@
 | 013 | addSoldIndicator - Phase 3 | Public display updates: Update catalogue and entry cards with sold indicators and filtering                                 | ✅   |
 | 014 | salesUpdate - Plan         | Write a plan to implement admin sales sold-sync workflow, details in @docs/plans/sales.md                                   | ✅   |
 | 015 | salesUpdate - Phase 1      | Route contract and skeleton for /admin/sales (no DB writes)                                                                 | ✅   |
-| 016 | salesUpdate - Phase 2      | Square read integration with date range filters and logging                                                                 |      |
+| 016 | salesUpdate - Phase 2      | Square read integration with date range filters and logging                                                                 | ✅   |
 | 017 | salesUpdate - Phase 3      | SKU parsing and classification (including ignoring SKU "Not Art")                                                           |      |
 | 018 | salesUpdate - Phase 4      | Entry matching preview using SKU fields: exhibitNumber + artistName + entryId                                               |      |
 | 019 | salesUpdate - Phase 5      | Controlled sold updates: set selected matched entries to sold=true                                                          |      |

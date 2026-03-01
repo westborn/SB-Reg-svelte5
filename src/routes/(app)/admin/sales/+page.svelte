@@ -1,10 +1,23 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
+	import * as Table from '$lib/components/ui/table';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { untrack } from 'svelte';
+
+	type SalesOrderRow = {
+		location: string;
+		state: string;
+		createdDateTime: string | Date;
+		orderAmountCents: number;
+		orderLine: number;
+		item: string;
+		sku: string;
+		quantity: number;
+		baseAmountCents: number;
+	};
 
 	let { data, form } = $props();
 	const initialFilter = untrack(() => form?.submittedFilter ?? data.filterDefaults);
@@ -40,6 +53,17 @@
 		});
 	}
 
+	function formatFromISO(value: string | Date): string {
+		const date = typeof value === 'string' ? new Date(value) : value;
+		if (Number.isNaN(date.getTime())) return '-';
+		return formatDisplayDate(date);
+	}
+
+	function formatDollars(cents: number): string {
+		if (!Number.isFinite(cents)) return '$0.00';
+		return `$${(cents / 100).toFixed(2)}`;
+	}
+
 	const quickRange = $derived.by(() => {
 		if (selectedRange === 'custom') {
 			return null;
@@ -57,6 +81,8 @@
 			endLocal: toDateTimeLocalString(todayMidnight)
 		};
 	});
+
+	const rawOrderRows = $derived((form?.preview?.sections?.rawOrders ?? []) as SalesOrderRow[]);
 
 	$effect(() => {
 		if (!form?.submittedFilter) return;
@@ -76,9 +102,7 @@
 <div class="container mx-auto max-w-5xl space-y-6 px-4 py-8">
 	<div>
 		<h1 class="text-3xl font-bold">Admin Sales Update</h1>
-		<p class="mt-2 text-muted-foreground">
-			Phase 1 skeleton: define filter contract and show read-only placeholder output.
-		</p>
+		<p class="mt-2 text-muted-foreground">Phase 2: fetch Square orders by date range and show read-only order rows.</p>
 	</div>
 
 	<Card.Root>
@@ -143,7 +167,7 @@
 
 				<div class="flex items-center gap-3">
 					<Button type="submit">Preview Sales Orders</Button>
-					<p class="text-sm text-muted-foreground">No Square call in Phase 1.</p>
+					<p class="text-sm text-muted-foreground">Read-only fetch from Square (no DB updates).</p>
 				</div>
 			</form>
 		</Card.Content>
@@ -160,7 +184,7 @@
 	{#if form?.preview}
 		<Card.Root>
 			<Card.Header>
-				<Card.Title>Preview Response (Phase 1 Placeholder)</Card.Title>
+				<Card.Title>Preview Response</Card.Title>
 				<Card.Description>{form.preview.message}</Card.Description>
 			</Card.Header>
 			<Card.Content class="space-y-3">
@@ -178,6 +202,64 @@
 						{form.preview.request.startDate} → {form.preview.request.endDate}
 					</p>
 				{/if}
+				<p class="text-sm">
+					<span class="font-semibold">Status:</span>
+					{form.preview.status}
+				</p>
+				<div class="grid gap-3 pt-2 md:grid-cols-2 lg:grid-cols-4">
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Orders</p>
+						<p class="text-xl font-semibold">{form.preview.sections.summary.totalOrders}</p>
+					</div>
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Line Items</p>
+						<p class="text-xl font-semibold">{form.preview.sections.summary.totalLineItems}</p>
+					</div>
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Matched (Phase 3)</p>
+						<p class="text-xl font-semibold">{form.preview.sections.summary.matched}</p>
+					</div>
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Ignored Not Art (Phase 3)</p>
+						<p class="text-xl font-semibold">{form.preview.sections.summary.ignoredNotArt}</p>
+					</div>
+				</div>
+
+				{#if rawOrderRows.length > 0}
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head class="whitespace-nowrap">Created</Table.Head>
+									<Table.Head>Location</Table.Head>
+									<Table.Head>State</Table.Head>
+									<Table.Head>Line</Table.Head>
+									<Table.Head>Item</Table.Head>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Qty</Table.Head>
+									<Table.Head class="text-right">Line Amount</Table.Head>
+									<Table.Head class="text-right">Order Amount</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each rawOrderRows as row}
+									<Table.Row>
+										<Table.Cell class="whitespace-nowrap">{formatFromISO(row.createdDateTime)}</Table.Cell>
+										<Table.Cell>{row.location}</Table.Cell>
+										<Table.Cell>{row.state}</Table.Cell>
+										<Table.Cell>{row.orderLine}</Table.Cell>
+										<Table.Cell>{row.item}</Table.Cell>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.quantity}</Table.Cell>
+										<Table.Cell class="text-right">{formatDollars(row.baseAmountCents)}</Table.Cell>
+										<Table.Cell class="text-right">{formatDollars(row.orderAmountCents)}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
 				<p class="text-sm text-muted-foreground">Generated at: {form.preview.generatedAt}</p>
 			</Card.Content>
 		</Card.Root>
