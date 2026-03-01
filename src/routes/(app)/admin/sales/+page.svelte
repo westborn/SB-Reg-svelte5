@@ -125,6 +125,40 @@
 	const alreadySoldRows = $derived(((form as any)?.preview?.sections?.alreadySoldRows ?? []) as MatchedRow[]);
 	const unmatchedRows = $derived(((form as any)?.preview?.sections?.unmatchedRows ?? []) as UnmatchedRow[]);
 	const ambiguousRows = $derived(((form as any)?.preview?.sections?.ambiguousRows ?? []) as AmbiguousRow[]);
+	const updateResult = $derived(
+		((form as any)?.updateResult ?? null) as {
+			requested: number;
+			updated: number;
+			alreadySold: number;
+			notEligible: number;
+			failed: number;
+			failedEntries: Array<{ entryId: number; reason: string }>;
+		} | null
+	);
+
+	let selectedEntryIds = $state<number[]>([]);
+
+	function toggleSelectedEntry(entryId: number, checked: boolean) {
+		if (checked) {
+			if (!selectedEntryIds.includes(entryId)) {
+				selectedEntryIds = [...selectedEntryIds, entryId];
+			}
+			return;
+		}
+		selectedEntryIds = selectedEntryIds.filter((id) => id !== entryId);
+	}
+
+	function isEntrySelected(entryId: number): boolean {
+		return selectedEntryIds.includes(entryId);
+	}
+
+	function selectAllMatchedRows() {
+		selectedEntryIds = [...new Set(matchedRows.map((row) => row.matchedEntry.entryId))];
+	}
+
+	function clearSelectedRows() {
+		selectedEntryIds = [];
+	}
 
 	$effect(() => {
 		if (!form?.submittedFilter) return;
@@ -139,14 +173,25 @@
 		startDate = '2025-03-07T00:00';
 		endDate = '2025-03-08T00:00';
 	});
+
+	$effect(() => {
+		if (!form?.preview) return;
+		const validMatchedEntryIds = new Set(matchedRows.map((row) => row.matchedEntry.entryId));
+		const filteredSelection = selectedEntryIds.filter((entryId) => validMatchedEntryIds.has(entryId));
+		const unchanged =
+			filteredSelection.length === selectedEntryIds.length &&
+			filteredSelection.every((entryId, index) => entryId === selectedEntryIds[index]);
+
+		if (!unchanged) {
+			selectedEntryIds = filteredSelection;
+		}
+	});
 </script>
 
 <div class="container mx-auto max-w-5xl space-y-6 px-4 py-8">
 	<div>
 		<h1 class="text-3xl font-bold">Admin Sales Update</h1>
-		<p class="mt-2 text-muted-foreground">
-			Phase 4: match parsed SKU rows against entries using exhibitNumber, artist name, and entry id.
-		</p>
+		<p class="mt-2 text-muted-foreground">Phase 5: select matched rows and update entry sold status (`sold = true`).</p>
 	</div>
 
 	<Card.Root>
@@ -221,6 +266,31 @@
 		<Card.Root>
 			<Card.Content class="pt-6">
 				<p class="text-sm font-medium text-red-600">{form.error}</p>
+			</Card.Content>
+		</Card.Root>
+	{/if}
+
+	{#if updateResult}
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Sold Update Result</Card.Title>
+			</Card.Header>
+			<Card.Content class="space-y-2 text-sm">
+				<p><span class="font-semibold">Requested:</span> {updateResult.requested}</p>
+				<p><span class="font-semibold">Updated:</span> {updateResult.updated}</p>
+				<p><span class="font-semibold">Already sold:</span> {updateResult.alreadySold}</p>
+				<p><span class="font-semibold">Not eligible:</span> {updateResult.notEligible}</p>
+				<p><span class="font-semibold">Failed:</span> {updateResult.failed}</p>
+				{#if updateResult.failedEntries.length > 0}
+					<div class="pt-2">
+						<p class="font-semibold text-red-600">Failed entries</p>
+						<ul class="list-inside list-disc text-red-600">
+							{#each updateResult.failedEntries as failed}
+								<li>Entry {failed.entryId}: {failed.reason}</li>
+							{/each}
+						</ul>
+					</div>
+				{/if}
 			</Card.Content>
 		</Card.Root>
 	{/if}
@@ -323,10 +393,16 @@
 
 				{#if matchedRows.length > 0}
 					<p class="pt-4 text-sm font-semibold">Matched Rows (Ready for sold update in Phase 5)</p>
+					<div class="flex items-center gap-2 pt-1">
+						<Button type="button" variant="outline" size="sm" onclick={selectAllMatchedRows}>Select all</Button>
+						<Button type="button" variant="outline" size="sm" onclick={clearSelectedRows}>Clear selection</Button>
+						<span class="text-xs text-muted-foreground">{selectedEntryIds.length} selected</span>
+					</div>
 					<div class="overflow-x-auto pt-2">
 						<Table.Root>
 							<Table.Header>
 								<Table.Row>
+									<Table.Head>Select</Table.Head>
 									<Table.Head>SKU</Table.Head>
 									<Table.Head>Entry Id</Table.Head>
 									<Table.Head>Exhibit Number</Table.Head>
@@ -337,6 +413,13 @@
 							<Table.Body>
 								{#each matchedRows as row}
 									<Table.Row>
+										<Table.Cell>
+											<input
+												type="checkbox"
+												checked={isEntrySelected(row.matchedEntry.entryId)}
+												onchange={(e) => toggleSelectedEntry(row.matchedEntry.entryId, e.currentTarget.checked)}
+											/>
+										</Table.Cell>
 										<Table.Cell>{row.sku}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.exhibitNumber}</Table.Cell>
@@ -347,6 +430,19 @@
 							</Table.Body>
 						</Table.Root>
 					</div>
+
+					<form method="POST" action="?/updateSold" class="mt-3 space-y-2">
+						<input type="hidden" name="rangePreset" value={form.preview.request.rangePreset} />
+						<input type="hidden" name="startDate" value={form.preview.request.startDate} />
+						<input type="hidden" name="endDate" value={form.preview.request.endDate} />
+						<input type="hidden" name="selectedEntryIds" value={selectedEntryIds.join(',')} />
+						<div class="flex items-center gap-3">
+							<Button type="submit" disabled={selectedEntryIds.length === 0}
+								>Update sold status for selected rows</Button
+							>
+							<p class="text-xs text-muted-foreground">Server revalidates eligible matches before writing.</p>
+						</div>
+					</form>
 				{/if}
 
 				{#if alreadySoldRows.length > 0}

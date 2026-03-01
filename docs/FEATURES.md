@@ -20,5 +20,5 @@
 | 016 | salesUpdate - Phase 2      | Square read integration with date range filters and logging                                                                 | ✅   |
 | 017 | salesUpdate - Phase 3      | SKU parsing and classification (including ignoring SKU "Not Art")                                                           | ✅   |
 | 018 | salesUpdate - Phase 4      | Entry matching preview using SKU fields: exhibitNumber + artistName + entryId                                               | ✅   |
-| 019 | salesUpdate - Phase 5      | Controlled sold updates: set selected matched entries to sold=true                                                          |      |
+| 019 | salesUpdate - Phase 5      | Controlled sold updates: set selected matched entries to sold=true                                                          | ✅   |
 | 020 | salesUpdate - Phase 6      | UX polish and admin navigation integration                                                                                  |      |

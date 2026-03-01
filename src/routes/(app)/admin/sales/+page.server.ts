@@ -4,7 +4,7 @@ import { SECRET_SQUARE_ACCESS_TOKEN } from '$env/static/private';
 import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 import SquareOrderChecker, { type OrderSummaryRow } from '$lib/server/squareOrderChecker';
 import { logger } from '$lib/server/logger';
-import { getExhibits, type Exhibit } from '$lib/components/server/registrationDB';
+import { getExhibits, updateEntry, type Exhibit } from '$lib/components/server/registrationDB';
 
 const SALES_TEST_EXHIBITION_YEAR = '2025';
 
@@ -54,7 +54,7 @@ type AmbiguousRow = ClassifiedOrderRow & {
 };
 
 type PreviewPayload = {
-	phase: 1 | 2 | 3 | 4;
+	phase: 1 | 2 | 3 | 4 | 5;
 	status: 'placeholder' | 'live';
 	message: string;
 	request: {
@@ -84,6 +84,15 @@ type PreviewPayload = {
 		ambiguousRows: AmbiguousRow[];
 	};
 	generatedAt: string;
+};
+
+type SoldUpdateResult = {
+	requested: number;
+	updated: number;
+	alreadySold: number;
+	notEligible: number;
+	failed: number;
+	failedEntries: Array<{ entryId: number; reason: string }>;
 };
 
 const DEFAULT_FILTER: FilterPayload = {
@@ -310,6 +319,18 @@ function parseDateInput(value: string): Date | null {
 	return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function parseSelectedEntryIds(formData: FormData): number[] {
+	const raw = String(formData.get('selectedEntryIds') ?? '').trim();
+	if (!raw) return [];
+
+	const parsed = raw
+		.split(',')
+		.map((part) => Number.parseInt(part.trim(), 10))
+		.filter((value) => Number.isFinite(value) && value > 0);
+
+	return [...new Set(parsed)];
+}
+
 function buildLoggerContext(
 	event: RequestEvent,
 	user: Awaited<ReturnType<RequestEvent['locals']['V1safeGetSession']>>['user']
@@ -369,7 +390,7 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 
 export const load = async () => {
 	return {
-		phase: 4,
+		phase: 5,
 		filterDefaults: DEFAULT_FILTER,
 		contract: {
 			fetchByQuickRange: {
@@ -512,6 +533,168 @@ export const actions: Actions = {
 		return {
 			submittedFilter: filter,
 			preview
+		};
+	},
+
+	updateSold: async (event: RequestEvent) => {
+		const { request } = event;
+		const formData = await request.formData();
+		const filter = getFilterPayload(formData);
+		const selectedEntryIds = parseSelectedEntryIds(formData);
+		const { user } = await event.locals.V1safeGetSession();
+		const logContext = buildLoggerContext(event, user);
+
+		if (selectedEntryIds.length === 0) {
+			return fail(400, {
+				error: 'Select at least one matched row before updating sold status.',
+				submittedFilter: filter,
+				preview: buildPlaceholderPreview(filter)
+			});
+		}
+
+		if (filter.rangePreset === 'custom' && (!filter.startDate || !filter.endDate)) {
+			return fail(400, {
+				error: 'Start and end date/time are required when using a custom range.',
+				submittedFilter: filter,
+				preview: buildPlaceholderPreview(filter)
+			});
+		}
+
+		if (!filter.startDate || !filter.endDate) {
+			return fail(400, {
+				error: 'A start and end date/time are required to fetch Square orders.',
+				submittedFilter: filter,
+				preview: buildPlaceholderPreview(filter)
+			});
+		}
+
+		const start = parseDateInput(filter.startDate);
+		const end = parseDateInput(filter.endDate);
+
+		if (!start || !end) {
+			return fail(400, {
+				error: 'Invalid date format provided. Please choose valid date/time values.',
+				submittedFilter: filter,
+				preview: buildPlaceholderPreview(filter)
+			});
+		}
+
+		if (start > end) {
+			return fail(400, {
+				error: 'Start date/time must be before or equal to end date/time.',
+				submittedFilter: filter,
+				preview: buildPlaceholderPreview(filter)
+			});
+		}
+
+		await logger.info('Sales sold update started', {
+			...logContext,
+			requestedEntryCount: selectedEntryIds.length,
+			rangePreset: filter.rangePreset,
+			startDate: filter.startDate,
+			endDate: filter.endDate
+		});
+
+		const checker = new SquareOrderChecker(SECRET_SQUARE_ACCESS_TOKEN, PUBLIC_SQUARE_ENVIRONMENT);
+		const [squareError, rows] = await checker.getOrderSummaryByDateRange(start, end);
+
+		if (squareError || !rows) {
+			const status = squareError?.status ?? 502;
+			const message = squareError?.message ?? 'Failed to fetch Square orders for selected range.';
+
+			await logger.error('Sales sold update failed during Square fetch', new Error(message), {
+				...logContext,
+				rangePreset: filter.rangePreset,
+				startDate: filter.startDate,
+				endDate: filter.endDate,
+				squareStatus: status
+			});
+
+			return fail(status, {
+				error: message,
+				submittedFilter: filter,
+				preview: buildPlaceholderPreview(filter)
+			});
+		}
+
+		let previewBeforeUpdate: PreviewPayload;
+		try {
+			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: SALES_TEST_EXHIBITION_YEAR });
+			previewBeforeUpdate = buildLivePreview(filter, rows, exhibits);
+		} catch (error) {
+			await logger.error('Sales sold update failed while loading exhibits', error as Error, {
+				...logContext,
+				entryYear: SALES_TEST_EXHIBITION_YEAR
+			});
+
+			return fail(500, {
+				error: 'Failed to load exhibit data for sold update. Please try again.',
+				submittedFilter: filter,
+				preview: buildPlaceholderPreview(filter)
+			});
+		}
+
+		const eligibleIds = new Set(previewBeforeUpdate.sections.matchedRows.map((row) => row.matchedEntry.entryId));
+		const alreadySoldIds = new Set(previewBeforeUpdate.sections.alreadySoldRows.map((row) => row.matchedEntry.entryId));
+
+		const result: SoldUpdateResult = {
+			requested: selectedEntryIds.length,
+			updated: 0,
+			alreadySold: 0,
+			notEligible: 0,
+			failed: 0,
+			failedEntries: []
+		};
+
+		for (const entryId of selectedEntryIds) {
+			if (alreadySoldIds.has(entryId)) {
+				result.alreadySold += 1;
+				continue;
+			}
+
+			if (!eligibleIds.has(entryId)) {
+				result.notEligible += 1;
+				continue;
+			}
+
+			try {
+				await updateEntry(entryId, { sold: true });
+				result.updated += 1;
+			} catch (error) {
+				result.failed += 1;
+				result.failedEntries.push({
+					entryId,
+					reason: error instanceof Error ? error.message : 'Unknown error'
+				});
+			}
+		}
+
+		let previewAfterUpdate = previewBeforeUpdate;
+		if (result.updated > 0) {
+			try {
+				const refreshedExhibits = await getExhibits({ rows: 999, offset: 0, entryYear: SALES_TEST_EXHIBITION_YEAR });
+				previewAfterUpdate = buildLivePreview(filter, rows, refreshedExhibits);
+			} catch {
+				// keep pre-update preview if refresh fails
+			}
+		}
+
+		await logger.info('Sales sold update completed', {
+			...logContext,
+			rangePreset: filter.rangePreset,
+			startDate: filter.startDate,
+			endDate: filter.endDate,
+			requested: result.requested,
+			updated: result.updated,
+			alreadySold: result.alreadySold,
+			notEligible: result.notEligible,
+			failed: result.failed
+		});
+
+		return {
+			submittedFilter: filter,
+			preview: previewAfterUpdate,
+			updateResult: result
 		};
 	}
 };
