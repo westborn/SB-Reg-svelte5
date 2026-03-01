@@ -31,6 +31,29 @@
 		reason: string;
 	};
 
+	type MatchCandidate = {
+		entryId: number;
+		exhibitNumber: string;
+		artistName: string;
+		title: string;
+		sold: boolean;
+	};
+
+	type MatchedRow = ParsedSkuRow & {
+		matchedEntry: MatchCandidate;
+		matchStatus: 'matched' | 'alreadySold';
+	};
+
+	type UnmatchedRow = ParsedSkuRow & {
+		reason: string;
+		candidates: MatchCandidate[];
+	};
+
+	type AmbiguousRow = ParsedSkuRow & {
+		reason: string;
+		candidates: MatchCandidate[];
+	};
+
 	let { data, form } = $props();
 	const initialFilter = untrack(() => form?.submittedFilter ?? data.filterDefaults);
 
@@ -98,6 +121,10 @@
 	const parsedValidRows = $derived((form?.preview?.sections?.parsedValid ?? []) as ParsedSkuRow[]);
 	const invalidSkuRows = $derived((form?.preview?.sections?.invalidSkuRows ?? []) as InvalidSkuRow[]);
 	const ignoredNotArtRows = $derived((form?.preview?.sections?.ignoredNotArtRows ?? []) as SalesOrderRow[]);
+	const matchedRows = $derived(((form as any)?.preview?.sections?.matchedRows ?? []) as MatchedRow[]);
+	const alreadySoldRows = $derived(((form as any)?.preview?.sections?.alreadySoldRows ?? []) as MatchedRow[]);
+	const unmatchedRows = $derived(((form as any)?.preview?.sections?.unmatchedRows ?? []) as UnmatchedRow[]);
+	const ambiguousRows = $derived(((form as any)?.preview?.sections?.ambiguousRows ?? []) as AmbiguousRow[]);
 
 	$effect(() => {
 		if (!form?.submittedFilter) return;
@@ -118,7 +145,7 @@
 	<div>
 		<h1 class="text-3xl font-bold">Admin Sales Update</h1>
 		<p class="mt-2 text-muted-foreground">
-			Phase 3: parse SKU values and classify rows as valid, invalid, or ignored (`Not Art`).
+			Phase 4: match parsed SKU rows against entries using exhibitNumber, artist name, and entry id.
 		</p>
 	</div>
 
@@ -233,8 +260,20 @@
 						<p class="text-xl font-semibold">{form.preview.sections.summary.totalLineItems}</p>
 					</div>
 					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Parsed Valid SKUs</p>
+						<p class="text-xs text-muted-foreground">Matched</p>
 						<p class="text-xl font-semibold">{form.preview.sections.summary.matched}</p>
+					</div>
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Already Sold</p>
+						<p class="text-xl font-semibold">{alreadySoldRows.length}</p>
+					</div>
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Unmatched</p>
+						<p class="text-xl font-semibold">{form.preview.sections.summary.unmatched}</p>
+					</div>
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Ambiguous</p>
+						<p class="text-xl font-semibold">{form.preview.sections.summary.ambiguous}</p>
 					</div>
 					<div class="rounded border p-3">
 						<p class="text-xs text-muted-foreground">Ignored Not Art</p>
@@ -275,6 +314,106 @@
 										<Table.Cell>{row.quantity}</Table.Cell>
 										<Table.Cell class="text-right">{formatDollars(row.baseAmountCents)}</Table.Cell>
 										<Table.Cell class="text-right">{formatDollars(row.orderAmountCents)}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
+				{#if matchedRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Matched Rows (Ready for sold update in Phase 5)</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Entry Id</Table.Head>
+									<Table.Head>Exhibit Number</Table.Head>
+									<Table.Head>Artist</Table.Head>
+									<Table.Head>Title</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each matchedRows as row}
+									<Table.Row>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.exhibitNumber}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
+				{#if alreadySoldRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Already Sold Rows (Excluded)</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Entry Id</Table.Head>
+									<Table.Head>Title</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each alreadySoldRows as row}
+									<Table.Row>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
+				{#if unmatchedRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Unmatched Rows</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Reason</Table.Head>
+									<Table.Head>Candidates</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each unmatchedRows as row}
+									<Table.Row>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.reason}</Table.Cell>
+										<Table.Cell>{row.candidates.length}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
+				{#if ambiguousRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Ambiguous Rows</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Reason</Table.Head>
+									<Table.Head>Candidates</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each ambiguousRows as row}
+									<Table.Row>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.reason}</Table.Cell>
+										<Table.Cell>{row.candidates.length}</Table.Cell>
 									</Table.Row>
 								{/each}
 							</Table.Body>
