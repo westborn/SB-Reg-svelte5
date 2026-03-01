@@ -71,24 +71,19 @@
 		return d;
 	}
 
-	function toDateTimeLocalString(date: Date): string {
+	function toDateInputString(date: Date): string {
 		const pad = (n: number) => String(n).padStart(2, '0');
 		const year = date.getFullYear();
 		const month = pad(date.getMonth() + 1);
 		const day = pad(date.getDate());
-		const hours = pad(date.getHours());
-		const minutes = pad(date.getMinutes());
-		return `${year}-${month}-${day}T${hours}:${minutes}`;
+		return `${year}-${month}-${day}`;
 	}
 
 	function formatDisplayDate(date: Date): string {
-		return date.toLocaleString('en-AU', {
+		return date.toLocaleDateString('en-AU', {
 			year: 'numeric',
 			month: 'short',
-			day: '2-digit',
-			hour: '2-digit',
-			minute: '2-digit',
-			hour12: false
+			day: '2-digit'
 		});
 	}
 
@@ -116,8 +111,8 @@
 		return {
 			start,
 			end: todayMidnight,
-			startLocal: toDateTimeLocalString(start),
-			endLocal: toDateTimeLocalString(todayMidnight)
+			startDate: toDateInputString(start),
+			endDate: toDateInputString(todayMidnight)
 		};
 	});
 
@@ -175,8 +170,8 @@
 	$effect(() => {
 		if (selectedRange !== 'custom') return;
 		if (startDate && endDate) return;
-		startDate = '2025-03-07T00:00';
-		endDate = '2025-03-08T00:00';
+		startDate = '2025-03-07';
+		endDate = '2025-03-08';
 	});
 
 	$effect(() => {
@@ -240,23 +235,17 @@
 				{#if selectedRange === 'custom'}
 					<div class="grid gap-4 md:grid-cols-2">
 						<div class="space-y-2">
-							<Label for="startDate">Start date/time</Label>
-							<Input
-								id="startDate"
-								name="startDate"
-								type="datetime-local"
-								class="custom-date-input"
-								bind:value={startDate}
-							/>
+							<Label for="startDate">Start date</Label>
+							<Input id="startDate" name="startDate" type="date" class="custom-date-input" bind:value={startDate} />
 						</div>
 						<div class="space-y-2">
-							<Label for="endDate">End date/time</Label>
-							<Input id="endDate" name="endDate" type="datetime-local" class="custom-date-input" bind:value={endDate} />
+							<Label for="endDate">End date</Label>
+							<Input id="endDate" name="endDate" type="date" class="custom-date-input" bind:value={endDate} />
 						</div>
 					</div>
 				{:else}
-					<input type="hidden" name="startDate" value={quickRange?.startLocal ?? ''} />
-					<input type="hidden" name="endDate" value={quickRange?.endLocal ?? ''} />
+					<input type="hidden" name="startDate" value={quickRange?.startDate ?? ''} />
+					<input type="hidden" name="endDate" value={quickRange?.endDate ?? ''} />
 				{/if}
 
 				<div class="flex items-center gap-3">

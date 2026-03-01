@@ -102,8 +102,8 @@ type SoldUpdateResult = {
 
 const DEFAULT_FILTER: FilterPayload = {
 	rangePreset: '7',
-	startDate: '2025-03-07T00:00',
-	endDate: '2025-03-08T00:00'
+	startDate: '2025-03-07',
+	endDate: '2025-03-08'
 };
 
 function isRangePreset(value: string): value is RangePreset {
@@ -332,8 +332,26 @@ function classifyRows(rows: OrderSummaryRow[]) {
 
 function parseDateInput(value: string): Date | null {
 	if (!value) return null;
+
+	const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+	if (dateOnlyMatch) {
+		const [, year, month, day] = dateOnlyMatch;
+		const parsed = new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
+		return Number.isNaN(parsed.getTime()) ? null : parsed;
+	}
+
 	const parsed = new Date(value);
 	return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function toFullDaySearchRange(startDate: Date, endDate: Date): { start: Date; end: Date } {
+	const start = new Date(startDate);
+	start.setHours(0, 0, 0, 0);
+
+	const end = new Date(endDate);
+	end.setHours(23, 59, 59, 999);
+
+	return { start, end };
 }
 
 function getEntryYearForDate(startDate: Date): string {
@@ -446,7 +464,7 @@ export const actions: Actions = {
 				rangePreset: filter.rangePreset
 			});
 			return fail(400, {
-				error: 'Start and end date/time are required when using a custom range.',
+				error: 'Start and end dates are required when using a custom range.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
@@ -458,7 +476,7 @@ export const actions: Actions = {
 				rangePreset: filter.rangePreset
 			});
 			return fail(400, {
-				error: 'A start and end date/time are required to fetch Square orders.',
+				error: 'A start and end date are required to fetch Square orders.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
@@ -475,13 +493,15 @@ export const actions: Actions = {
 				rangePreset: filter.rangePreset
 			});
 			return fail(400, {
-				error: 'Invalid date format provided. Please choose valid date/time values.',
+				error: 'Invalid date format provided. Please choose valid date values.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
 		}
 
-		if (start > end) {
+		const searchRange = toFullDaySearchRange(start, end);
+
+		if (searchRange.start > searchRange.end) {
 			await logger.warn('Sales preview rejected: start date is after end date', {
 				...logContext,
 				startDate: filter.startDate,
@@ -489,7 +509,7 @@ export const actions: Actions = {
 				rangePreset: filter.rangePreset
 			});
 			return fail(400, {
-				error: 'Start date/time must be before or equal to end date/time.',
+				error: 'Start date must be before or equal to end date.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
@@ -503,7 +523,7 @@ export const actions: Actions = {
 		});
 
 		const checker = new SquareOrderChecker(SECRET_SQUARE_ACCESS_TOKEN, PUBLIC_SQUARE_ENVIRONMENT);
-		const [squareError, rows] = await checker.getOrderSummaryByDateRange(start, end);
+		const [squareError, rows] = await checker.getOrderSummaryByDateRange(searchRange.start, searchRange.end);
 
 		if (squareError || !rows) {
 			const status = squareError?.status ?? 502;
@@ -525,7 +545,7 @@ export const actions: Actions = {
 		}
 
 		let preview: PreviewPayload;
-		const entryYear = getEntryYearForDate(start);
+		const entryYear = getEntryYearForDate(searchRange.start);
 		try {
 			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
 			preview = buildLivePreview(filter, rows, exhibits);
@@ -583,7 +603,7 @@ export const actions: Actions = {
 
 		if (filter.rangePreset === 'custom' && (!filter.startDate || !filter.endDate)) {
 			return fail(400, {
-				error: 'Start and end date/time are required when using a custom range.',
+				error: 'Start and end dates are required when using a custom range.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
@@ -591,7 +611,7 @@ export const actions: Actions = {
 
 		if (!filter.startDate || !filter.endDate) {
 			return fail(400, {
-				error: 'A start and end date/time are required to fetch Square orders.',
+				error: 'A start and end date are required to fetch Square orders.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
@@ -602,15 +622,17 @@ export const actions: Actions = {
 
 		if (!start || !end) {
 			return fail(400, {
-				error: 'Invalid date format provided. Please choose valid date/time values.',
+				error: 'Invalid date format provided. Please choose valid date values.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
 		}
 
-		if (start > end) {
+		const searchRange = toFullDaySearchRange(start, end);
+
+		if (searchRange.start > searchRange.end) {
 			return fail(400, {
-				error: 'Start date/time must be before or equal to end date/time.',
+				error: 'Start date must be before or equal to end date.',
 				submittedFilter: filter,
 				preview: buildPlaceholderPreview(filter)
 			});
@@ -625,7 +647,7 @@ export const actions: Actions = {
 		});
 
 		const checker = new SquareOrderChecker(SECRET_SQUARE_ACCESS_TOKEN, PUBLIC_SQUARE_ENVIRONMENT);
-		const [squareError, rows] = await checker.getOrderSummaryByDateRange(start, end);
+		const [squareError, rows] = await checker.getOrderSummaryByDateRange(searchRange.start, searchRange.end);
 
 		if (squareError || !rows) {
 			const status = squareError?.status ?? 502;
@@ -647,7 +669,7 @@ export const actions: Actions = {
 		}
 
 		let previewBeforeUpdate: PreviewPayload;
-		const entryYear = getEntryYearForDate(start);
+		const entryYear = getEntryYearForDate(searchRange.start);
 		try {
 			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
 			previewBeforeUpdate = buildLivePreview(filter, rows, exhibits);
