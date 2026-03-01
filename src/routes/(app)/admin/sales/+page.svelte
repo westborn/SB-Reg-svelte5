@@ -54,6 +54,10 @@
 		candidates: MatchCandidate[];
 	};
 
+	type CanceledRow = ParsedSkuRow & {
+		reason: string;
+	};
+
 	let { data, form } = $props();
 	const initialFilter = untrack(() => form?.submittedFilter ?? data.filterDefaults);
 
@@ -125,6 +129,7 @@
 	const alreadySoldRows = $derived(((form as any)?.preview?.sections?.alreadySoldRows ?? []) as MatchedRow[]);
 	const unmatchedRows = $derived(((form as any)?.preview?.sections?.unmatchedRows ?? []) as UnmatchedRow[]);
 	const ambiguousRows = $derived(((form as any)?.preview?.sections?.ambiguousRows ?? []) as AmbiguousRow[]);
+	const canceledRows = $derived(((form as any)?.preview?.sections?.canceledRows ?? []) as CanceledRow[]);
 	const updateResult = $derived(
 		((form as any)?.updateResult ?? null) as {
 			requested: number;
@@ -333,6 +338,10 @@
 						<p class="text-xs text-muted-foreground">Matched</p>
 						<p class="text-xl font-semibold">{form.preview.sections.summary.matched}</p>
 					</div>
+					<div class="rounded border border-red-200 bg-red-50 p-3">
+						<p class="text-xs text-red-700">Canceled (Excluded)</p>
+						<p class="text-xl font-semibold text-red-700">{(form as any).preview.sections.summary.canceled ?? 0}</p>
+					</div>
 					<div class="rounded border p-3">
 						<p class="text-xs text-muted-foreground">Already Sold</p>
 						<p class="text-xl font-semibold">{alreadySoldRows.length}</p>
@@ -374,7 +383,7 @@
 							</Table.Header>
 							<Table.Body>
 								{#each rawOrderRows as row}
-									<Table.Row>
+									<Table.Row class={row.state === 'CANCELLED' ? 'bg-red-50 text-red-700' : ''}>
 										<Table.Cell class="whitespace-nowrap">{formatFromISO(row.createdDateTime)}</Table.Cell>
 										<Table.Cell>{row.location}</Table.Cell>
 										<Table.Cell>{row.state}</Table.Cell>
@@ -443,6 +452,32 @@
 							<p class="text-xs text-muted-foreground">Server revalidates eligible matches before writing.</p>
 						</div>
 					</form>
+				{/if}
+
+				{#if canceledRows.length > 0}
+					<p class="pt-4 text-sm font-semibold text-red-700">Canceled Rows (Excluded from updates)</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Entry Id</Table.Head>
+									<Table.Head>State</Table.Head>
+									<Table.Head>Reason</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each canceledRows as row}
+									<Table.Row class="bg-red-50 text-red-700">
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.parsedSku.entryId}</Table.Cell>
+										<Table.Cell>{row.state}</Table.Cell>
+										<Table.Cell>{row.reason}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
 				{/if}
 
 				{#if alreadySoldRows.length > 0}

@@ -5,8 +5,7 @@ import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 import SquareOrderChecker, { type OrderSummaryRow } from '$lib/server/squareOrderChecker';
 import { logger } from '$lib/server/logger';
 import { getExhibits, updateEntry, type Exhibit } from '$lib/components/server/registrationDB';
-
-const SALES_TEST_EXHIBITION_YEAR = '2025';
+import { EXHIBITION_YEAR } from '$lib/constants';
 
 type RangePreset = '2' | '7' | '10' | 'custom';
 
@@ -53,6 +52,10 @@ type AmbiguousRow = ClassifiedOrderRow & {
 	candidates: MatchCandidate[];
 };
 
+type CanceledRow = ClassifiedOrderRow & {
+	reason: string;
+};
+
 type PreviewPayload = {
 	phase: 1 | 2 | 3 | 4 | 5;
 	status: 'placeholder' | 'live';
@@ -68,6 +71,7 @@ type PreviewPayload = {
 			totalOrders: number;
 			totalLineItems: number;
 			matched: number;
+			canceled: number;
 			unmatched: number;
 			ambiguous: number;
 			invalidSku: number;
@@ -82,6 +86,7 @@ type PreviewPayload = {
 		alreadySoldRows: MatchedRow[];
 		unmatchedRows: UnmatchedRow[];
 		ambiguousRows: AmbiguousRow[];
+		canceledRows: CanceledRow[];
 	};
 	generatedAt: string;
 };
@@ -135,6 +140,7 @@ function buildPlaceholderPreview(filter: FilterPayload): PreviewPayload {
 				totalOrders: 0,
 				totalLineItems: 0,
 				matched: 0,
+				canceled: 0,
 				unmatched: 0,
 				ambiguous: 0,
 				invalidSku: 0,
@@ -148,7 +154,8 @@ function buildPlaceholderPreview(filter: FilterPayload): PreviewPayload {
 			matchedRows: [],
 			alreadySoldRows: [],
 			unmatchedRows: [],
-			ambiguousRows: []
+			ambiguousRows: [],
+			canceledRows: []
 		},
 		generatedAt: new Date().toISOString()
 	};
@@ -173,8 +180,17 @@ function matchParsedRows(parsedValid: ClassifiedOrderRow[], exhibits: Exhibit[])
 	const alreadySoldRows: MatchedRow[] = [];
 	const unmatchedRows: UnmatchedRow[] = [];
 	const ambiguousRows: AmbiguousRow[] = [];
+	const canceledRows: CanceledRow[] = [];
 
 	for (const row of parsedValid) {
+		if (row.state === 'CANCELED') {
+			canceledRows.push({
+				...row,
+				reason: 'Order state is CANCELED. Excluded from sold updates.'
+			});
+			continue;
+		}
+
 		const candidatesByEntry = exhibits.filter((exhibit) => exhibit.entryId === row.parsedSku.entryId);
 
 		if (candidatesByEntry.length === 0) {
@@ -251,7 +267,8 @@ function matchParsedRows(parsedValid: ClassifiedOrderRow[], exhibits: Exhibit[])
 		matchedRows,
 		alreadySoldRows,
 		unmatchedRows,
-		ambiguousRows
+		ambiguousRows,
+		canceledRows
 	};
 }
 
@@ -319,6 +336,11 @@ function parseDateInput(value: string): Date | null {
 	return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function getEntryYearForDate(startDate: Date): string {
+	const startYear = String(startDate.getFullYear());
+	return startYear === EXHIBITION_YEAR ? EXHIBITION_YEAR : startYear;
+}
+
 function parseSelectedEntryIds(formData: FormData): number[] {
 	const raw = String(formData.get('selectedEntryIds') ?? '').trim();
 	if (!raw) return [];
@@ -349,7 +371,10 @@ function buildLoggerContext(
 
 function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibits: Exhibit[]): PreviewPayload {
 	const { parsedValid, invalidSkuRows, ignoredNotArtRows } = classifyRows(rows);
-	const { matchedRows, alreadySoldRows, unmatchedRows, ambiguousRows } = matchParsedRows(parsedValid, exhibits);
+	const { matchedRows, alreadySoldRows, unmatchedRows, ambiguousRows, canceledRows } = matchParsedRows(
+		parsedValid,
+		exhibits
+	);
 	const totalLineItems = rows.length;
 	const totalOrders = rows.filter((row) => row.orderAmountCents > 0).length;
 	const requestType = filter.rangePreset === 'custom' ? 'custom-range' : 'quick-range';
@@ -357,7 +382,7 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 	return {
 		phase: 4,
 		status: 'live',
-		message: `Retrieved ${totalLineItems} line items. Matched ${matchedRows.length}, already sold ${alreadySoldRows.length}, unmatched ${unmatchedRows.length}, ambiguous ${ambiguousRows.length}, invalid SKU ${invalidSkuRows.length}, ignored Not Art ${ignoredNotArtRows.length}.`,
+		message: `Retrieved ${totalLineItems} line items. Matched ${matchedRows.length}, canceled ${canceledRows.length}, already sold ${alreadySoldRows.length}, unmatched ${unmatchedRows.length}, ambiguous ${ambiguousRows.length}, invalid SKU ${invalidSkuRows.length}, ignored Not Art ${ignoredNotArtRows.length}.`,
 		request: {
 			type: requestType,
 			rangePreset: filter.rangePreset,
@@ -369,6 +394,7 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 				totalOrders,
 				totalLineItems,
 				matched: matchedRows.length,
+				canceled: canceledRows.length,
 				unmatched: unmatchedRows.length,
 				ambiguous: ambiguousRows.length,
 				invalidSku: invalidSkuRows.length,
@@ -382,7 +408,8 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 			matchedRows,
 			alreadySoldRows,
 			unmatchedRows,
-			ambiguousRows
+			ambiguousRows,
+			canceledRows
 		},
 		generatedAt: new Date().toISOString()
 	};
@@ -498,8 +525,9 @@ export const actions: Actions = {
 		}
 
 		let preview: PreviewPayload;
+		const entryYear = getEntryYearForDate(start);
 		try {
-			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: SALES_TEST_EXHIBITION_YEAR });
+			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
 			preview = buildLivePreview(filter, rows, exhibits);
 		} catch (error) {
 			await logger.error('Sales preview matching failed while loading exhibits', error as Error, {
@@ -507,7 +535,7 @@ export const actions: Actions = {
 				rangePreset: filter.rangePreset,
 				startDate: filter.startDate,
 				endDate: filter.endDate,
-				entryYear: SALES_TEST_EXHIBITION_YEAR
+				entryYear
 			});
 
 			return fail(500, {
@@ -522,6 +550,7 @@ export const actions: Actions = {
 			rangePreset: filter.rangePreset,
 			startDate: filter.startDate,
 			endDate: filter.endDate,
+			entryYear,
 			totalOrders: preview.sections.summary.totalOrders,
 			totalLineItems: preview.sections.summary.totalLineItems,
 			matchedRows: preview.sections.matchedRows.length,
@@ -618,13 +647,14 @@ export const actions: Actions = {
 		}
 
 		let previewBeforeUpdate: PreviewPayload;
+		const entryYear = getEntryYearForDate(start);
 		try {
-			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: SALES_TEST_EXHIBITION_YEAR });
+			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
 			previewBeforeUpdate = buildLivePreview(filter, rows, exhibits);
 		} catch (error) {
 			await logger.error('Sales sold update failed while loading exhibits', error as Error, {
 				...logContext,
-				entryYear: SALES_TEST_EXHIBITION_YEAR
+				entryYear
 			});
 
 			return fail(500, {
@@ -672,7 +702,7 @@ export const actions: Actions = {
 		let previewAfterUpdate = previewBeforeUpdate;
 		if (result.updated > 0) {
 			try {
-				const refreshedExhibits = await getExhibits({ rows: 999, offset: 0, entryYear: SALES_TEST_EXHIBITION_YEAR });
+				const refreshedExhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
 				previewAfterUpdate = buildLivePreview(filter, rows, refreshedExhibits);
 			} catch {
 				// keep pre-update preview if refresh fails
@@ -684,6 +714,7 @@ export const actions: Actions = {
 			rangePreset: filter.rangePreset,
 			startDate: filter.startDate,
 			endDate: filter.endDate,
+			entryYear,
 			requested: result.requested,
 			updated: result.updated,
 			alreadySold: result.alreadySold,
