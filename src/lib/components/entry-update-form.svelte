@@ -14,6 +14,7 @@
 	import { entrySchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte';
 	import { MultipleImageUploadForm } from '$lib/components';
+	import { DIMENSION_SEPARATOR } from '$lib/constants';
 
 	type Props = {
 		currentEntryId: number;
@@ -48,40 +49,53 @@
 				toast.error('Failed to update entry');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success('Entry Updated');
 			myState.entryUpdateDialogOpen = false;
 			return;
 		}
 	});
 
-	const { form: formData, enhance, delayed, errors } = form;
+	const { form: formData, enhance, delayed, errors, reset } = form;
 
 	// get the form field values from the submission object using the id that was passed in
 	let entry = $derived(
 		myState?.submission?.registrations[0].entries.find((entry: { id: number }) => entry.id === editingEntryId)
 	);
 
-	// Initialize form data when entry is first available
-	let lastEntryId = $state<number | null>(null);
+	// Track when dialog transitions from closed to open to trigger form reset
+	let wasDialogOpen = $state(false);
 
 	$effect(() => {
-		// Only reinitialize if we're looking at a different entry
-		if (entry && entry.id !== lastEntryId) {
-			({
-				id: $formData.id,
-				inOrOut: $formData.inOrOut,
-				description: $formData.description,
-				material: $formData.material,
-				specialRequirements: $formData.specialRequirements,
-				title: $formData.title
-			} = entry);
-			$formData.price = entry.price ? entry.price / 100 : 0;
-			//split the dimensions string into the three fields
-			const dimensions = entry?.dimensions?.split('x') || [];
-			[$formData.dimLength, $formData.dimWidth, $formData.dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
-			lastEntryId = entry.id;
+		// Detect dialog opening transition
+		const isDialogOpen = myState.entryUpdateDialogOpen;
+
+		if (isDialogOpen && !wasDialogOpen && entry) {
+			// Dialog just opened - reset form with fresh entry data
+			const dimensions = entry?.dimensions?.split(DIMENSION_SEPARATOR) || [];
+			const [dimLength, dimWidth, dimHeight] = [...dimensions, '', '', ''].slice(0, 3);
+
+			// Use reset() to properly update all form state including validation, errors, and tainted flags
+			reset({
+				data: {
+					id: entry.id,
+					title: entry.title,
+					inOrOut: entry.inOrOut,
+					price: entry.price ? entry.price / 100 : 0,
+					material: entry.material ?? '',
+					dimLength: dimLength,
+					dimWidth: dimWidth,
+					dimHeight: dimHeight,
+					specialRequirements: entry.specialRequirements ?? '',
+					description: entry.description ?? ''
+				}
+			});
 		}
+
+		// Update tracked state for next iteration
+		wasDialogOpen = isDialogOpen;
 	});
 </script>
 

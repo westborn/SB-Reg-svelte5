@@ -11,7 +11,6 @@
 
 	import { confirmSchemaUI } from '$lib/zod-schemas';
 	import { getRegisterState } from '$lib/context.svelte.js';
-	import { untrack } from 'svelte';
 
 	let myState = getRegisterState();
 
@@ -23,30 +22,46 @@
 				toast.error('Failed to Update the Registration');
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success(' Registration Updated');
 			myState.confirmDialogOpen = false;
 			return;
 		}
 	});
-	const { form: formData, enhance, errors, message, delayed } = form;
+	const { form: formData, enhance, errors, message, delayed, reset } = form;
 
-	// grab the form field values from the submission object
+	// Track when dialog transitions from closed to open to trigger form reset
+	let wasDialogOpen = $state(false);
+
 	$effect(() => {
-		const bumpIn = untrack(() => myState?.submission?.registrations[0].bumpIn);
-		const bumpOut = untrack(() => myState?.submission?.registrations[0].bumpOut);
-		const crane = untrack(() => myState?.submission?.registrations[0].crane);
-		const displayRequirements = untrack(() => myState?.submission?.registrations[0].displayRequirements ?? '');
-		const bankAccountName = untrack(() => myState?.submission?.bankAccountName ?? '');
-		const bankBSB = untrack(() => myState?.submission?.bankBSB ?? '');
-		const bankAccount = untrack(() => myState?.submission?.bankAccount ?? '');
-		$formData.bumpIn = bumpIn;
-		$formData.bumpOut = bumpOut;
-		$formData.crane = crane ? 'Yes' : 'No';
-		$formData.displayRequirements = displayRequirements;
-		$formData.bankAccountName = bankAccountName;
-		$formData.bankBSB = bankBSB;
-		$formData.bankAccount = bankAccount;
+		// Detect dialog opening transition
+		const isDialogOpen = myState.confirmDialogOpen;
+		const registration = myState.submission?.registrations?.[0];
+		const artist = myState.submission;
+
+		if (isDialogOpen && !wasDialogOpen && registration && artist) {
+			// Dialog just opened - reset form with fresh registration and artist data
+			reset({
+				data: {
+					id: registration.id,
+					artistId: registration.artistId,
+					registrationYear: registration.registrationYear ?? '',
+					closed: registration.closed ? 'Yes' : 'No',
+					bumpIn: registration.bumpIn ?? '',
+					bumpOut: registration.bumpOut ?? '',
+					displayRequirements: registration.displayRequirements ?? '',
+					crane: registration.crane ? 'Yes' : 'No',
+					bankAccountName: artist.bankAccountName ?? '',
+					bankBSB: artist.bankBSB ?? '',
+					bankAccount: artist.bankAccount ?? ''
+				}
+			});
+		}
+
+		// Update tracked state for next iteration
+		wasDialogOpen = isDialogOpen;
 	});
 </script>
 

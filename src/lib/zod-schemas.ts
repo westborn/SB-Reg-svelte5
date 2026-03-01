@@ -216,3 +216,11 @@ export const locationSchemaUI = z.object({
 		.min(3, { message: 'location must be 3 numbers' })
 		.max(3, { message: 'location must be 3 numbers' })
 });
+
+/////////////////////////////////////////
+// ACTION RESULT TYPES (Phase 3, Step 10)
+/////////////////////////////////////////
+// Note: We keep onResult handlers using `any` due to complexity of SvelteKit's ActionResult type
+// The actual result structure from our server actions is:
+// { type: 'success' | 'failure' | 'error' | 'redirect', data?: { formValidationResult, updatedSubmission? } }
+// But TypeScript's strict typing conflicts with SvelteKit's built-in ActionResult union type

@@ -5,11 +5,12 @@ import { prisma } from '$lib/components/server/prisma';
 import { getExhibits, type Exhibit } from '$lib/components/server/registrationDB';
 import { locationSchemaUI } from '$lib/zod-schemas';
 import { EXHIBITION_YEAR, GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
+import { logger } from '$lib/server/logger';
 import type { Actions, PageServerLoad, RequestEvent } from '../$types';
 import { message, superValidate } from 'sveltekit-superforms';
 
-export const load: PageServerLoad = async () => {
-	// console.log(`${event.route.id} - LOAD - START`);
+export const load: PageServerLoad = async (event) => {
+	const { user } = await event.locals.V1safeGetSession();
 	try {
 		const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear: EXHIBITION_YEAR });
 		return {
@@ -21,7 +22,15 @@ export const load: PageServerLoad = async () => {
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (error: any) {
-		console.log('error: ', error.message);
+		await logger.error('Failed to load exhibits for location update', error, {
+			userId: user?.id,
+			userEmail: user?.email,
+			routeId: '/admin/locationUpdate',
+			...(user?.isSuperAdmin && {
+				adminAction: true,
+				adminEmail: user.email
+			})
+		});
 		return { error: error.message };
 	}
 };
@@ -30,7 +39,6 @@ const locationUpdate = async (event: RequestEvent) => {
 	const newlocationSchemaUI = locationSchemaUI.extend({ entryId: z.number() });
 	const formValidationResult = await superValidate(event, zod4(newlocationSchemaUI));
 	if (!formValidationResult.valid) {
-		console.log('locationUpdate - formValidationResult:', formValidationResult);
 		return message(formValidationResult, 'Registration is Invalid - please reload and try again, or, call us!!', {
 			status: 400
 		});
@@ -54,20 +62,32 @@ const locationUpdate = async (event: RequestEvent) => {
 				status: 400
 			});
 		}
-		const upsertResult = await prisma.locationTable.upsert({
+		await prisma.locationTable.upsert({
 			where: { entryId: entryId },
 			update: { exhibitNumber: formValidationResult.data.location },
 			create: { entryId: formValidationResult.data.entryId, exhibitNumber: formValidationResult.data.location }
 		});
 
-		if (!upsertResult) {
-			console.error(`${event.route.id} - ${GENERIC_ERROR_MESSAGE}`);
-			return message(formValidationResult, GENERIC_ERROR_MESSAGE, {
-				status: 400
-			});
-		}
+		// Log successful location update
+		await logger.info('Location updated successfully', {
+			userId: user.id,
+			entryId,
+			exhibitNumber,
+			userEmail: user.email,
+			routeId: event.route.id,
+			adminAction: true,
+			adminEmail: user.email
+		});
 	} catch (error) {
-		console.error(`${event.route.id}`, error);
+		await logger.error('Location update failed', error as Error, {
+			userId: user.id,
+			entryId,
+			exhibitNumber,
+			userEmail: user.email,
+			routeId: event.route.id,
+			adminAction: true,
+			adminEmail: user.email
+		});
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED, {
 			status: 400
 		});

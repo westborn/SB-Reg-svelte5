@@ -6,7 +6,7 @@ The Sculpture Bermagui Registration System is a modern web application built wit
 
 ## 📈 Current Status
 
-**Version**: 1.7.0
+**Version**: 1.8.0 (2026 Cleanup)
 **Exhibition Year**: 2026 (Automatically calculated)
 
 ### **2026 Registrations now OPEN**
@@ -27,6 +27,7 @@ Built with modern web technologies and designed for scalability, this system con
 - **Database Schema Evolution**: Added primary image table with complete data migration and validation
 - **Enhanced Image Management**: Full CRUD operations for images with integrity validation
 - **Validation Scripts**: Comprehensive data integrity checking for image relationships
+- **Structured Logging**: Centralized database logging with configurable log levels for monitoring and debugging
 
 ## 🎨 What This System Does
 
@@ -147,3 +148,6 @@ The system uses environment variables for configuration:
 - Email service (Gmail)
 - Payment processing
 - Exhibition year settings
+- Logging level (DEBUG, INFO, WARN, ERROR, OFF)
+
+See `.env.local.example` for required environment variables.

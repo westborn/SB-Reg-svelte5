@@ -115,6 +115,20 @@ model primaryImageTable {
   @@map("primary_image")
 }
 
+model logTable {
+  id        Int      @id @default(autoincrement())
+  level     LogLevel
+  message   String
+  context   Json?
+  userId    String?  @map("user_id")
+  routeId   String?  @map("route_id")
+  error     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@index([level, createdAt])
+  @@map("log")
+}
+
 enum Indigenous {
   Yes
   No
@@ -128,4 +142,13 @@ enum EntryType {
   Outdoor
 
   @@map("entry_type")
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+
+  @@map("log_level")
 }

@@ -16,7 +16,7 @@
 
 	const form = superForm(myState.entryDeleteForm, {
 		validators: zod4Client(entryDeleteSchemaUI),
-		id: `deleteEntryForm`,
+		id: 'deleteEntryForm',
 		onResult({ result }: { result: any }) {
 			// console.log('Action result', result);
 			if (result.type != 'success') {
@@ -24,7 +24,9 @@
 				myState.entryDeleteDialogOpen = false;
 				return;
 			}
-			myState.submission = result?.data?.updatedSubmission;
+			if (result.data?.updatedSubmission) {
+				myState.submission = result.data.updatedSubmission;
+			}
 			toast.success('Entry Deleted');
 			myState.entryDeleteDialogOpen = false;
 		}

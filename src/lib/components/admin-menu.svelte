@@ -23,6 +23,7 @@
 				<DropdownMenu.Item
 					><a class="w-full" href="\admin\locationUpdate">Manage Exhibit Placement (Location)</a></DropdownMenu.Item
 				>
+				<DropdownMenu.Item><a class="w-full" href="\admin\errorLog">System Error Log</a></DropdownMenu.Item>
 				<DropdownMenu.Sub>
 					<DropdownMenu.SubTrigger>More Things coming soon</DropdownMenu.SubTrigger>
 					<DropdownMenu.SubContent>
