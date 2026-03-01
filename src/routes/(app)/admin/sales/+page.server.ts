@@ -13,8 +13,22 @@ type FilterPayload = {
 	endDate: string;
 };
 
+type ParsedSku = {
+	exhibitNumber: string;
+	artistName: string;
+	entryId: number;
+};
+
+type ClassifiedOrderRow = OrderSummaryRow & {
+	parsedSku: ParsedSku;
+};
+
+type InvalidSkuRow = OrderSummaryRow & {
+	reason: string;
+};
+
 type PreviewPayload = {
-	phase: 1 | 2;
+	phase: 1 | 2 | 3;
 	status: 'placeholder' | 'live';
 	message: string;
 	request: {
@@ -34,7 +48,10 @@ type PreviewPayload = {
 			ignoredNotArt: number;
 		};
 		rawOrders: OrderSummaryRow[];
-		matchCandidates: unknown[];
+		matchCandidates: ClassifiedOrderRow[];
+		parsedValid: ClassifiedOrderRow[];
+		invalidSkuRows: InvalidSkuRow[];
+		ignoredNotArtRows: OrderSummaryRow[];
 	};
 	generatedAt: string;
 };
@@ -85,9 +102,70 @@ function buildPlaceholderPreview(filter: FilterPayload): PreviewPayload {
 				ignoredNotArt: 0
 			},
 			rawOrders: [],
-			matchCandidates: []
+			matchCandidates: [],
+			parsedValid: [],
+			invalidSkuRows: [],
+			ignoredNotArtRows: []
 		},
 		generatedAt: new Date().toISOString()
+	};
+}
+
+function parseSku(sku: string): { parsed: ParsedSku | null; reason?: string } {
+	const trimmedSku = sku.trim();
+	const match = trimmedSku.match(/^(\d{3})\s-\s(.+)\s-\s(\d+)$/);
+
+	if (!match) {
+		return { parsed: null, reason: 'SKU does not match required format: nnn - xxxxxxx - iiii' };
+	}
+
+	const [, exhibitNumber, artistNameRaw, entryIdRaw] = match;
+	const artistName = artistNameRaw.trim();
+	const entryId = Number.parseInt(entryIdRaw, 10);
+
+	if (!artistName) {
+		return { parsed: null, reason: 'Artist name segment is empty' };
+	}
+
+	if (!Number.isFinite(entryId) || entryId <= 0) {
+		return { parsed: null, reason: 'Entry id segment is invalid' };
+	}
+
+	return {
+		parsed: {
+			exhibitNumber,
+			artistName,
+			entryId
+		}
+	};
+}
+
+function classifyRows(rows: OrderSummaryRow[]) {
+	const parsedValid: ClassifiedOrderRow[] = [];
+	const invalidSkuRows: InvalidSkuRow[] = [];
+	const ignoredNotArtRows: OrderSummaryRow[] = [];
+
+	for (const row of rows) {
+		const sku = row.sku?.trim() ?? '';
+
+		if (sku === 'Not Art') {
+			ignoredNotArtRows.push(row);
+			continue;
+		}
+
+		const { parsed, reason } = parseSku(sku);
+		if (!parsed) {
+			invalidSkuRows.push({ ...row, reason: reason ?? 'Invalid SKU format' });
+			continue;
+		}
+
+		parsedValid.push({ ...row, parsedSku: parsed });
+	}
+
+	return {
+		parsedValid,
+		invalidSkuRows,
+		ignoredNotArtRows
 	};
 }
 
@@ -114,14 +192,15 @@ function buildLoggerContext(
 }
 
 function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[]): PreviewPayload {
+	const { parsedValid, invalidSkuRows, ignoredNotArtRows } = classifyRows(rows);
 	const totalLineItems = rows.length;
 	const totalOrders = rows.filter((row) => row.orderAmountCents > 0).length;
 	const requestType = filter.rangePreset === 'custom' ? 'custom-range' : 'quick-range';
 
 	return {
-		phase: 2,
+		phase: 3,
 		status: 'live',
-		message: `Retrieved ${totalLineItems} order line items from Square.`,
+		message: `Retrieved ${totalLineItems} line items. Parsed ${parsedValid.length} valid SKUs, ignored ${ignoredNotArtRows.length} Not Art rows, and flagged ${invalidSkuRows.length} invalid SKUs.`,
 		request: {
 			type: requestType,
 			rangePreset: filter.rangePreset,
@@ -132,14 +211,17 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[]): Previ
 			summary: {
 				totalOrders,
 				totalLineItems,
-				matched: 0,
+				matched: parsedValid.length,
 				unmatched: 0,
 				ambiguous: 0,
-				invalidSku: 0,
-				ignoredNotArt: 0
+				invalidSku: invalidSkuRows.length,
+				ignoredNotArt: ignoredNotArtRows.length
 			},
 			rawOrders: rows,
-			matchCandidates: []
+			matchCandidates: parsedValid,
+			parsedValid,
+			invalidSkuRows,
+			ignoredNotArtRows
 		},
 		generatedAt: new Date().toISOString()
 	};
@@ -147,7 +229,7 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[]): Previ
 
 export const load = async () => {
 	return {
-		phase: 2,
+		phase: 3,
 		filterDefaults: DEFAULT_FILTER,
 		contract: {
 			fetchByQuickRange: {

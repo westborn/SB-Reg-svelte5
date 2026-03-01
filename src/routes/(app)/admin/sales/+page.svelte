@@ -19,6 +19,18 @@
 		baseAmountCents: number;
 	};
 
+	type ParsedSkuRow = SalesOrderRow & {
+		parsedSku: {
+			exhibitNumber: string;
+			artistName: string;
+			entryId: number;
+		};
+	};
+
+	type InvalidSkuRow = SalesOrderRow & {
+		reason: string;
+	};
+
 	let { data, form } = $props();
 	const initialFilter = untrack(() => form?.submittedFilter ?? data.filterDefaults);
 
@@ -83,6 +95,9 @@
 	});
 
 	const rawOrderRows = $derived((form?.preview?.sections?.rawOrders ?? []) as SalesOrderRow[]);
+	const parsedValidRows = $derived((form?.preview?.sections?.parsedValid ?? []) as ParsedSkuRow[]);
+	const invalidSkuRows = $derived((form?.preview?.sections?.invalidSkuRows ?? []) as InvalidSkuRow[]);
+	const ignoredNotArtRows = $derived((form?.preview?.sections?.ignoredNotArtRows ?? []) as SalesOrderRow[]);
 
 	$effect(() => {
 		if (!form?.submittedFilter) return;
@@ -102,7 +117,9 @@
 <div class="container mx-auto max-w-5xl space-y-6 px-4 py-8">
 	<div>
 		<h1 class="text-3xl font-bold">Admin Sales Update</h1>
-		<p class="mt-2 text-muted-foreground">Phase 2: fetch Square orders by date range and show read-only order rows.</p>
+		<p class="mt-2 text-muted-foreground">
+			Phase 3: parse SKU values and classify rows as valid, invalid, or ignored (`Not Art`).
+		</p>
 	</div>
 
 	<Card.Root>
@@ -216,16 +233,21 @@
 						<p class="text-xl font-semibold">{form.preview.sections.summary.totalLineItems}</p>
 					</div>
 					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Matched (Phase 3)</p>
+						<p class="text-xs text-muted-foreground">Parsed Valid SKUs</p>
 						<p class="text-xl font-semibold">{form.preview.sections.summary.matched}</p>
 					</div>
 					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Ignored Not Art (Phase 3)</p>
+						<p class="text-xs text-muted-foreground">Ignored Not Art</p>
 						<p class="text-xl font-semibold">{form.preview.sections.summary.ignoredNotArt}</p>
+					</div>
+					<div class="rounded border p-3">
+						<p class="text-xs text-muted-foreground">Invalid SKU</p>
+						<p class="text-xl font-semibold">{form.preview.sections.summary.invalidSku}</p>
 					</div>
 				</div>
 
 				{#if rawOrderRows.length > 0}
+					<p class="pt-2 text-sm font-semibold">All Order Rows</p>
 					<div class="overflow-x-auto pt-2">
 						<Table.Root>
 							<Table.Header>
@@ -253,6 +275,82 @@
 										<Table.Cell>{row.quantity}</Table.Cell>
 										<Table.Cell class="text-right">{formatDollars(row.baseAmountCents)}</Table.Cell>
 										<Table.Cell class="text-right">{formatDollars(row.orderAmountCents)}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
+				{#if parsedValidRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Parsed Valid SKU Rows</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Exhibit Number</Table.Head>
+									<Table.Head>Artist Name</Table.Head>
+									<Table.Head>Entry Id</Table.Head>
+									<Table.Head>Item</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each parsedValidRows as row}
+									<Table.Row>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.parsedSku.exhibitNumber}</Table.Cell>
+										<Table.Cell>{row.parsedSku.artistName}</Table.Cell>
+										<Table.Cell>{row.parsedSku.entryId}</Table.Cell>
+										<Table.Cell>{row.item}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
+				{#if invalidSkuRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Invalid SKU Rows</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Reason</Table.Head>
+									<Table.Head>Item</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each invalidSkuRows as row}
+									<Table.Row>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.reason}</Table.Cell>
+										<Table.Cell>{row.item}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
+				{/if}
+
+				{#if ignoredNotArtRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Ignored Not Art Rows</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>SKU</Table.Head>
+									<Table.Head>Item</Table.Head>
+									<Table.Head>Location</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each ignoredNotArtRows as row}
+									<Table.Row>
+										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{row.item}</Table.Cell>
+										<Table.Cell>{row.location}</Table.Cell>
 									</Table.Row>
 								{/each}
 							</Table.Body>
