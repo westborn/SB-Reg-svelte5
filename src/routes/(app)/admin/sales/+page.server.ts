@@ -76,8 +76,6 @@ type CanceledRow = ClassifiedOrderRow & {
 };
 
 type PreviewPayload = {
-	phase: 1 | 2 | 3 | 4 | 5;
-	status: 'placeholder' | 'live';
 	message: string;
 	request: {
 		type: 'quick-range' | 'custom-range';
@@ -139,8 +137,6 @@ function buildPlaceholderPreview(filter: FilterPayload): PreviewPayload {
 	const requestType = filter.rangePreset === 'custom' ? 'custom-range' : 'quick-range';
 
 	return {
-		phase: 1,
-		status: 'placeholder',
 		message: 'Preview unavailable. Check filter values and retry.',
 		request: {
 			type: requestType,
@@ -410,9 +406,7 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 	const requestType = filter.rangePreset === 'custom' ? 'custom-range' : 'quick-range';
 
 	return {
-		phase: 4,
-		status: 'live',
-		message: `Retrieved ${totalLineItems} line items. Matched ${matchedRows.length}, canceled ${canceledRows.length}, already sold ${alreadySoldRows.length}, unmatched ${unmatchedRows.length}, ambiguous ${ambiguousRows.length}, invalid SKU ${invalidSkuRows.length}, ignored Not Art ${ignoredNotArtRows.length}.`,
+		message: `Retrieved ${totalLineItems} line items. Matched ${matchedRows.length}, canceled ${canceledRows.length}, already sold ${alreadySoldRows.length}, unmatched ${unmatchedRows.length}, ambiguous ${ambiguousRows.length}, invalid SKU ${invalidSkuRows.length}, Not Art ${ignoredNotArtRows.length}.`,
 		request: {
 			type: requestType,
 			rangePreset: filter.rangePreset,
@@ -446,7 +440,6 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 
 export const load = async () => {
 	return {
-		phase: 6,
 		filterDefaults: DEFAULT_FILTER,
 		contract: {
 			fetchByQuickRange: {

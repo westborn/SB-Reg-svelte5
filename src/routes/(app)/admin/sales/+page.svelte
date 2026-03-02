@@ -106,6 +106,17 @@
 		return formatDisplayDate(date);
 	}
 
+	function formatDateDdMmmYyyy(value: string | Date): string {
+		const date = typeof value === 'string' ? new Date(value) : value;
+		if (Number.isNaN(date.getTime())) return '-';
+
+		const day = String(date.getDate()).padStart(2, '0');
+		const month = date.toLocaleDateString('en-AU', { month: 'short' });
+		const year = date.getFullYear();
+
+		return `${day}-${month}-${year}`;
+	}
+
 	function formatDollars(cents: number): string {
 		if (!Number.isFinite(cents)) return '$0.00';
 		return `$${(cents / 100).toFixed(2)}`;
@@ -198,17 +209,6 @@
 			event.preventDefault();
 			return;
 		}
-
-		const label = selectedEntryIds.length === 1 ? 'entry' : 'entries';
-		const confirmed = window.confirm(
-			`Set sold = true for ${selectedEntryIds.length} selected ${label}? This action is not reversible on this screen.`
-		);
-
-		if (!confirmed) {
-			event.preventDefault();
-			return;
-		}
-
 		isUpdateSubmitting = true;
 	}
 
@@ -250,7 +250,7 @@
 <div class="container mx-auto max-w-5xl space-y-6 px-4 py-8">
 	<div>
 		<h1 class="text-3xl font-bold">Admin Sales Update</h1>
-		<p class="mt-2 text-muted-foreground">Phase 6: review matches, confirm updates, and mark sold entries safely.</p>
+		<p class="mt-2 text-muted-foreground">Review orders and entries, confirm updates, and mark entries as sold.</p>
 	</div>
 
 	<Card.Root>
@@ -375,25 +375,13 @@
 				<Card.Description>{form.preview.message}</Card.Description>
 			</Card.Header>
 			<Card.Content class="space-y-3">
-				<p class="text-sm">
-					<span class="font-semibold">Request type:</span>
-					{form.preview.request.type}
-				</p>
-				<p class="text-sm">
-					<span class="font-semibold">Range preset:</span>
-					{form.preview.request.rangePreset}
-				</p>
 				{#if form.preview.request.startDate || form.preview.request.endDate}
 					<p class="text-sm">
 						<span class="font-semibold">Range:</span>
-						{form.preview.request.startDate} → {form.preview.request.endDate}
+						{formatDateDdMmmYyyy(form.preview.request.startDate)} → {formatDateDdMmmYyyy(form.preview.request.endDate)}
 					</p>
 				{/if}
-				<p class="text-sm">
-					<span class="font-semibold">Status:</span>
-					{form.preview.status}
-				</p>
-				<div class="grid gap-3 pt-2 md:grid-cols-2 lg:grid-cols-4">
+				<!-- <div class="grid gap-3 pt-2 md:grid-cols-2 lg:grid-cols-4">
 					<div class="rounded border p-3">
 						<p class="text-xs text-muted-foreground">Orders</p>
 						<p class="text-xl font-semibold">{form.preview.sections.summary.totalOrders}</p>
@@ -430,50 +418,10 @@
 						<p class="text-xs text-muted-foreground">Invalid SKU</p>
 						<p class="text-xl font-semibold">{form.preview.sections.summary.invalidSku}</p>
 					</div>
-				</div>
-
-				<div class="pt-2">
-					<Button type="button" variant="outline" size="sm" onclick={() => (showAllOrderRows = !showAllOrderRows)}>
-						{showAllOrderRows ? 'Hide All Order Rows' : 'Show All Order Rows'}
-					</Button>
-				</div>
-
-				{#if showAllOrderRows}
-					{#if displayOrderRows.length === 0}
-						<p class="pt-2 text-sm text-muted-foreground">No order rows were returned for this date range.</p>
-					{:else}
-						<p class="pt-2 text-sm font-semibold">All Order Rows</p>
-						<div class="overflow-x-auto pt-2">
-							<table class="w-full border-collapse text-sm">
-								<thead>
-									<tr class="text-left">
-										<th class="whitespace-nowrap pr-4 font-medium">Created</th>
-										<th class="pr-4 font-medium">Location</th>
-										<th class="pr-4 font-medium">State</th>
-										<th class="pr-4 font-medium">Item</th>
-										<th class="pr-4 font-medium">SKU</th>
-										<th class="text-right font-medium">Line Amount</th>
-									</tr>
-								</thead>
-								<tbody>
-									{#each displayOrderRows as row}
-										<tr class={row.state === 'CANCELLED' ? 'text-red-700' : ''}>
-											<td class="whitespace-nowrap pr-4">{formatFromISO(row.createdDateTime)}</td>
-											<td class="pr-4">{row.location}</td>
-											<td class="pr-4">{row.state}</td>
-											<td class="pr-4">{row.item}</td>
-											<td class="pr-4">{row.sku}</td>
-											<td class="text-right">{formatDollars(row.baseAmountCents)}</td>
-										</tr>
-									{/each}
-								</tbody>
-							</table>
-						</div>
-					{/if}
-				{/if}
+				</div> -->
 
 				{#if matchedRows.length > 0}
-					<p class="pt-4 text-sm font-semibold">Matched Rows (Ready for sold update in Phase 5)</p>
+					<p class="pt-4 text-sm font-semibold">Matched Rows (Can be updated to Sold)</p>
 					<div class="flex items-center gap-2 pt-1">
 						<Button type="button" variant="outline" size="sm" onclick={selectAllMatchedRows}>Select all</Button>
 						<Button type="button" variant="outline" size="sm" onclick={clearSelectedRows}>Clear selection</Button>
@@ -521,9 +469,6 @@
 							<Button type="submit" disabled={selectedEntryIds.length === 0 || isUpdateSubmitting}
 								>{isUpdateSubmitting ? 'Updating Sold Status…' : 'Update sold status for selected rows'}</Button
 							>
-							<p class="text-xs text-muted-foreground">
-								Server revalidates eligible matches before writing. You will be asked to confirm before submit.
-							</p>
 						</div>
 					</form>
 				{/if}
@@ -631,6 +576,47 @@
 						</Table.Root>
 					</div>
 				{/if}
+
+				<div class="pt-2">
+					<Button type="button" variant="outline" size="sm" onclick={() => (showAllOrderRows = !showAllOrderRows)}>
+						{showAllOrderRows ? 'Hide All Order Rows' : 'Show All Order Rows'}
+					</Button>
+				</div>
+
+				{#if showAllOrderRows}
+					{#if displayOrderRows.length === 0}
+						<p class="pt-2 text-sm text-muted-foreground">No order rows were returned for this date range.</p>
+					{:else}
+						<p class="pt-2 text-sm font-semibold">All Order Rows</p>
+						<div class="overflow-x-auto pt-2">
+							<table class="w-full border-collapse text-sm">
+								<thead>
+									<tr class="text-left">
+										<th class="whitespace-nowrap pr-4 font-medium">Created</th>
+										<th class="pr-4 font-medium">Location</th>
+										<th class="pr-4 font-medium">State</th>
+										<th class="pr-4 font-medium">Item</th>
+										<th class="pr-4 font-medium">SKU</th>
+										<th class="text-right font-medium">Line Amount</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each displayOrderRows as row}
+										<tr class={row.state === 'CANCELLED' ? 'text-red-700' : ''}>
+											<td class="whitespace-nowrap pr-4">{formatFromISO(row.createdDateTime)}</td>
+											<td class="pr-4">{row.location}</td>
+											<td class="pr-4">{row.state}</td>
+											<td class="pr-4">{row.item}</td>
+											<td class="pr-4">{row.sku}</td>
+											<td class="text-right">{formatDollars(row.baseAmountCents)}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					{/if}
+				{/if}
+
 				<p class="text-sm text-muted-foreground">Generated at: {formatSydneyDateTime(form.preview.generatedAt)}</p>
 			</Card.Content>
 		</Card.Root>
