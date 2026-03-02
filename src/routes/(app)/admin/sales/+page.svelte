@@ -66,6 +66,7 @@
 	let endDate = $state(initialFilter.endDate);
 	let isPreviewSubmitting = $state(false);
 	let isUpdateSubmitting = $state(false);
+	let showAllOrderRows = $state(false);
 
 	function getMidnight(date: Date): Date {
 		const d = new Date(date);
@@ -110,6 +111,22 @@
 		return `$${(cents / 100).toFixed(2)}`;
 	}
 
+	function formatSydneyDateTime(value: string | Date): string {
+		const date = typeof value === 'string' ? new Date(value) : value;
+		if (Number.isNaN(date.getTime())) return '-';
+
+		return new Intl.DateTimeFormat('en-AU', {
+			timeZone: 'Australia/Sydney',
+			year: 'numeric',
+			month: 'short',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			timeZoneName: 'short'
+		}).format(date);
+	}
+
 	const quickRange = $derived.by(() => {
 		if (selectedRange === 'custom') {
 			return null;
@@ -129,9 +146,8 @@
 	});
 
 	const rawOrderRows = $derived((form?.preview?.sections?.rawOrders ?? []) as SalesOrderRow[]);
-	const parsedValidRows = $derived((form?.preview?.sections?.parsedValid ?? []) as ParsedSkuRow[]);
+	const displayOrderRows = $derived(rawOrderRows.filter((row) => row.sku?.trim() !== 'Not Art'));
 	const invalidSkuRows = $derived((form?.preview?.sections?.invalidSkuRows ?? []) as InvalidSkuRow[]);
-	const ignoredNotArtRows = $derived((form?.preview?.sections?.ignoredNotArtRows ?? []) as SalesOrderRow[]);
 	const matchedRows = $derived(((form as any)?.preview?.sections?.matchedRows ?? []) as MatchedRow[]);
 	const alreadySoldRows = $derived(((form as any)?.preview?.sections?.alreadySoldRows ?? []) as MatchedRow[]);
 	const unmatchedRows = $derived(((form as any)?.preview?.sections?.unmatchedRows ?? []) as UnmatchedRow[]);
@@ -174,6 +190,7 @@
 
 	function handlePreviewSubmit() {
 		isPreviewSubmitting = true;
+		showAllOrderRows = false;
 	}
 
 	function handleUpdateSubmit(event: SubmitEvent) {
@@ -220,6 +237,12 @@
 
 		if (!unchanged) {
 			selectedEntryIds = filteredSelection;
+		}
+	});
+
+	$effect(() => {
+		if (form?.preview || form?.error) {
+			isPreviewSubmitting = false;
 		}
 	});
 </script>
@@ -294,7 +317,15 @@
 		</Card.Content>
 	</Card.Root>
 
-	{#if !form?.preview && !form?.error}
+	{#if isPreviewSubmitting}
+		<Card.Root>
+			<Card.Content class="pt-6">
+				<p class="text-sm text-muted-foreground">Loading preview response…</p>
+			</Card.Content>
+		</Card.Root>
+	{/if}
+
+	{#if !isPreviewSubmitting && !form?.preview && !form?.error}
 		<Card.Root>
 			<Card.Content class="pt-6">
 				<p class="text-sm text-muted-foreground">
@@ -304,7 +335,7 @@
 		</Card.Root>
 	{/if}
 
-	{#if form?.error}
+	{#if !isPreviewSubmitting && form?.error}
 		<Card.Root>
 			<Card.Content class="pt-6">
 				<p class="text-sm font-medium text-red-600">{form.error}</p>
@@ -312,7 +343,7 @@
 		</Card.Root>
 	{/if}
 
-	{#if updateResult}
+	{#if !isPreviewSubmitting && updateResult}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>Sold Update Result</Card.Title>
@@ -337,7 +368,7 @@
 		</Card.Root>
 	{/if}
 
-	{#if form?.preview}
+	{#if !isPreviewSubmitting && form?.preview}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>Preview Response</Card.Title>
@@ -401,44 +432,44 @@
 					</div>
 				</div>
 
-				{#if rawOrderRows.length === 0}
-					<p class="pt-2 text-sm text-muted-foreground">No order rows were returned for this date range.</p>
-				{/if}
+				<div class="pt-2">
+					<Button type="button" variant="outline" size="sm" onclick={() => (showAllOrderRows = !showAllOrderRows)}>
+						{showAllOrderRows ? 'Hide All Order Rows' : 'Show All Order Rows'}
+					</Button>
+				</div>
 
-				{#if rawOrderRows.length > 0}
-					<p class="pt-2 text-sm font-semibold">All Order Rows</p>
-					<div class="overflow-x-auto pt-2">
-						<Table.Root>
-							<Table.Header>
-								<Table.Row>
-									<Table.Head class="whitespace-nowrap">Created</Table.Head>
-									<Table.Head>Location</Table.Head>
-									<Table.Head>State</Table.Head>
-									<Table.Head>Line</Table.Head>
-									<Table.Head>Item</Table.Head>
-									<Table.Head>SKU</Table.Head>
-									<Table.Head>Qty</Table.Head>
-									<Table.Head class="text-right">Line Amount</Table.Head>
-									<Table.Head class="text-right">Order Amount</Table.Head>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{#each rawOrderRows as row}
-									<Table.Row class={row.state === 'CANCELLED' ? 'bg-red-50 text-red-700' : ''}>
-										<Table.Cell class="whitespace-nowrap">{formatFromISO(row.createdDateTime)}</Table.Cell>
-										<Table.Cell>{row.location}</Table.Cell>
-										<Table.Cell>{row.state}</Table.Cell>
-										<Table.Cell>{row.orderLine}</Table.Cell>
-										<Table.Cell>{row.item}</Table.Cell>
-										<Table.Cell>{row.sku}</Table.Cell>
-										<Table.Cell>{row.quantity}</Table.Cell>
-										<Table.Cell class="text-right">{formatDollars(row.baseAmountCents)}</Table.Cell>
-										<Table.Cell class="text-right">{formatDollars(row.orderAmountCents)}</Table.Cell>
-									</Table.Row>
-								{/each}
-							</Table.Body>
-						</Table.Root>
-					</div>
+				{#if showAllOrderRows}
+					{#if displayOrderRows.length === 0}
+						<p class="pt-2 text-sm text-muted-foreground">No order rows were returned for this date range.</p>
+					{:else}
+						<p class="pt-2 text-sm font-semibold">All Order Rows</p>
+						<div class="overflow-x-auto pt-2">
+							<table class="w-full border-collapse text-sm">
+								<thead>
+									<tr class="text-left">
+										<th class="whitespace-nowrap pr-4 font-medium">Created</th>
+										<th class="pr-4 font-medium">Location</th>
+										<th class="pr-4 font-medium">State</th>
+										<th class="pr-4 font-medium">Item</th>
+										<th class="pr-4 font-medium">SKU</th>
+										<th class="text-right font-medium">Line Amount</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each displayOrderRows as row}
+										<tr class={row.state === 'CANCELLED' ? 'text-red-700' : ''}>
+											<td class="whitespace-nowrap pr-4">{formatFromISO(row.createdDateTime)}</td>
+											<td class="pr-4">{row.location}</td>
+											<td class="pr-4">{row.state}</td>
+											<td class="pr-4">{row.item}</td>
+											<td class="pr-4">{row.sku}</td>
+											<td class="text-right">{formatDollars(row.baseAmountCents)}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					{/if}
 				{/if}
 
 				{#if matchedRows.length > 0}
@@ -529,30 +560,6 @@
 					</div>
 				{/if}
 
-				{#if alreadySoldRows.length > 0}
-					<p class="pt-4 text-sm font-semibold">Already Sold Rows (Excluded)</p>
-					<div class="overflow-x-auto pt-2">
-						<Table.Root>
-							<Table.Header>
-								<Table.Row>
-									<Table.Head>SKU</Table.Head>
-									<Table.Head>Entry Id</Table.Head>
-									<Table.Head>Title</Table.Head>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{#each alreadySoldRows as row}
-									<Table.Row>
-										<Table.Cell>{row.sku}</Table.Cell>
-										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
-										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
-									</Table.Row>
-								{/each}
-							</Table.Body>
-						</Table.Root>
-					</div>
-				{/if}
-
 				{#if unmatchedRows.length > 0}
 					<p class="pt-4 text-sm font-semibold">Unmatched Rows</p>
 					<div class="overflow-x-auto pt-2">
@@ -601,34 +608,6 @@
 					</div>
 				{/if}
 
-				{#if parsedValidRows.length > 0}
-					<p class="pt-4 text-sm font-semibold">Parsed Valid SKU Rows</p>
-					<div class="overflow-x-auto pt-2">
-						<Table.Root>
-							<Table.Header>
-								<Table.Row>
-									<Table.Head>SKU</Table.Head>
-									<Table.Head>Exhibit Number</Table.Head>
-									<Table.Head>Artist Name</Table.Head>
-									<Table.Head>Entry Id</Table.Head>
-									<Table.Head>Item</Table.Head>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{#each parsedValidRows as row}
-									<Table.Row>
-										<Table.Cell>{row.sku}</Table.Cell>
-										<Table.Cell>{row.parsedSku.exhibitNumber}</Table.Cell>
-										<Table.Cell>{row.parsedSku.artistName}</Table.Cell>
-										<Table.Cell>{row.parsedSku.entryId}</Table.Cell>
-										<Table.Cell>{row.item}</Table.Cell>
-									</Table.Row>
-								{/each}
-							</Table.Body>
-						</Table.Root>
-					</div>
-				{/if}
-
 				{#if invalidSkuRows.length > 0}
 					<p class="pt-4 text-sm font-semibold">Invalid SKU Rows</p>
 					<div class="overflow-x-auto pt-2">
@@ -652,32 +631,7 @@
 						</Table.Root>
 					</div>
 				{/if}
-
-				{#if ignoredNotArtRows.length > 0}
-					<p class="pt-4 text-sm font-semibold">Ignored Not Art Rows</p>
-					<div class="overflow-x-auto pt-2">
-						<Table.Root>
-							<Table.Header>
-								<Table.Row>
-									<Table.Head>SKU</Table.Head>
-									<Table.Head>Item</Table.Head>
-									<Table.Head>Location</Table.Head>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{#each ignoredNotArtRows as row}
-									<Table.Row>
-										<Table.Cell>{row.sku}</Table.Cell>
-										<Table.Cell>{row.item}</Table.Cell>
-										<Table.Cell>{row.location}</Table.Cell>
-									</Table.Row>
-								{/each}
-							</Table.Body>
-						</Table.Root>
-					</div>
-				{/if}
-
-				<p class="text-sm text-muted-foreground">Generated at: {form.preview.generatedAt}</p>
+				<p class="text-sm text-muted-foreground">Generated at: {formatSydneyDateTime(form.preview.generatedAt)}</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}

@@ -98,7 +98,6 @@ type PreviewPayload = {
 		};
 		rawOrders: OrderSummaryRow[];
 		matchCandidates: ClassifiedOrderRow[];
-		parsedValid: ClassifiedOrderRow[];
 		invalidSkuRows: InvalidSkuRow[];
 		ignoredNotArtRows: OrderSummaryRow[];
 		matchedRows: MatchedRow[];
@@ -162,7 +161,6 @@ function buildPlaceholderPreview(filter: FilterPayload): PreviewPayload {
 			},
 			rawOrders: [],
 			matchCandidates: [],
-			parsedValid: [],
 			invalidSkuRows: [],
 			ignoredNotArtRows: [],
 			matchedRows: [],
@@ -434,7 +432,6 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 			},
 			rawOrders: rows,
 			matchCandidates: parsedValid,
-			parsedValid,
 			invalidSkuRows,
 			ignoredNotArtRows,
 			matchedRows,
