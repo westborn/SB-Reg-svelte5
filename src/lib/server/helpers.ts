@@ -1,8 +1,4 @@
-import { error } from '@sveltejs/kit';
-import { message, superValidate, type SuperValidated } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
-import type { ZodObject } from 'zod';
-import type { RequestEvent } from '@sveltejs/kit';
+import type { SuperValidated } from 'sveltekit-superforms';
 import type { Submission, User } from '$lib/components/server/registrationDB';
 
 /**

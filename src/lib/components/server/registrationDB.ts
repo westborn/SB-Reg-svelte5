@@ -244,6 +244,29 @@ export const createNewRegistration = async (artistId: number) => {
 };
 
 /**
+ * Creates a new artist record.
+ *
+ * @param data - Artist data to create
+ * @returns Newly created artist record
+ */
+export const createArtist = async (data: Prisma.artistTableCreateInput) => {
+	return await prisma.artistTable.create({ data });
+};
+
+type EntryCreateInput = {
+	artistId: number;
+	registrationId: number;
+	accepted: boolean;
+	inOrOut: 'Indoor' | 'Outdoor';
+	title: string;
+	material?: string | null;
+	dimensions?: string | null;
+	description?: string | null;
+	specialRequirements?: string | null;
+	price: number;
+};
+
+/**
  * Creates a new entry record in the database.
  *
  * @param workingEntry - Entry data to create
@@ -252,7 +275,7 @@ export const createNewRegistration = async (artistId: number) => {
  * @example
  * const entry = await entryCreate({ title: 'My Sculpture', ... });
  */
-export const entryCreate = async (workingEntry: EntryTable) => {
+export const entryCreate = async (workingEntry: EntryCreateInput) => {
 	const {
 		artistId,
 		registrationId,
@@ -401,6 +424,33 @@ export const createImage = async (workingImage: CurrentImage) => {
 		}
 	});
 	return image;
+};
+
+/**
+ * Deletes an entry by ID.
+ *
+ * @param entryId - Entry ID
+ * @returns Deleted entry record
+ */
+export const deleteEntryById = async (entryId: number) => {
+	return await prisma.entryTable.delete({
+		where: { id: entryId }
+	});
+};
+
+/**
+ * Creates or updates a location assignment for an entry.
+ *
+ * @param entryId - Entry ID
+ * @param exhibitNumber - Exhibit number/location code
+ * @returns Upserted location record
+ */
+export const upsertEntryLocation = async (entryId: number, exhibitNumber: string) => {
+	return await prisma.locationTable.upsert({
+		where: { entryId },
+		update: { exhibitNumber },
+		create: { entryId, exhibitNumber }
+	});
 };
 
 /////////////////////////////////////////

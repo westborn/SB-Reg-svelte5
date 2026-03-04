@@ -198,7 +198,7 @@ function matchParsedRows(parsedValid: ClassifiedOrderRow[], exhibits: Exhibit[])
 			});
 			continue;
 		}
-
+		console.log({ row });
 		const candidatesByEntry = exhibits.filter((exhibit) => exhibit.entryId === row.parsedSku.entryId);
 
 		if (candidatesByEntry.length === 0) {
@@ -316,7 +316,7 @@ function classifyRows(rows: OrderSummaryRow[]) {
 
 	for (const row of rows) {
 		const sku = row.sku?.trim() ?? '';
-
+		console.log({ row });
 		if (sku === 'Not Art') {
 			ignoredNotArtRows.push(row);
 			continue;

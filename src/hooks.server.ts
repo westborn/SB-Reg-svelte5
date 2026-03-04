@@ -2,7 +2,14 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createServerClient } from '@supabase/ssr';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { REGISTRATIONS_OPEN, ADMIN_DOMAIN } from '$lib/constants';
+import {
+	canAccessWithoutUser,
+	getAuthFlags,
+	isAdminRoute,
+	isLoginRoute,
+	isRegisterRoute,
+	shouldBlockRegisterRoute
+} from '$lib/server/auth';
 
 // https://khromov.se/the-comprehensive-guide-to-locals-in-sveltekit/
 // https://joyofcode.xyz/sveltekit-hooks#creating-routes
@@ -47,14 +54,9 @@ const auth: Handle = async ({ event, resolve }) => {
 		}
 		user.isSuperAdmin = false;
 		user.isAdmin = false;
-		user.proxyEmail = 'not set';
+		user.proxyEmail = user.email;
 
-		const superAdmins = ['george', 'david', 'webmaster'];
-
-		const userName = user.email.split('@')[0];
-		const userDomain = user.email.split('@')[1];
-		const isAdmin = userDomain === ADMIN_DOMAIN;
-		const isSuperAdmin = superAdmins.includes(userName);
+		const { isAdmin, isSuperAdmin } = getAuthFlags(user.email);
 		if (isAdmin && session && user) {
 			user.isAdmin = true;
 			if (isSuperAdmin) {
@@ -72,22 +74,21 @@ const auth: Handle = async ({ event, resolve }) => {
 	});
 };
 
-const routesAllowedWithoutUser = ['/signup', '/verify-email', '/login'];
 const routeGuards: Handle = async ({ event, resolve }) => {
 	const { session, user } = await event.locals.V1safeGetSession();
-	if (event.url.pathname === '/login' && user) {
+	if (isLoginRoute(event.url.pathname) && user) {
 		throw redirect(303, '/');
 	}
 
-	if ((!session || !user) && !routesAllowedWithoutUser.includes(event.url.pathname)) {
+	if ((!session || !user) && !canAccessWithoutUser(event.url.pathname)) {
 		throw redirect(303, '/login');
 	}
 	// only allow /admin if user is admin
-	if (event.url.pathname.startsWith('/admin') && !user.isAdmin) {
+	if (isAdminRoute(event.url.pathname) && !user.isAdmin) {
 		throw redirect(303, '/');
 	}
 	// don't allow /register routes if registrations are closed - admin is exempt
-	if (event.url.pathname.startsWith('/register') && !user.isAdmin && !REGISTRATIONS_OPEN) {
+	if (isRegisterRoute(event.url.pathname) && shouldBlockRegisterRoute(user.isAdmin)) {
 		throw redirect(303, '/view');
 	}
 

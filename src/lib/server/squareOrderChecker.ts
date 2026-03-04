@@ -1,4 +1,5 @@
-import { SquareClient, SquareEnvironment, SearchOrdersSortField, SortOrder } from 'square';
+import { SquareClient, SearchOrdersSortField, SortOrder } from 'square';
+import { createSquareClient } from '$lib/server/squareClient';
 
 const DEFAULT_ORDER_LIMIT = 100;
 
@@ -133,10 +134,7 @@ export default class SquareOrderChecker {
 			return;
 		}
 
-		this.client = new SquareClient({
-			token: accessToken,
-			environment: environment === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox
-		});
+		this.client = createSquareClient(accessToken, environment);
 
 		this.ordersApi = this.client.orders;
 		this.locationsApi = this.client.locations;

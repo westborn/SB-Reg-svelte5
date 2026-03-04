@@ -15,11 +15,13 @@ import {
 import { entryDeleteSchemaUI, entrySchemaUI, fileUploadSchema } from '$lib/zod-schemas';
 import {
 	createImage,
+	entryCreate as createEntry,
 	createNewRegistration,
 	getSubmission,
 	createPrimaryImageRelation,
 	setPrimaryImage,
 	deleteImage,
+	deleteEntryById,
 	updateEntry,
 	type CurrentImage,
 	type User
@@ -254,20 +256,17 @@ const entryCreate = async (event: RequestEvent) => {
 
 	let newEntry;
 	try {
-		newEntry = await prisma.entryTable.create({
-			data: {
-				artistId,
-				registrationId,
-				accepted: false,
-				title: title ?? '',
-				inOrOut: inOrOut === 'Outdoor' ? 'Outdoor' : 'Indoor',
-				material: material ?? '',
-				description: description ?? '',
-				specialRequirements: specialRequirements ?? '',
-				enterMajorPrize: true,
-				dimensions,
-				price: (price ?? 0) * 100
-			}
+		newEntry = await createEntry({
+			artistId,
+			registrationId,
+			accepted: false,
+			title: title ?? '',
+			inOrOut: inOrOut === 'Outdoor' ? 'Outdoor' : 'Indoor',
+			material: material ?? '',
+			description: description ?? '',
+			specialRequirements: specialRequirements ?? '',
+			dimensions,
+			price: (price ?? 0) * 100
 		});
 
 		// Log successful entry creation
@@ -392,7 +391,7 @@ const entryDelete = async (event: RequestEvent) => {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}
 
-		const deletedEntry = await prisma.entryTable.delete({ where: { id: idToDelete } });
+		const deletedEntry = await deleteEntryById(idToDelete);
 		if (!deletedEntry) {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
 		}

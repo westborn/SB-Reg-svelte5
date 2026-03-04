@@ -1,8 +1,7 @@
-import { getSubmission, type Submission, type User } from '$lib/components/server/registrationDB';
+import { getSubmission, type Submission, type User, updateRegistration } from '$lib/components/server/registrationDB';
 import type { RequestEvent } from '../../$types';
 import { GENERIC_ERROR_MESSAGE } from '$lib/constants';
 import { sendGoogleEmail } from '$lib/components/server/mailer';
-import { prisma } from '$lib/components/server/prisma';
 import { registrationConfirmationEmail } from '$lib/server/email-templates';
 import { logger } from '$lib/server/logger';
 
@@ -14,6 +13,9 @@ export async function POST(event: RequestEvent) {
 	}
 
 	const { user } = await locals.V1safeGetSession();
+	if (!user) {
+		return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 });
+	}
 
 	try {
 		// Get the submission from the database
@@ -32,11 +34,11 @@ export async function POST(event: RequestEvent) {
 		});
 
 		const registrationToUpdate = submissionFromDB?.registrations[0]?.id;
-		const updatedRegistration = await prisma.registrationTable.update({
-			where: { id: registrationToUpdate },
-			data: {
-				closed: true
-			}
+		if (!registrationToUpdate) {
+			return new Response(JSON.stringify({ message: 'Error in registerComplete - no registration' }), { status: 500 });
+		}
+		const updatedRegistration = await updateRegistration(registrationToUpdate, {
+			closed: true
 		});
 		if (!updatedRegistration) {
 			await logger.error('Failed to update registration closed status', new Error('Update registration failed'), {
@@ -127,7 +129,10 @@ async function sendRegistrationConfirmationEmail({ submission, user }: { submiss
 	try {
 		await sendGoogleEmail(mailoptions);
 	} catch (e) {
-		console.error(e);
+		await logger.error('Failed to send registration confirmation email', e as Error, {
+			userId: user.id,
+			userEmail: user.email
+		});
 		return new Response(JSON.stringify({ message: 'Error Getting Submission -Email' }), { status: 500 });
 	}
 

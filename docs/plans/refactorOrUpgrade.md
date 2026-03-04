@@ -295,14 +295,14 @@ Required context files for any new agent starting mid-program:
 
 ### Program State Ledger (update as you go)
 
-| Wave | Status      | Commit                    | Manual Test Result | Summary of What Was Completed                                                                                           | Known Issues / Follow-ups                                            |
-| ---- | ----------- | ------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded. | Create rollback tag before entering Wave 1 (if not already created). |
-| 1    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
-| 2    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
-| 3    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
-| 4    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
-| 5    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
+| Wave | Status      | Commit                    | Manual Test Result | Summary of What Was Completed                                                                                                                                                  | Known Issues / Follow-ups                                            |
+| ---- | ----------- | ------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                        | Create rollback tag before entering Wave 1 (if not already created). |
+| 1    | In progress | TBD                       | TBD                | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API moved to modern Square client, package hygiene cleanup applied. | Manual Auth smoke + rollback tag + wave completion commit pending.   |
+| 2    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
+| 3    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
+| 4    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
+| 5    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
 
 How to update this ledger:
 
@@ -403,35 +403,35 @@ Exit gate:
 
 #### 1A. Forms Consistency
 
-- [ ] Inventory all `superForm(...)` usages and adapter imports
-- [ ] Normalize on one adapter strategy and remove stale alternatives
-- [ ] Ensure form IDs remain stable and unique where required
+- [x] Inventory all `superForm(...)` usages and adapter imports
+- [x] Normalize on one adapter strategy and remove stale alternatives
+- [x] Ensure form IDs remain stable and unique where required
 
 #### 1B. Auth Boundary Hardening
 
-- [ ] Consolidate and document user/session assumptions used in hooks and guards
-- [ ] Verify proxy/super-admin behavior does not alter auth safety guarantees
-- [ ] Ensure protected-route checks are centralized and consistent
+- [x] Consolidate and document user/session assumptions used in hooks and guards
+- [x] Verify proxy/super-admin behavior does not alter auth safety guarantees
+- [x] Ensure protected-route checks are centralized and consistent
 
 #### 1C. DB & Transaction Safety
 
-- [ ] Verify write operations use consistent transaction boundaries where needed
-- [ ] Remove inconsistent direct DB patterns that bypass agreed helpers
+- [x] Verify write operations use consistent transaction boundaries where needed
+- [x] Remove inconsistent direct DB patterns that bypass agreed helpers
 
 #### 1D. Payment Adapter Consistency
 
-- [ ] Inventory all `square` client usage paths
-- [ ] Align to one approach (remove mixed legacy/new style usage)
+- [x] Inventory all `square` client usage paths
+- [x] Align to one approach (remove mixed legacy/new style usage)
 
 #### 1E. Package Hygiene Pre-work
 
-- [ ] Remove duplicate dependency declarations across `dependencies` / `devDependencies`
-- [ ] Move misplaced build/runtime tools to correct section
-- [ ] Reinstall and verify lockfile determinism
+- [x] Remove duplicate dependency declarations across `dependencies` / `devDependencies`
+- [x] Move misplaced build/runtime tools to correct section
+- [x] Reinstall and verify lockfile determinism
 
 Exit gate:
 
-- [ ] Gate A pass
+- [x] Gate A pass
 - [ ] Gate B (Auth smoke) pass
 - [ ] Gate C rollback tag created
 - [ ] Manual integrity test complete and recorded in Program State Ledger

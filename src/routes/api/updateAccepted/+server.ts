@@ -1,4 +1,5 @@
-import { prisma } from '$lib/components/server/prisma';
+import { updateEntry } from '$lib/components/server/registrationDB';
+import { logger } from '$lib/server/logger';
 import type { RequestEvent } from './$types';
 
 export async function POST(event: RequestEvent) {
@@ -9,20 +10,39 @@ export async function POST(event: RequestEvent) {
 		return new Response(JSON.stringify({ message: 'Error in acceptEntry - no entryId' }), { status: 500 });
 	}
 	const { user } = await locals.V1safeGetSession();
+	if (!user) {
+		return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 });
+	}
 	// Only admins can update entries to accepted
 	if (!user.isAdmin) {
-		console.log('Error in acceptEntry - not admin');
-		return new Response(JSON.stringify({ message: 'Error in acceptEntry' }), { status: 500 });
+		await logger.warn('Rejected updateAccepted call from non-admin user', {
+			userId: user.id,
+			userEmail: user.email,
+			entryId,
+			routeId: event.route.id
+		});
+		return new Response(JSON.stringify({ message: 'Forbidden' }), { status: 403 });
 	}
 	try {
-		await prisma.entryTable.update({
-			where: { id: entryId },
-			data: { accepted: !accepted }
+		await updateEntry(entryId, {
+			accepted: !accepted
 		});
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	} catch (error: any) {
-		console.log('Error in getExhibits:', error.message);
+	} catch (error) {
+		await logger.error('Failed to update accepted status', error as Error, {
+			userId: user.id,
+			userEmail: user.email,
+			entryId,
+			routeId: event.route.id
+		});
 		return new Response(JSON.stringify({ message: 'Error in getExhibits' }), { status: 500 });
 	}
+
+	await logger.info('Updated accepted status', {
+		userId: user.id,
+		userEmail: user.email,
+		entryId,
+		accepted: !accepted,
+		routeId: event.route.id
+	});
 	return new Response('', { status: 200 });
 }
