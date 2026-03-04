@@ -27,8 +27,8 @@
 | 023 | refactorOrUpgrade - Wave 1 | Refactor hardening (forms/auth/db/payment + package hygiene pre-work). Manual integrity test required. Commit gate.         | ✅   |
 | 024 | refactorOrUpgrade - Wave 2 | Low-risk upgrades (tooling/non-critical libs). Manual integrity test required. Commit gate.                                 | ✅   |
 | 025 | refactorOrUpgrade - Wave 3 | Core runtime upgrades (Vite/Svelte/SvelteKit/Superforms/Supabase + shadcn ecosystem validation). Test + commit gate.        | ✅   |
-| 026 | refactorOrUpgrade - Wave 4 | Prisma upgrade and migration checkpoint (same cycle). Manual integrity test required. Commit gate.                          | ⬜   |
-| 027 | refactorOrUpgrade - Wave 5 | Final stabilization, release prep, and post-release checklist setup. Manual integrity test required. Commit gate.           | ⬜   |
+| 026 | refactorOrUpgrade - Wave 4 | Prisma upgrade and migration checkpoint (same cycle). Manual integrity test required. Commit gate.                          | ✅   |
+| 027 | refactorOrUpgrade - Wave 5 | Final stabilization, release prep, and post-release checklist setup. Manual integrity test required. Commit gate.           | ✅   |
 
 ## Tracking Rules for refactorOrUpgrade
 
