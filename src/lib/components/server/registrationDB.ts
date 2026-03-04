@@ -4,7 +4,7 @@ import { getImagesWithPrimary as getImagesWithPrimaryUtil, getNewPrimaryAfterRem
 
 import { EntryType } from '$lib/constants';
 import type { EntryTable, ImageTable, PrimaryImageTable } from '$lib/zod-schemas';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '$lib/generated/prisma/client';
 
 // Two different ways to add types from a prisma query
 

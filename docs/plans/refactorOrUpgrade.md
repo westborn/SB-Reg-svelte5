@@ -295,14 +295,14 @@ Required context files for any new agent starting mid-program:
 
 ### Program State Ledger (update as you go)
 
-| Wave | Status      | Commit                    | Manual Test Result       | Summary of What Was Completed                                                                                                                                                                                                                                                                                                                         | Known Issues / Follow-ups                                                                                                           |
-| ---- | ----------- | ------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)        | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                                                                                                                                                                                               | Create rollback tag before entering Wave 1 (if not already created).                                                                |
-| 1    | Done        | a279067 - Wave 1 closeout | Pass (manual)            | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API aligned to current SDK with consistent error shape, package hygiene cleanup applied.                                                                                                                                                   | Rollback tag created: `pre-wave-2-20260304`.                                                                                        |
-| 2    | Done        | Wave 2 closeout commit    | Pass (manual auth smoke) | Upgraded low-risk tooling/dev libraries (TypeScript, svelte-check, Prettier stack, ESLint 9-compatible set, PostCSS/Autoprefixer, tsx, low-blast dev utilities), resolved formatter drift, revalidated Gate A (`pnpm lint`, `pnpm check`, `pnpm build`), and completed manual Auth smoke validation.                                                  | Rollback tag created: `pre-wave-3-20260304`. ESLint v10 + eslint-plugin-svelte v3 lint-rule churn deferred to Wave 5 stabilization. |
-| 3    | Done        | cbf896f - Wave 3 closeout | Pass (manual auth smoke) | Upgraded core runtime stack in sequence: Vite + Svelte plugin, Svelte + SvelteKit, Superforms, Supabase SSR/Auth, and shadcn ecosystem dependencies (including Tailwind 4 migration updates for PostCSS/app stylesheet). Revalidated Gate A after each sub-wave (`pnpm lint`, `pnpm check`, `pnpm build`) and completed manual Auth smoke validation. | Existing non-blocking lint/build warnings remain (unused eslint-disable directives and externalized node:dns warning).              |
-| 4    | Not started | TBD                       | TBD                      | TBD                                                                                                                                                                                                                                                                                                                                                   | TBD                                                                                                                                 |
-| 5    | Not started | TBD                       | TBD                      | TBD                                                                                                                                                                                                                                                                                                                                                   | TBD                                                                                                                                 |
+| Wave | Status      | Commit                    | Manual Test Result        | Summary of What Was Completed                                                                                                                                                                                                                                                                                                                         | Known Issues / Follow-ups                                                                                                           |
+| ---- | ----------- | ------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)         | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                                                                                                                                                                                               | Create rollback tag before entering Wave 1 (if not already created).                                                                |
+| 1    | Done        | a279067 - Wave 1 closeout | Pass (manual)             | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API aligned to current SDK with consistent error shape, package hygiene cleanup applied.                                                                                                                                                   | Rollback tag created: `pre-wave-2-20260304`.                                                                                        |
+| 2    | Done        | Wave 2 closeout commit    | Pass (manual auth smoke)  | Upgraded low-risk tooling/dev libraries (TypeScript, svelte-check, Prettier stack, ESLint 9-compatible set, PostCSS/Autoprefixer, tsx, low-blast dev utilities), resolved formatter drift, revalidated Gate A (`pnpm lint`, `pnpm check`, `pnpm build`), and completed manual Auth smoke validation.                                                  | Rollback tag created: `pre-wave-3-20260304`. ESLint v10 + eslint-plugin-svelte v3 lint-rule churn deferred to Wave 5 stabilization. |
+| 3    | Done        | cbf896f - Wave 3 closeout | Pass (manual auth smoke)  | Upgraded core runtime stack in sequence: Vite + Svelte plugin, Svelte + SvelteKit, Superforms, Supabase SSR/Auth, and shadcn ecosystem dependencies (including Tailwind 4 migration updates for PostCSS/app stylesheet). Revalidated Gate A after each sub-wave (`pnpm lint`, `pnpm check`, `pnpm build`) and completed manual Auth smoke validation. | Existing non-blocking lint/build warnings remain (unused eslint-disable directives and externalized node:dns warning).              |
+| 4    | Done        | 371346b - Wave 4 closeout | Pass (manual auth smoke)  | Prisma upgraded to v7.4.2 with adapter-based client wiring (`@prisma/adapter-pg` + `pg`), schema generator migrated to `prisma-client` with explicit output, new `prisma.config.ts` added for CLI env loading, all direct Prisma imports migrated to generated client paths, and Gate A (`pnpm lint`, `pnpm check`, `pnpm build`) passed.             | `zod-prisma-types` reports peer-range warning for Prisma 7; existing non-blocking build warning (`node:dns/promises`) remains.      |
+| 5    | Not started | TBD                       | TBD                       | TBD                                                                                                                                                                                                                                                                                                                                                   | TBD                                                                                                                                 |
 
 How to update this ledger:
 
@@ -521,19 +521,78 @@ Wave 3 exit gate:
 
 ### Wave 4 — Prisma (Same Cycle)
 
-- [ ] Upgrade `prisma` and `@prisma/client` together
-- [ ] Verify schema compatibility (`generator`, `previewFeatures`, datasource)
-- [ ] Run migration status review and document outcomes
-- [ ] Regenerate Prisma artifacts and validate compile/runtime
-- [ ] Verify auth-related DB calls still behave correctly
+Decision for SvelteKit integration (confirmed before implementation):
+
+- Runtime app code should continue using SvelteKit server env modules (for example `$env/static/private` / `$env/dynamic/private`) where env access is needed.
+- Prisma CLI behavior in v7 is different: CLI env vars are **not auto-loaded** by default, so Wave 4 will add explicit env loading in `prisma.config.ts` (using `dotenv/config`) for migration/generate/seed workflows.
+- This means: **no standalone dotenv wiring is required across regular SvelteKit server routes just to run Prisma queries**; dotenv is required for Prisma CLI configuration.
+
+#### 4A. Package + adapter baseline
+
+- [x] Upgrade `prisma` and `@prisma/client` together to latest v7 stable
+- [x] Add Postgres driver adapter dependency (`@prisma/adapter-pg`) and `pg` runtime dependency if not already present
+- [x] Confirm Node/TypeScript prerequisites for Prisma 7 are satisfied in this repo
+
+#### 4B. Prisma schema + config migration
+
+- [x] Update `prisma/schema.prisma` generator from `prisma-client-js` to `prisma-client`
+- [x] Add required generator `output` path for generated client (repo-local path, not `node_modules`)
+- [x] Review/remove Prisma 6-only generator fields no longer required for v7 flow
+- [x] Add root `prisma.config.ts` with explicit env loading and datasource config
+
+#### 4C. Runtime client wiring in SvelteKit
+
+- [x] Update Prisma client module in [src/lib/components/server/prisma.ts](src/lib/components/server/prisma.ts) to instantiate client via Prisma 7 adapter pattern
+- [x] Replace imports from `@prisma/client` with imports from generated client output path in server/runtime code
+- [x] Keep one shared server-side client boundary and preserve existing call sites via same exported `prisma` symbol
+
+#### 4D. Script and type import migration
+
+- [x] Update all project scripts importing `@prisma/client` to generated-client imports (and adapter where needed)
+- [x] Validate `Prisma` type-only imports still compile after generated-path migration
+
+#### 4E. CLI/workflow changes (v7-specific)
+
+- [x] Update npm/pnpm scripts if needed for explicit `prisma generate` / `prisma db seed` execution
+- [x] Verify migration commands behavior under `prisma.config.ts`
+- [x] Record any command syntax changes used during Wave 4 in this document
+
+Wave 4 command notes (v7):
+
+- `pnpm prisma generate` is required explicitly after schema/generator changes.
+- `db:migrate` script updated to run `prisma migrate dev && prisma generate`.
+- `db:reset` script updated to run `prisma migrate reset --force && prisma generate && prisma db seed`.
+- `db:seed` script now uses `prisma db seed` (seed command configured in `prisma.config.ts`).
+
+#### 4F. Verification and checkpoints
+
+- [x] Run migration status review and document outcomes
+- [x] Regenerate Prisma artifacts and validate compile/runtime
+- [x] Verify auth-related DB calls still behave correctly
+- [x] Run manual DB smoke for register flow write/read paths (artist create, registration read, entry read)
+
+Migration checkpoint note:
+
+- `prisma migrate status` result: **Database schema is up to date**, 6 migrations found.
+- `prisma generate` result: **Prisma Client 7.4.2 generated** to `src/lib/generated/prisma`.
+- Gate A status after Wave 4 changes: `pnpm lint` pass (warnings only), `pnpm check` pass, `pnpm build` pass.
+
+Expected file touch-list for Wave 4 (minimum):
+
+- [x] [package.json](package.json)
+- [x] [prisma/schema.prisma](prisma/schema.prisma)
+- [x] [prisma.config.ts](prisma.config.ts) (new)
+- [x] [src/lib/components/server/prisma.ts](src/lib/components/server/prisma.ts)
+- [x] [src/lib/components/server/registrationDB.ts](src/lib/components/server/registrationDB.ts)
+- [x] scripts under [scripts/](scripts/) and [src/scripts/](src/scripts/) that import Prisma client directly
 
 Exit gate:
 
-- [ ] Gate A pass
-- [ ] Gate B pass
-- [ ] Migration checkpoint note added to this document
-- [ ] Manual integrity test complete and recorded in Program State Ledger
-- [ ] Wave 4 completion commit created
+- [x] Gate A pass
+- [x] Gate B pass
+- [x] Migration checkpoint note added to this document
+- [x] Manual integrity test complete and recorded in Program State Ledger
+- [x] Wave 4 completion commit created
 
 ### Wave 5 — Final Stabilization & Release Prep
 
