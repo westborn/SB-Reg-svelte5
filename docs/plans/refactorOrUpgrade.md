@@ -298,7 +298,7 @@ Required context files for any new agent starting mid-program:
 | Wave | Status      | Commit                    | Manual Test Result | Summary of What Was Completed                                                                                                                                                  | Known Issues / Follow-ups                                            |
 | ---- | ----------- | ------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
 | 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                        | Create rollback tag before entering Wave 1 (if not already created). |
-| 1    | In progress | TBD                       | TBD                | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API moved to modern Square client, package hygiene cleanup applied. | Manual Auth smoke + rollback tag + wave completion commit pending.   |
+| 1    | Done        | a279067 - Wave 1 closeout | Pass (manual)      | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API aligned to current SDK with consistent error shape, package hygiene cleanup applied. | Rollback tag created: `pre-wave-2-20260304`.                        |
 | 2    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
 | 3    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
 | 4    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
@@ -432,10 +432,10 @@ Exit gate:
 Exit gate:
 
 - [x] Gate A pass
-- [ ] Gate B (Auth smoke) pass
-- [ ] Gate C rollback tag created
-- [ ] Manual integrity test complete and recorded in Program State Ledger
-- [ ] Wave 1 completion commit created
+- [x] Gate B (Auth smoke) pass
+- [x] Gate C rollback tag created
+- [x] Manual integrity test complete and recorded in Program State Ledger
+- [x] Wave 1 completion commit created
 
 ### Wave 2 — Low-Risk Upgrades
 
