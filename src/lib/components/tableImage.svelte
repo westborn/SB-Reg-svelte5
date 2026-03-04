@@ -148,7 +148,7 @@
 									/>
 									<!-- Primary Image Star Indicator -->
 									{#if image.isPrimary}
-										<div class="absolute right-2 top-2 rounded-full bg-yellow-500 p-1 text-white shadow-md">
+										<div class="absolute top-2 right-2 rounded-full bg-yellow-500 p-1 text-white shadow-md">
 											<Star class="h-3 w-3 fill-current" />
 										</div>
 									{/if}
@@ -158,8 +158,8 @@
 
 						<!-- Navigation Arrows (only show if multiple images) -->
 						{#if processedImages.length > 1}
-							<Carousel.Previous class="absolute left-2 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/80 hover:bg-white" />
-							<Carousel.Next class="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/80 hover:bg-white" />
+							<Carousel.Previous class="absolute top-1/2 left-2 h-8 w-8 -translate-y-1/2 bg-white/80 hover:bg-white" />
+							<Carousel.Next class="absolute top-1/2 right-2 h-8 w-8 -translate-y-1/2 bg-white/80 hover:bg-white" />
 						{/if}
 					</Carousel.Root>
 

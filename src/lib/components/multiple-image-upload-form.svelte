@@ -149,9 +149,9 @@
 
 	<!-- Images grid or empty state -->
 	{#if images.length === 0}
-		<div class="rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 text-center">
-			<Upload class="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
-			<p class="mb-4 text-sm text-muted-foreground">No images uploaded yet</p>
+		<div class="border-muted-foreground/25 rounded-lg border-2 border-dashed p-8 text-center">
+			<Upload class="text-muted-foreground/50 mx-auto mb-4 h-12 w-12" />
+			<p class="text-muted-foreground mb-4 text-sm">No images uploaded yet</p>
 			<Button onclick={handleAddImage} disabled={isUploading}>
 				<Upload class="mr-2 h-4 w-4" />
 				{isUploading ? 'Uploading...' : 'Upload First Image'}
@@ -160,14 +160,14 @@
 	{:else}
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
 			{#each images.filter((img) => img !== null) as image (image.id)}
-				<div class="group relative overflow-hidden rounded-lg border bg-card">
+				<div class="group bg-card relative overflow-hidden rounded-lg border">
 					<!-- Image -->
 					<div class="relative aspect-square">
 						<img src={image.cloudURL} alt={image.originalFileName} class="h-full w-full object-cover" />
 
 						<!-- Primary indicator -->
 						{#if image.id === primaryImageId}
-							<div class="absolute left-2 top-2 rounded-full bg-yellow-500 p-1 text-white">
+							<div class="absolute top-2 left-2 rounded-full bg-yellow-500 p-1 text-white">
 								<Star class="h-4 w-4 fill-current" />
 							</div>
 						{/if}
@@ -205,7 +205,7 @@
 
 		{#if images.length > MIN_IMAGES_PER_ENTRY}
 			<!-- Instructions -->
-			<div class="space-y-1 text-sm text-muted-foreground">
+			<div class="text-muted-foreground space-y-1 text-sm">
 				<p>• The primary image (starred) will be in the catalogue</p>
 				<p>• Hover over image to set a primary or remove image</p>
 			</div>

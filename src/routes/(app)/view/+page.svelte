@@ -30,7 +30,7 @@
 
 <section class="mx-auto mt-2 max-w-[500px] px-3">
 	{#if (REGISTRATIONS_OPEN || data.user.isSuperAdmin) && myState.artistExists}
-		<h3 class="text-xl font-bold text-primary">Registration Information</h3>
+		<h3 class="text-primary text-xl font-bold">Registration Information</h3>
 		<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 			{#each textList as [textItem, textValue]}
 				{@render TextList(textItem, textValue)}

@@ -66,7 +66,7 @@
 		<button
 			onclick={() => goto('/register/payment')}
 			type="submit"
-			class="mt-4 inline-block w-auto rounded-lg bg-red-500 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-200 active:shadow-lg"
+			class="mt-4 inline-block w-auto rounded-lg bg-red-500 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:ring-0 focus:outline-none active:bg-red-200 active:shadow-lg"
 			>By clicking here I CONFIRM that all details are correct<br />
 			<span class="text-base">and I have read the "Artists Terms & Conditions"</span><br />
 		</button>
@@ -74,7 +74,7 @@
 			<p class="my-3 text-sm font-bold italic">No is payment required for Indigenous Artist entries</p>
 		{/if}
 	{:else}
-		<p class="text-sm text-muted-foreground">
+		<p class="text-muted-foreground text-sm">
 			First you need to register for the exhibition,<br /> and provide some basic details so we can contact you.
 		</p>
 	{/if}

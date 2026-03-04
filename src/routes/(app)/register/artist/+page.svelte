@@ -29,7 +29,7 @@
 		</Card.Header>
 		<Card.Content class="p-2 sm:px-6">
 			{#if myState && myState.artistExists && myState.submission}
-				<p class="text-sm text-muted-foreground">Some basic information we use to contact you:</p>
+				<p class="text-muted-foreground text-sm">Some basic information we use to contact you:</p>
 				<div class="my-3 grid grid-cols-[14ch_1fr] items-center">
 					{#each textList as [textItem, textValue]}
 						{@render TextList(textItem, textValue)}
@@ -37,7 +37,7 @@
 				</div>
 				<ArtistUpdateDialog />
 			{:else}
-				<p class="text-sm text-muted-foreground">
+				<p class="text-muted-foreground text-sm">
 					First you need to register for the exhibition,<br /> and provide some basic details so we can contact you.
 				</p>
 				<ArtistCreateForm />

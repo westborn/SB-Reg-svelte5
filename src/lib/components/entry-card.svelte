@@ -64,7 +64,7 @@
 </script>
 
 <Card.Root class="mb-4">
-	<Card.Title class="pl-4 pt-4">{entryItem.title}</Card.Title>
+	<Card.Title class="pt-4 pl-4">{entryItem.title}</Card.Title>
 	<Card.Content class="p-0 pl-4 text-sm">
 		<p class="text-xs">({entryItem.inOrOut})</p>
 		<p>{entryItem.description}</p>
@@ -101,7 +101,7 @@
 									{/if}
 									<!-- Primary Image Star Indicator -->
 									{#if image.isPrimary}
-										<div class="absolute right-2 top-2 rounded-full bg-yellow-500 p-1 text-white shadow-md">
+										<div class="absolute top-2 right-2 rounded-full bg-yellow-500 p-1 text-white shadow-md">
 											<Star class="h-3 w-3 fill-current" />
 										</div>
 									{/if}
@@ -112,10 +112,10 @@
 						<!-- Navigation Arrows (only show if multiple images) -->
 						{#if images.length > 1}
 							<Carousel.Previous
-								class="absolute left-2 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:opacity-100 focus:opacity-100 group-hover:opacity-70"
+								class="absolute top-1/2 left-2 h-6 w-6 -translate-y-1/2 rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-70 hover:opacity-100 focus:opacity-100"
 							/>
 							<Carousel.Next
-								class="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:opacity-100 focus:opacity-100 group-hover:opacity-70"
+								class="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2 rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-70 hover:opacity-100 focus:opacity-100"
 							/>
 						{/if}
 					</Carousel.Root>

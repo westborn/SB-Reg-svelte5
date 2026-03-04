@@ -26,7 +26,7 @@
 <div class="mx-1 mt-6 max-w-xl sm:container sm:mx-auto">
 	<div class="grid">
 		<div class="w-full max-w-screen-lg gap-2 p-2">
-			<h4 class="text-xl font-bold text-primary">Change Exhibit Number(s)</h4>
+			<h4 class="text-primary text-xl font-bold">Change Exhibit Number(s)</h4>
 			{#if updateError}
 				<p class="text-red-500">{updateError}</p>
 			{/if}
@@ -34,9 +34,9 @@
 				<p>No exhibits found</p>
 			{:else}
 				<div class="mt-6 grid grid-cols-[50px_200px_150px] items-center gap-1 text-base">
-					<p class="text-nowrap text-primary">Entry</p>
-					<p class="text-nowrap text-primary">Exhibit Number</p>
-					<p class="text-nowrap text-primary">Artist - Title</p>
+					<p class="text-primary text-nowrap">Entry</p>
+					<p class="text-primary text-nowrap">Exhibit Number</p>
+					<p class="text-primary text-nowrap">Artist - Title</p>
 					{#each exhibits as exhibit, index}
 						<p class="py-1 text-sm">{exhibit.entryId}</p>
 						<LocationUpdateForm
@@ -46,7 +46,7 @@
 							formOccurence={index}
 							{updateLocationOnSuccess}
 						/>
-						<p class="text-nowrap text-sm">{exhibit.artistName} - {exhibit.title}</p>
+						<p class="text-sm text-nowrap">{exhibit.artistName} - {exhibit.title}</p>
 					{/each}
 				</div>
 			{/if}

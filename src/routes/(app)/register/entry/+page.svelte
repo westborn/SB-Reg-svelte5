@@ -34,11 +34,11 @@
 	{#if actionType === entryType.create}
 		{#if !myState.entriesExist}
 			<div>
-				<div class="mb-10 mt-10">Create your first entry</div>
+				<div class="mt-10 mb-10">Create your first entry</div>
 				<EntryCreateForm />
 			</div>
 		{:else}
-			<p class="mt-2 text-base font-bold text-primary-400">
+			<p class="text-primary-400 mt-2 text-base font-bold">
 				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}
 			</p>
 			<div class="mt-6">
@@ -51,7 +51,7 @@
 	{/if}
 	{#if actionType === entryType.update}
 		<div>
-			<div class="mb-10 mt-10">Update your entry</div>
+			<div class="mt-10 mb-10">Update your entry</div>
 			<EntryUpdateButton {currentEntryId} />
 		</div>
 	{/if}

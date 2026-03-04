@@ -9,10 +9,9 @@
 	import { AdminMenu } from '$lib/components';
 	import { EXHIBITION_YEAR } from '../constants';
 
-	let data = $props();
-	const { navItems, user } = data;
-	const loggedInEmail = user?.email ?? 'Guest';
-	const avatar = loggedInEmail.slice(0, 2);
+	let { navItems, user } = $props();
+	const loggedInEmail = $derived(user?.email ?? 'Guest');
+	const avatar = $derived(loggedInEmail.slice(0, 2));
 
 	let sheetOpen = $state(false);
 </script>
@@ -27,14 +26,14 @@
 		<div class="hidden h-14 grid-cols-[200px_2fr] items-center md:grid">
 			<div class="flex">
 				<img src="/favicon-32x32.png" alt="Sculpture Bermagui Logo" class="mt-2 h-10" />
-				<h1 class="ml-2 text-lg text-primary-400">Exhibition Registration {EXHIBITION_YEAR}</h1>
+				<h1 class="text-primary-400 ml-2 text-lg">Exhibition Registration {EXHIBITION_YEAR}</h1>
 			</div>
 			<div class="grid grid-cols-3">
 				{#each navItems as { label, href }, i}
 					{#if page.url.pathname.startsWith(href)}
-						<Button class="bg-transparent font-semibold text-primary-300" disabled><p>{label}</p></Button>
+						<Button class="text-primary-300 bg-transparent font-semibold" disabled><p>{label}</p></Button>
 					{:else}
-						<Button class="font-semibold text-primary-300" {href} variant="ghost"><p>{label}</p></Button>
+						<Button class="text-primary-300 font-semibold" {href} variant="ghost"><p>{label}</p></Button>
 					{/if}
 				{/each}
 			</div>
@@ -48,19 +47,19 @@
 						><AlignJustify class="text-primary-300" /></Sheet.Trigger
 					>
 					<Sheet.Content side="left" class="w-1/2">
-						<h1 class="mt-4 text-center text-sm text-primary-400 md:hidden">
+						<h1 class="text-primary-400 mt-4 text-center text-sm md:hidden">
 							Exhibition Registration {EXHIBITION_YEAR}
 						</h1>
-						<div class="mt-10 flex flex-col items-start justify-between text-primary-300">
+						<div class="text-primary-300 mt-10 flex flex-col items-start justify-between">
 							{#each navItems as { label, href }, i}
 								{#if page.url.pathname.startsWith(href)}
 									<Sheet.Trigger>
-										<Button class="bg-transparent font-semibold text-primary-300 " disabled>{label}</Button>
+										<Button class="text-primary-300 bg-transparent font-semibold " disabled>{label}</Button>
 									</Sheet.Trigger>
 								{:else}
 									<Sheet.Trigger>
 										<Button
-											class="font-semibold text-primary-300"
+											class="text-primary-300 font-semibold"
 											{href}
 											variant="ghost"
 											onclick={() => {
@@ -93,7 +92,7 @@
 					<Tooltip.Content>
 						<p>{loggedInEmail}</p>
 						{#if user.isSuperAdmin && page.data.user.proxyEmail}
-							<p><span class="text-xs text-primary">as: {page.data.user.proxyEmail}</span></p>
+							<p><span class="text-primary text-xs">as: {page.data.user.proxyEmail}</span></p>
 						{/if}
 					</Tooltip.Content>
 				</Tooltip.Root>

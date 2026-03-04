@@ -102,7 +102,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<p class="pt-4 text-sm text-muted-foreground">(You can add this bank stuff later if you like...)</p>
+	<p class="text-muted-foreground pt-4 text-sm">(You can add this bank stuff later if you like...)</p>
 
 	<Form.Field {form} name="bankAccountName">
 		<Form.Control>

@@ -27,7 +27,7 @@
 <AuthPage type="verify-email" session={data.session} user={data.user}>
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Verify your account</h1>
-		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
+		<p class="text-muted-foreground text-sm">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<form method="POST" use:enhance class="w-full space-y-4">
 		<Form.Field {form} name="email">
@@ -44,7 +44,7 @@
 				{#snippet children({ props })}
 					<Form.Label
 						>6 Digit Token
-						<span class="py-4 text-xs text-muted-foreground">(that we sent to your email address)</span>
+						<span class="text-muted-foreground py-4 text-xs">(that we sent to your email address)</span>
 					</Form.Label>
 					<Input autofocus type="text" {...props} bind:value={$formData.token} />
 				{/snippet}

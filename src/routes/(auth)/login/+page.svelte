@@ -24,7 +24,7 @@
 <AuthPage type="login" session={data.session} user={data.user}>
 	<div class="flex flex-col space-y-2 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight">Login to manage your registration</h1>
-		<p class="text-sm text-muted-foreground">Start telling us about your exhibit(s) today.</p>
+		<p class="text-muted-foreground text-sm">Start telling us about your exhibit(s) today.</p>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<form method="POST" use:enhance class="w-full space-y-4">
@@ -49,7 +49,7 @@
 					<LoaderCircle class="ml-4 h-6 w-6 animate-spin" />
 				{/if}
 			</Form.Button>
-			<span class="px-4 text-sm text-muted-foreground">
+			<span class="text-muted-foreground px-4 text-sm">
 				We will send a token to your email address for verification - check for spam</span
 			>
 		</div>

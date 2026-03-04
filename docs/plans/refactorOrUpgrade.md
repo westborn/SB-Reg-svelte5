@@ -2,7 +2,7 @@
 
 **Project**: SB-Reg-svelte5  
 **Date**: 2026-03-04  
-**Status**: Wave 2 complete; Wave 3 ready to start
+**Status**: Wave 3 complete; Wave 4 ready to start
 
 ---
 
@@ -295,14 +295,14 @@ Required context files for any new agent starting mid-program:
 
 ### Program State Ledger (update as you go)
 
-| Wave | Status      | Commit                    | Manual Test Result       | Summary of What Was Completed                                                                                                                                                                                                                                                                        | Known Issues / Follow-ups                                                                                                           |
-| ---- | ----------- | ------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)        | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                                                                                                                                              | Create rollback tag before entering Wave 1 (if not already created).                                                                |
-| 1    | Done        | a279067 - Wave 1 closeout | Pass (manual)            | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API aligned to current SDK with consistent error shape, package hygiene cleanup applied.                                                                                                  | Rollback tag created: `pre-wave-2-20260304`.                                                                                        |
-| 2    | Done        | Wave 2 closeout commit    | Pass (manual auth smoke) | Upgraded low-risk tooling/dev libraries (TypeScript, svelte-check, Prettier stack, ESLint 9-compatible set, PostCSS/Autoprefixer, tsx, low-blast dev utilities), resolved formatter drift, revalidated Gate A (`pnpm lint`, `pnpm check`, `pnpm build`), and completed manual Auth smoke validation. | Rollback tag created: `pre-wave-3-20260304`. ESLint v10 + eslint-plugin-svelte v3 lint-rule churn deferred to Wave 5 stabilization. |
-| 3    | Not started | TBD                       | TBD                      | TBD                                                                                                                                                                                                                                                                                                  | TBD                                                                                                                                 |
-| 4    | Not started | TBD                       | TBD                      | TBD                                                                                                                                                                                                                                                                                                  | TBD                                                                                                                                 |
-| 5    | Not started | TBD                       | TBD                      | TBD                                                                                                                                                                                                                                                                                                  | TBD                                                                                                                                 |
+| Wave | Status      | Commit                    | Manual Test Result       | Summary of What Was Completed                                                                                                                                                                                                                                                                                                                         | Known Issues / Follow-ups                                                                                                           |
+| ---- | ----------- | ------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)        | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                                                                                                                                                                                               | Create rollback tag before entering Wave 1 (if not already created).                                                                |
+| 1    | Done        | a279067 - Wave 1 closeout | Pass (manual)            | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API aligned to current SDK with consistent error shape, package hygiene cleanup applied.                                                                                                                                                   | Rollback tag created: `pre-wave-2-20260304`.                                                                                        |
+| 2    | Done        | Wave 2 closeout commit    | Pass (manual auth smoke) | Upgraded low-risk tooling/dev libraries (TypeScript, svelte-check, Prettier stack, ESLint 9-compatible set, PostCSS/Autoprefixer, tsx, low-blast dev utilities), resolved formatter drift, revalidated Gate A (`pnpm lint`, `pnpm check`, `pnpm build`), and completed manual Auth smoke validation.                                                  | Rollback tag created: `pre-wave-3-20260304`. ESLint v10 + eslint-plugin-svelte v3 lint-rule churn deferred to Wave 5 stabilization. |
+| 3    | Done        | Wave 3 closeout commit    | Pass (manual auth smoke) | Upgraded core runtime stack in sequence: Vite + Svelte plugin, Svelte + SvelteKit, Superforms, Supabase SSR/Auth, and shadcn ecosystem dependencies (including Tailwind 4 migration updates for PostCSS/app stylesheet). Revalidated Gate A after each sub-wave (`pnpm lint`, `pnpm check`, `pnpm build`) and completed manual Auth smoke validation. | Existing non-blocking lint/build warnings remain (unused eslint-disable directives and externalized node:dns warning).              |
+| 4    | Not started | TBD                       | TBD                      | TBD                                                                                                                                                                                                                                                                                                                                                   | TBD                                                                                                                                 |
+| 5    | Not started | TBD                       | TBD                      | TBD                                                                                                                                                                                                                                                                                                                                                   | TBD                                                                                                                                 |
 
 How to update this ledger:
 
@@ -458,66 +458,66 @@ Order is strict; complete sub-wave gates each time.
 
 #### 3A. Vite + Svelte Plugin
 
-- [ ] Upgrade `vite`
-- [ ] Upgrade `@sveltejs/vite-plugin-svelte`
-- [ ] Verify SvelteKit compatibility matrix
-- [ ] Validate dev/build behavior
+- [x] Upgrade `vite`
+- [x] Upgrade `@sveltejs/vite-plugin-svelte`
+- [x] Verify SvelteKit compatibility matrix
+- [x] Validate dev/build behavior
 
 Sub-wave gate:
 
-- [ ] Gate A pass
-- [ ] Gate B pass
+- [x] Gate A pass
+- [x] Gate B pass
 
 #### 3B. Svelte + SvelteKit
 
-- [ ] Upgrade `svelte`
-- [ ] Upgrade `@sveltejs/kit`
-- [ ] Apply required migration changes (if any)
-- [ ] Validate route behavior + hooks compatibility
+- [x] Upgrade `svelte`
+- [x] Upgrade `@sveltejs/kit`
+- [x] Apply required migration changes (if any)
+- [x] Validate route behavior + hooks compatibility
 
 Sub-wave gate:
 
-- [ ] Gate A pass
-- [ ] Gate B pass
+- [x] Gate A pass
+- [x] Gate B pass
 
 #### 3C. Superforms Stack
 
-- [ ] Upgrade `sveltekit-superforms`
-- [ ] Validate adapter compatibility and form action result handling
-- [ ] Verify all auth-adjacent forms still submit and handle failures correctly
+- [x] Upgrade `sveltekit-superforms`
+- [x] Validate adapter compatibility and form action result handling
+- [x] Verify all auth-adjacent forms still submit and handle failures correctly
 
 Sub-wave gate:
 
-- [ ] Gate A pass
-- [ ] Gate B pass
+- [x] Gate A pass
+- [x] Gate B pass
 
 #### 3D. Supabase SSR/Auth Stack
 
-- [ ] Upgrade `@supabase/ssr`
-- [ ] Upgrade `@supabase/supabase-js`
-- [ ] Verify session retrieval and token/user validation behavior in hooks
+- [x] Upgrade `@supabase/ssr`
+- [x] Upgrade `@supabase/supabase-js`
+- [x] Verify session retrieval and token/user validation behavior in hooks
 
 Sub-wave gate:
 
-- [ ] Gate A pass
-- [ ] Gate B pass
+- [x] Gate A pass
+- [x] Gate B pass
 
 #### 3E. shadcn-svelte Ecosystem Validation
 
-- [ ] Validate `components.json` expectations still match generated UI structure
-- [ ] Upgrade and validate key generated-stack libraries (`bits-ui`, `formsnap`, `cmdk-sv`, `vaul-svelte`, `tailwind-*`)
-- [ ] Confirm no auth-page blocking UI regressions
+- [x] Validate `components.json` expectations still match generated UI structure
+- [x] Upgrade and validate key generated-stack libraries (`bits-ui`, `formsnap`, `cmdk-sv`, `vaul-svelte`, `tailwind-*`)
+- [x] Confirm no auth-page blocking UI regressions
 
 Sub-wave gate:
 
-- [ ] Gate A pass
-- [ ] Gate B pass
+- [x] Gate A pass
+- [x] Gate B pass
 
 Wave 3 exit gate:
 
-- [ ] All Wave 3 sub-wave gates pass
-- [ ] Manual integrity test complete and recorded in Program State Ledger
-- [ ] Wave 3 completion commit created
+- [x] All Wave 3 sub-wave gates pass
+- [x] Manual integrity test complete and recorded in Program State Ledger
+- [x] Wave 3 completion commit created
 
 ### Wave 4 — Prisma (Same Cycle)
 

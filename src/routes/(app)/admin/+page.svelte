@@ -175,7 +175,7 @@
 </script>
 
 <section class="mx-auto mt-2 px-3">
-	<h4 class="text-xl font-bold text-primary">Admin Page</h4>
+	<h4 class="text-primary text-xl font-bold">Admin Page</h4>
 	<p class="mt-4">This page contains functions that you can use to get different views of the SB database</p>
 	<p>It is a work in progress and will be updated as new features are added</p>
 </section>
