@@ -2,7 +2,7 @@
 
 **Project**: SB-Reg-svelte5  
 **Date**: 2026-03-04  
-**Status**: Finalized planning baseline (no implementation yet)
+**Status**: Phase 0 in progress (baseline captured)
 
 ---
 
@@ -295,14 +295,14 @@ Required context files for any new agent starting mid-program:
 
 ### Program State Ledger (update as you go)
 
-| Wave | Status      | Commit | Manual Test Result | Summary of What Was Completed | Known Issues / Follow-ups |
-| ---- | ----------- | ------ | ------------------ | ----------------------------- | ------------------------- |
-| 0    | Not started | TBD    | TBD                | TBD                           | TBD                       |
-| 1    | Not started | TBD    | TBD                | TBD                           | TBD                       |
-| 2    | Not started | TBD    | TBD                | TBD                           | TBD                       |
-| 3    | Not started | TBD    | TBD                | TBD                           | TBD                       |
-| 4    | Not started | TBD    | TBD                | TBD                           | TBD                       |
-| 5    | Not started | TBD    | TBD                | TBD                           | TBD                       |
+| Wave | Status      | Commit | Manual Test Result | Summary of What Was Completed                                                    | Known Issues / Follow-ups                                             |
+| ---- | ----------- | ------ | ------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 0    | In progress | TBD    | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, and lint recovery completed. | Lint now passes with non-blocking warnings; Wave 0 completion commit/tag still pending. |
+| 1    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
+| 2    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
+| 3    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
+| 4    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
+| 5    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
 
 How to update this ledger:
 
@@ -314,20 +314,89 @@ How to update this ledger:
 
 ### Wave 0 — Preflight & Baseline Capture
 
-- [ ] Create branch: `plan/refactor-upgrade-2026`
-- [ ] Capture baseline versions from `package.json` + lockfile into a short table in this document
-- [ ] Capture baseline quality status: lint, check, build results
-- [ ] Capture baseline Auth smoke evidence:
-  - [ ] Login works
-  - [ ] Session persists after refresh
-  - [ ] Route guards behave correctly for `/login`, `/admin`, `/register`
-- [ ] Freeze feature work for the cycle
-- [ ] Define rollback tags naming convention (e.g. `pre-wave-1`, `pre-wave-2`)
+- [x] Create branch: `plan/refactor-upgrade-2026`
+- [x] Capture baseline versions from `package.json` + lockfile into a short table in this document
+- [x] Capture baseline quality status: lint, check, build results
+- [x] Capture baseline Auth smoke evidence:
+  - [x] Login works
+  - [x] Session persists after refresh
+  - [x] Route guards behave correctly for `/login`, `/admin`, `/register`
+- [x] Freeze feature work for the cycle
+- [x] Define rollback tags naming convention (e.g. `pre-wave-1`, `pre-wave-2`)
+
+#### Wave 0 Deliverable — Version Inventory (Current -> Target)
+
+Source:
+
+- Declared baseline: `package.json`
+- Locked/resolved baseline: `pnpm list --depth 0 --json`
+- Target policy: latest stable via `pnpm dlx npm-check-updates --target latest --jsonUpgraded`
+
+| Package                      | Class               | Current (resolved) | Target (latest stable) | Change      |
+| ---------------------------- | ------------------- | ------------------ | ---------------------- | ----------- |
+| @sveltejs/kit                | Runtime core        | 2.49.1             | ^2.53.4                | Minor       |
+| svelte                       | Runtime core        | 5.45.5             | ^5.53.7                | Minor       |
+| vite                         | Runtime core        | 5.4.21             | ^7.3.1                 | Major       |
+| @sveltejs/vite-plugin-svelte | Runtime core        | 4.0.0              | ^6.2.4                 | Major       |
+| sveltekit-superforms         | Runtime critical    | 2.28.1             | ^2.30.0                | Minor       |
+| @supabase/ssr                | Runtime critical    | 0.5.2              | ^0.9.0                 | Minor (0.x) |
+| @supabase/supabase-js        | Runtime critical    | 2.48.1             | ^2.98.0                | Minor       |
+| prisma                       | Runtime data layer  | 5.22.0             | ^7.4.2                 | Major       |
+| @prisma/client               | Runtime data layer  | 5.22.0             | ^7.4.2                 | Major       |
+| square                       | Runtime integration | 43.2.1             | ^44.0.0                | Major       |
+| bits-ui                      | Runtime UI infra    | 1.8.0              | ^2.16.2                | Major       |
+| formsnap                     | Runtime UI infra    | 2.0.1              | 2.0.1                  | None        |
+| tailwindcss                  | Build/UI infra      | 3.4.17             | ^4.2.1                 | Major       |
+| eslint                       | Tooling             | 9.19.0             | ^10.0.2                | Major       |
+| prettier                     | Tooling             | 3.4.2              | ^3.8.1                 | Minor       |
+| svelte-check                 | Tooling             | 4.1.4              | ^4.4.4                 | Minor       |
+| typescript                   | Tooling             | 5.7.3              | ^5.9.3                 | Minor       |
+
+#### Wave 0 Deliverable — Dependency Matrix (Runtime vs Tooling, Blast Radius)
+
+| Group                  | Representative packages                                           | Upgrade profile     | Blast radius              | Planned wave           |
+| ---------------------- | ----------------------------------------------------------------- | ------------------- | ------------------------- | ---------------------- |
+| Runtime core framework | `@sveltejs/kit`, `svelte`, `vite`, `@sveltejs/vite-plugin-svelte` | Mixed minor + major | High                      | 3                      |
+| Runtime auth/session   | `@supabase/ssr`, `@supabase/supabase-js`                          | Minor (0.x + 2.x)   | High                      | 3                      |
+| Runtime forms          | `sveltekit-superforms`                                            | Minor               | High (form flow critical) | 3                      |
+| Runtime data layer     | `prisma`, `@prisma/client`                                        | Major               | High                      | 4                      |
+| Runtime payments       | `square`                                                          | Major               | Medium                    | 1D then 3/4 validation |
+| Runtime UI ecosystem   | `bits-ui`, `formsnap`, `cmdk-sv`, `vaul-svelte`, `tailwind-*`     | Mixed major/minor   | Medium                    | 3 + 5 stabilization    |
+| Tooling & quality      | `eslint`, `prettier`, `typescript`, `svelte-check`                | Mixed major/minor   | Low                       | 2                      |
+
+#### Wave 0 Deliverable — Baseline Quality Status (Gate A Inputs)
+
+| Command      | Result | Notes                                                                                         |
+| ------------ | ------ | --------------------------------------------------------------------------------------------- |
+| `pnpm lint`  | Pass   | Prettier is clean and ESLint runs successfully (warnings only, no errors).                    |
+| `pnpm check` | Pass   | `svelte-check` found 0 errors / 0 warnings.                                                   |
+| `pnpm build` | Pass   | Production build succeeds; non-blocking warnings only.                                        |
+
+#### Wave 0 Deliverable — Baseline Auth Smoke Evidence (Gate B Inputs)
+
+| Check                                            | Result                 | Evidence                                                                                                     |
+| ------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Login works                                      | Pass (manual)          | Manually verified successful login flow in browser.                                                          |
+| Session persists after refresh                   | Pass (manual)          | Manually verified active session is retained after browser refresh.                                          |
+| Route guards for `/login`, `/admin`, `/register` | Pass (code inspection) | Verified guard logic and redirects in `src/hooks.server.ts` against auth/admin/registration-open conditions. |
+
+#### Wave 0 Deliverable — Ownership, Freeze, Rollback Conventions
+
+- Owner confirmed: single owner model retained.
+- Feature freeze: active from 2026-03-04 through end of wave program (except wave-scoped upgrade/refactor tasks).
+- Rollback tag naming convention: `pre-wave-<n>-YYYYMMDD` (example: `pre-wave-1-20260304`).
+
+#### Wave 0 Deliverable — Package Cleanup Checklist (for Wave 1E execution)
+
+- Remove duplicate package declaration: `@sveltejs/vite-plugin-svelte` appears in both `dependencies` and `devDependencies`.
+- Reclassify package manager dependency: remove `pnpm` from runtime `dependencies` unless explicitly required at runtime.
+- Audit runtime vs dev-only placement for tooling/build libraries and normalize sections.
+- Reinstall and confirm lockfile determinism after cleanup.
 
 Exit gate:
 
 - [ ] Gate A/B/C pass at baseline
-- [ ] Manual integrity test complete and recorded in Program State Ledger
+- [x] Manual integrity test complete and recorded in Program State Ledger
 - [ ] Wave 0 completion commit created
 
 ### Wave 1 — Refactor Hardening (No Behavior Change)

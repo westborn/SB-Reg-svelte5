@@ -24,9 +24,11 @@ export function getStep() {
 			if (nextStepIndex > 1 && myState.entriesExist && !completedBankDetails) return 2; // 'Confirm' step
 
 			const hasNoImage =
-			!myState.artistExists || !myState.entriesExist || myState.currentEntries.some((entry) => entry.images.length === 0)
-				? true
-				: false;
+				!myState.artistExists ||
+				!myState.entriesExist ||
+				myState.currentEntries.some((entry) => entry.images.length === 0)
+					? true
+					: false;
 			if (myState.entriesExist && hasNoImage) return 2; // 'Complete' step
 
 			if (myState.entriesExist && completedBankDetails) return 3; // 'Complete' step
