@@ -23,7 +23,7 @@
 | 019 | salesUpdate - Phase 5      | Controlled sold updates: set selected matched entries to sold=true                                                          | ✅   |
 | 020 | salesUpdate - Phase 6      | UX polish and admin navigation integration                                                                                  | ✅   |
 | 021 | refactorOrUpgrade - Plan   | Create and finalize plan in @docs/plans/refactorOrUpgrade.md                                                                | ✅   |
-| 022 | refactorOrUpgrade - Wave 0 | Preflight & baseline capture. Manual integrity test required. Must be committed before Wave 1.                              | ⬜   |
+| 022 | refactorOrUpgrade - Wave 0 | Preflight & baseline capture. Manual integrity test required. Must be committed before Wave 1.                              | ✅   |
 | 023 | refactorOrUpgrade - Wave 1 | Refactor hardening (forms/auth/db/payment + package hygiene pre-work). Manual integrity test required. Commit gate.         | ⬜   |
 | 024 | refactorOrUpgrade - Wave 2 | Low-risk upgrades (tooling/non-critical libs). Manual integrity test required. Commit gate.                                 | ⬜   |
 | 025 | refactorOrUpgrade - Wave 3 | Core runtime upgrades (Vite/Svelte/SvelteKit/Superforms/Supabase + shadcn ecosystem validation). Test + commit gate.        | ⬜   |

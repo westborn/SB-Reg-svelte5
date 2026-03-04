@@ -295,14 +295,14 @@ Required context files for any new agent starting mid-program:
 
 ### Program State Ledger (update as you go)
 
-| Wave | Status      | Commit | Manual Test Result | Summary of What Was Completed                                                    | Known Issues / Follow-ups                                             |
-| ---- | ----------- | ------ | ------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| 0    | In progress | TBD    | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, and lint recovery completed. | Lint now passes with non-blocking warnings; Wave 0 completion commit/tag still pending. |
-| 1    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
-| 2    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
-| 3    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
-| 4    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
-| 5    | Not started | TBD    | TBD                | TBD                                                                              | TBD                                                                   |
+| Wave | Status      | Commit                    | Manual Test Result | Summary of What Was Completed                                                                                           | Known Issues / Follow-ups                                            |
+| ---- | ----------- | ------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded. | Create rollback tag before entering Wave 1 (if not already created). |
+| 1    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
+| 2    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
+| 3    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
+| 4    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
+| 5    | Not started | TBD                       | TBD                | TBD                                                                                                                     | TBD                                                                  |
 
 How to update this ledger:
 
@@ -366,11 +366,11 @@ Source:
 
 #### Wave 0 Deliverable — Baseline Quality Status (Gate A Inputs)
 
-| Command      | Result | Notes                                                                                         |
-| ------------ | ------ | --------------------------------------------------------------------------------------------- |
-| `pnpm lint`  | Pass   | Prettier is clean and ESLint runs successfully (warnings only, no errors).                    |
-| `pnpm check` | Pass   | `svelte-check` found 0 errors / 0 warnings.                                                   |
-| `pnpm build` | Pass   | Production build succeeds; non-blocking warnings only.                                        |
+| Command      | Result | Notes                                                                      |
+| ------------ | ------ | -------------------------------------------------------------------------- |
+| `pnpm lint`  | Pass   | Prettier is clean and ESLint runs successfully (warnings only, no errors). |
+| `pnpm check` | Pass   | `svelte-check` found 0 errors / 0 warnings.                                |
+| `pnpm build` | Pass   | Production build succeeds; non-blocking warnings only.                     |
 
 #### Wave 0 Deliverable — Baseline Auth Smoke Evidence (Gate B Inputs)
 
@@ -395,9 +395,9 @@ Source:
 
 Exit gate:
 
-- [ ] Gate A/B/C pass at baseline
+- [x] Gate A/B/C pass at baseline
 - [x] Manual integrity test complete and recorded in Program State Ledger
-- [ ] Wave 0 completion commit created
+- [x] Wave 0 completion commit created
 
 ### Wave 1 — Refactor Hardening (No Behavior Change)
 
