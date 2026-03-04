@@ -2,7 +2,7 @@
 
 **Project**: SB-Reg-svelte5  
 **Date**: 2026-03-04  
-**Status**: Phase 0 in progress (baseline captured)
+**Status**: Wave 2 complete; Wave 3 ready to start
 
 ---
 
@@ -295,14 +295,14 @@ Required context files for any new agent starting mid-program:
 
 ### Program State Ledger (update as you go)
 
-| Wave | Status      | Commit                    | Manual Test Result | Summary of What Was Completed                                                                                                                                                  | Known Issues / Follow-ups                                            |
-| ---- | ----------- | ------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                        | Create rollback tag before entering Wave 1 (if not already created). |
-| 1    | Done        | a279067 - Wave 1 closeout | Pass (manual)      | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API aligned to current SDK with consistent error shape, package hygiene cleanup applied. | Rollback tag created: `pre-wave-2-20260304`.                        |
-| 2    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
-| 3    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
-| 4    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
-| 5    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                            | TBD                                                                  |
+| Wave | Status      | Commit                    | Manual Test Result | Summary of What Was Completed                                                                                                                                                                                                                                | Known Issues / Follow-ups                                                                            |
+| ---- | ----------- | ------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| 0    | Done        | d0bcf3c - Wave 0 baseline | Pass (Auth smoke)  | Baseline inventory, quality checks, wave matrix, manual Auth smoke, lint recovery, and wave completion commit recorded.                                                                                                                                      | Create rollback tag before entering Wave 1 (if not already created).                                 |
+| 1    | Done        | a279067 - Wave 1 closeout | Pass (manual)      | Forms/import patterns normalized, auth guard logic centralized, DB write paths aligned to helpers, payment API aligned to current SDK with consistent error shape, package hygiene cleanup applied.                                                          | Rollback tag created: `pre-wave-2-20260304`.                                                         |
+| 2    | Done        | Wave 2 closeout commit    | Pass (manual auth smoke) | Upgraded low-risk tooling/dev libraries (TypeScript, svelte-check, Prettier stack, ESLint 9-compatible set, PostCSS/Autoprefixer, tsx, low-blast dev utilities), resolved formatter drift, revalidated Gate A (`pnpm lint`, `pnpm check`, `pnpm build`), and completed manual Auth smoke validation. | Rollback tag created: `pre-wave-3-20260304`. ESLint v10 + eslint-plugin-svelte v3 lint-rule churn deferred to Wave 5 stabilization. |
+| 3    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                                                                                                          | TBD                                                                                                  |
+| 4    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                                                                                                          | TBD                                                                                                  |
+| 5    | Not started | TBD                       | TBD                | TBD                                                                                                                                                                                                                                                          | TBD                                                                                                  |
 
 How to update this ledger:
 
@@ -439,18 +439,18 @@ Exit gate:
 
 ### Wave 2 — Low-Risk Upgrades
 
-- [ ] Upgrade lint/format/typecheck tooling to latest stable
-- [ ] Upgrade low-blast non-runtime libraries to latest stable
-- [ ] Resolve any config breakage from tooling updates
-- [ ] Re-run baseline quality checks
+- [x] Upgrade lint/format/typecheck tooling to latest stable (or latest compatible major where required)
+- [x] Upgrade low-blast non-runtime libraries to latest stable
+- [x] Resolve any config breakage from tooling updates
+- [x] Re-run baseline quality checks
 
 Exit gate:
 
-- [ ] Gate A pass
-- [ ] Gate B pass
-- [ ] Rollback tag created before entering Wave 3
-- [ ] Manual integrity test complete and recorded in Program State Ledger
-- [ ] Wave 2 completion commit created
+- [x] Gate A pass
+- [x] Gate B pass
+- [x] Rollback tag created before entering Wave 3
+- [x] Manual integrity test complete and recorded in Program State Ledger
+- [x] Wave 2 completion commit created
 
 ### Wave 3 — Core Runtime Upgrades
 

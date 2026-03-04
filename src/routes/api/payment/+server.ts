@@ -23,7 +23,9 @@ function buildPaymentErrorResponse(message: string, errors: unknown[], status: n
 
 function normalizeBigInts<T>(value: T): T {
 	return JSON.parse(
-		JSON.stringify(value, (_, currentValue) => (typeof currentValue === 'bigint' ? currentValue.toString() : currentValue))
+		JSON.stringify(value, (_, currentValue) =>
+			typeof currentValue === 'bigint' ? currentValue.toString() : currentValue
+		)
 	) as T;
 }
 
@@ -77,7 +79,11 @@ export async function POST({ request }) {
 			? errorObj.errors
 			: [{ detail: errorObj.message ?? 'Payment failed' }];
 		const statusCode =
-			typeof errorObj.statusCode === 'number' ? errorObj.statusCode : typeof errorObj.status === 'number' ? errorObj.status : 400;
+			typeof errorObj.statusCode === 'number'
+				? errorObj.statusCode
+				: typeof errorObj.status === 'number'
+					? errorObj.status
+					: 400;
 
 		await logger.error('Payment creation failed', err as Error, {
 			routeId: '/api/payment',
