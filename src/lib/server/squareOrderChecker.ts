@@ -44,6 +44,33 @@ export interface FormattedLineItem {
 	catalogVersion?: bigint | number | string | null;
 }
 
+export interface SquareOrderReturnLineItem {
+	name?: string | null;
+	quantity?: string;
+	totalMoney?: Money | null;
+	total_money?: Money | null;
+	basePriceMoney?: Money | null;
+	base_price_money?: Money | null;
+	catalogObjectId?: string | null;
+	catalog_object_id?: string | null;
+	catalogVersion?: bigint | number | string | null;
+	catalog_version?: bigint | number | string | null;
+}
+
+export interface SquareOrderReturn {
+	uid?: string | null;
+	sourceOrderId?: string | null;
+	source_order_id?: string | null;
+	returnLineItems?: SquareOrderReturnLineItem[] | null;
+	return_line_items?: SquareOrderReturnLineItem[] | null;
+}
+
+export interface FormattedOrderReturn {
+	uid?: string;
+	sourceOrderId?: string;
+	returnLineItems: FormattedLineItem[];
+}
+
 export interface FormattedOrder {
 	id: string;
 	locationId?: string;
@@ -51,6 +78,7 @@ export interface FormattedOrder {
 	createdAt: string;
 	totalMoney: Money | null;
 	lineItems: FormattedLineItem[];
+	returns: FormattedOrderReturn[];
 }
 
 export interface LocationMap {
@@ -84,6 +112,7 @@ export interface SquareOrder {
 	totalMoney?: Money | null;
 	lineItems?: SquareLineItem[];
 	line_items?: SquareLineItem[];
+	returns?: SquareOrderReturn[] | null;
 }
 
 interface CatalogMetadata {
@@ -91,6 +120,9 @@ interface CatalogMetadata {
 }
 
 export interface OrderSummaryRow {
+	orderId: string;
+	orderKind: 'sale' | 'return';
+	sourceOrderId?: string | null;
 	location: string;
 	state: string;
 	createdDateTime: Date;
@@ -199,6 +231,26 @@ export default class SquareOrderChecker {
 		};
 	}
 
+	private normalizeReturnLineItem(item: SquareOrderReturnLineItem): FormattedLineItem {
+		return {
+			name: item.name || undefined,
+			quantity: item.quantity,
+			totalMoney: item.totalMoney || item.total_money || item.basePriceMoney || item.base_price_money || null,
+			catalogObjectId: item.catalogObjectId || item.catalog_object_id || undefined,
+			catalogVersion: item.catalogVersion || item.catalog_version || null
+		};
+	}
+
+	private normalizeReturn(orderReturn: SquareOrderReturn): FormattedOrderReturn {
+		return {
+			uid: orderReturn.uid || undefined,
+			sourceOrderId: orderReturn.sourceOrderId || orderReturn.source_order_id || undefined,
+			returnLineItems: (orderReturn.returnLineItems || orderReturn.return_line_items || []).map((item) =>
+				this.normalizeReturnLineItem(item)
+			)
+		};
+	}
+
 	private normalizeOrder(order: SquareOrder): FormattedOrder {
 		return {
 			id: order.id || 'N/A',
@@ -211,7 +263,8 @@ export default class SquareOrderChecker {
 						currency: order.totalMoney.currency
 					}
 				: null,
-			lineItems: (order.lineItems || order.line_items || []).map((item) => this.normalizeLineItem(item))
+			lineItems: (order.lineItems || order.line_items || []).map((item) => this.normalizeLineItem(item)),
+			returns: (order.returns || []).map((orderReturn) => this.normalizeReturn(orderReturn))
 		};
 	}
 
@@ -475,12 +528,13 @@ export default class SquareOrderChecker {
 
 		for (const order of formattedOrders) {
 			const baseOrderData = {
+				orderId: order.id,
 				location: locationMap[order.locationId!] || order.locationId || 'N/A',
 				state: order.state,
 				createdDateTime: new Date(order.createdAt)
 			};
 
-			if (order.lineItems.length === 0) {
+			if (order.lineItems.length === 0 && order.returns.length === 0) {
 				continue;
 			}
 
@@ -492,6 +546,8 @@ export default class SquareOrderChecker {
 
 				rows.push({
 					...baseOrderData,
+					orderKind: 'sale',
+					sourceOrderId: null,
 					orderAmountCents: !amountShown ? this.toCents(order.totalMoney) : 0,
 					orderLine: index + 1,
 					item: lineItem.name || 'Unknown Item',
@@ -501,6 +557,40 @@ export default class SquareOrderChecker {
 				});
 
 				amountShown = true;
+			}
+
+			for (const orderReturn of order.returns) {
+				const returnLineItems =
+					orderReturn.returnLineItems.length > 0
+						? orderReturn.returnLineItems
+						: [
+								{
+									name: 'Return / exchange adjustment',
+									quantity: '1',
+									totalMoney: order.totalMoney,
+									catalogObjectId: undefined,
+									catalogVersion: null
+								}
+							];
+
+				for (let index = 0; index < returnLineItems.length; index += 1) {
+					const lineItem = returnLineItems[index];
+					const { sku } = await this.getCatalogMetadataForLineItem(lineItem);
+
+					rows.push({
+						...baseOrderData,
+						orderKind: 'return',
+						sourceOrderId: orderReturn.sourceOrderId || null,
+						orderAmountCents: !amountShown ? this.toCents(order.totalMoney) : 0,
+						orderLine: index + 1,
+						item: lineItem.name || 'Return / exchange adjustment',
+						sku: sku || 'Not Art',
+						quantity: Number(lineItem.quantity ?? '1') || 1,
+						baseAmountCents: this.toCents(lineItem.totalMoney)
+					});
+
+					amountShown = true;
+				}
 			}
 		}
 

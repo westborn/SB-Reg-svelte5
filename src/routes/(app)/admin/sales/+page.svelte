@@ -8,6 +8,9 @@
 	import { untrack } from 'svelte';
 
 	type SalesOrderRow = {
+		orderId: string;
+		orderKind: 'sale' | 'return';
+		sourceOrderId?: string | null;
 		location: string;
 		state: string;
 		createdDateTime: string | Date;
@@ -42,6 +45,7 @@
 	type MatchedRow = ParsedSkuRow & {
 		matchedEntry: MatchCandidate;
 		matchStatus: 'matched' | 'alreadySold';
+		potentialReturn: boolean;
 	};
 
 	type UnmatchedRow = ParsedSkuRow & {
@@ -58,6 +62,12 @@
 		reason: string;
 	};
 
+	type ReturnedOrderRow = SalesOrderRow & {
+		returnOrderId: string;
+		sourceOrderId: string;
+		originalOrder?: SalesOrderRow;
+	};
+
 	let { data, form } = $props();
 	const initialFilter = untrack(() => form?.submittedFilter ?? data.filterDefaults);
 
@@ -67,6 +77,8 @@
 	let isPreviewSubmitting = $state(false);
 	let isUpdateSubmitting = $state(false);
 	let showAllOrderRows = $state(false);
+	let showCancelledRows = $state(false);
+	let showReturnedRows = $state(false);
 
 	function getMidnight(date: Date): Date {
 		const d = new Date(date);
@@ -165,6 +177,8 @@
 	const unmatchedRows = $derived(((form as any)?.preview?.sections?.unmatchedRows ?? []) as UnmatchedRow[]);
 	const ambiguousRows = $derived(((form as any)?.preview?.sections?.ambiguousRows ?? []) as AmbiguousRow[]);
 	const canceledRows = $derived(((form as any)?.preview?.sections?.canceledRows ?? []) as CanceledRow[]);
+	const returnedRows = $derived(((form as any)?.preview?.sections?.returnedRows ?? []) as ReturnedOrderRow[]);
+	const returnedSourceOrderIds = $derived(new Set(returnedRows.map((row) => row.sourceOrderId)));
 	const updateResult = $derived(
 		((form as any)?.updateResult ?? null) as {
 			requested: number;
@@ -198,6 +212,10 @@
 
 	function clearSelectedRows() {
 		selectedEntryIds = [];
+	}
+
+	function hasPotentialReturn(row: SalesOrderRow): boolean {
+		return row.orderKind !== 'return' && returnedSourceOrderIds.has(row.orderId);
 	}
 
 	function handlePreviewSubmit() {
@@ -438,6 +456,7 @@
 									<Table.Head>Exhibit</Table.Head>
 									<Table.Head>Artist</Table.Head>
 									<Table.Head>Title</Table.Head>
+									<Table.Head>Status</Table.Head>
 									<Table.Head>Price</Table.Head>
 								</Table.Row>
 							</Table.Header>
@@ -456,6 +475,13 @@
 										<Table.Cell>{row.matchedEntry.exhibitNumber}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
+										<Table.Cell>
+											{#if row.potentialReturn}
+												<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"> Return </span>
+											{:else}
+												<span class="text-muted-foreground text-xs">-</span>
+											{/if}
+										</Table.Cell>
 										<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
 									</Table.Row>
 								{/each}
@@ -482,7 +508,17 @@
 					</p>
 				{/if}
 
-				{#if canceledRows.length > 0}
+				<div class="flex flex-wrap gap-2 pt-2">
+					<Button type="button" variant="outline" size="sm" onclick={() => (showCancelledRows = !showCancelledRows)}>
+						{showCancelledRows ? 'Hide Cancelled Rows' : 'Show Cancelled Rows'}
+					</Button>
+					{#if returnedRows.length > 0}
+						<Button type="button" variant="outline" size="sm" onclick={() => (showReturnedRows = !showReturnedRows)}>
+							{showReturnedRows ? 'Hide Returned Orders' : 'Show Returned Orders'}
+						</Button>
+					{/if}
+				</div>
+				{#if showCancelledRows && canceledRows.length > 0}
 					<p class="pt-4 text-sm font-semibold text-red-700">Canceled Rows (Excluded from updates)</p>
 					<div class="overflow-x-auto pt-2">
 						<Table.Root>
@@ -582,6 +618,46 @@
 					</div>
 				{/if}
 
+				{#if returnedRows.length > 0}
+					{#if showReturnedRows}
+						<p class="pt-4 text-sm font-semibold text-blue-700">Returned Orders</p>
+						<div class="overflow-x-auto pt-2">
+							<Table.Root>
+								<Table.Header>
+									<Table.Row>
+										<Table.Head>DateTime</Table.Head>
+										<Table.Head>Item</Table.Head>
+										<Table.Head>SKU</Table.Head>
+										<Table.Head>Amount</Table.Head>
+										<Table.Head>Original Order</Table.Head>
+									</Table.Row>
+								</Table.Header>
+								<Table.Body>
+									{#each returnedRows as row}
+										<Table.Row>
+											<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
+											<Table.Cell>{row.item}</Table.Cell>
+											<Table.Cell>{row.sku}</Table.Cell>
+											<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
+											<Table.Cell>
+												{#if row.originalOrder}
+													<span>
+														Item: {row.originalOrder.item} | Date: {formatSydneyDateTime(
+															row.originalOrder.createdDateTime
+														)} | Amount: {formatDollars(row.originalOrder.baseAmountCents)}
+													</span>
+												{:else}
+													<span class="text-muted-foreground">Not found</span>
+												{/if}
+											</Table.Cell>
+										</Table.Row>
+									{/each}
+								</Table.Body>
+							</Table.Root>
+						</div>
+					{/if}
+				{/if}
+
 				<div class="pt-2">
 					<Button type="button" variant="outline" size="sm" onclick={() => (showAllOrderRows = !showAllOrderRows)}>
 						{showAllOrderRows ? 'Hide All Order Rows' : 'Show All Order Rows'}
@@ -601,6 +677,7 @@
 										<th class="pr-4 font-medium">Location</th>
 										<th class="pr-4 font-medium">State</th>
 										<th class="pr-4 font-medium">Item</th>
+										<th class="pr-4 font-medium">Status</th>
 										<th class="pr-4 font-medium">SKU</th>
 										<th class="text-right font-medium">Line Amount</th>
 									</tr>
@@ -612,6 +689,15 @@
 											<td class="pr-4">{row.location}</td>
 											<td class="pr-4">{row.state}</td>
 											<td class="pr-4">{row.item}</td>
+											<td class="pr-4">
+												{#if hasPotentialReturn(row)}
+													<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">
+														Return
+													</span>
+												{:else}
+													<span class="text-muted-foreground text-xs">-</span>
+												{/if}
+											</td>
 											<td class="pr-4">{row.sku}</td>
 											<td class="text-right">{formatDollars(row.baseAmountCents)}</td>
 										</tr>
