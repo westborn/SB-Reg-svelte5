@@ -287,7 +287,6 @@ For existing entries with images:
 ## Implementation Order
 
 1. **Phase 1**: Database schema changes and migration
-
    - Create primary image table
    - Update Prisma schema
    - Run migration
@@ -295,7 +294,6 @@ For existing entries with images:
    - **FEATURES.md**: Add Phase 1 completion
 
 2. **Phase 2**: Backend API changes (schemas, database helpers, server actions)
-
    - Update Zod schemas
    - Add database helper functions
    - Update server actions
@@ -303,14 +301,12 @@ For existing entries with images:
    - **FEATURES.md**: Add Phase 2 completion
 
 3. **Phase 3**: State management updates
-
    - Update context for multiple images
    - Add constants for UI limits
    - **Git Commit**: `feat: update state management for multiple images support`
    - **FEATURES.md**: Add Phase 3 completion
 
 4. **Phase 4**: Core UI components (image slots, upload form)
-
    - Create new image components
    - Multiple image upload form
    - Image gallery and slots
@@ -318,14 +314,12 @@ For existing entries with images:
    - **FEATURES.md**: Add Phase 4 completion
 
 5. **Phase 5**: Integration with entry forms
-
    - Update entry create/update forms
    - Update catalogue card
    - **Git Commit**: `feat: integrate multiple images with entry forms`
    - **FEATURES.md**: Add Phase 5 completion
 
 6. **Phase 6**: Testing and refinement
-
    - Validation testing
    - User experience testing
    - Bug fixes

@@ -313,7 +313,7 @@
 		<button
 			type="button"
 			onclick={() => goto('/')}
-			class="rounded-md bg-primary-300 px-5 py-1 text-sm font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-primary-400 hover:shadow-lg focus:bg-primary-400 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primary-200 active:shadow-lg"
+			class="bg-primary-300 hover:bg-primary-400 focus:bg-primary-400 active:bg-primary-200 rounded-md px-5 py-1 text-sm font-semibold text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:ring-0 focus:outline-none active:shadow-lg"
 			>Back
 		</button>
 	{:else}
@@ -332,7 +332,7 @@
 			</Card.Root>
 		</div>
 		{#if myState.submission.firstNations === 'Yes'}
-			<p class="mt-4 text-sm italic text-green-600">First Nations discount applied.</p>
+			<p class="mt-4 text-sm text-green-600 italic">First Nations discount applied.</p>
 		{:else}
 			<p class="mt-6 text-xl text-red-400">
 				Your registration of {numberOfEntries} has a total fee of ${costOfRegistration}{registrationPaid}
@@ -359,11 +359,11 @@
 			{#if currentState === validStates.COMMENCING || currentState === validStates.PAYMENTERROR}
 				<div class="mt-6 max-w-prose px-3">
 					<!-- this is the container that gets the Credit Card fields dropped into it by Square -->
-					<div id="card-container" class="w-100 mx-auto"></div>
+					<div id="card-container" class="mx-auto w-100"></div>
 					<button
 						onclick={readyToPay}
 						disabled={fetchingData}
-						class="mt-8 inline-block w-auto rounded-lg bg-red-400 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-200 active:shadow-lg disabled:cursor-not-allowed"
+						class="mt-8 inline-block w-auto rounded-lg bg-red-400 px-7 py-3 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-red-500 hover:shadow-lg focus:bg-red-500 focus:shadow-lg focus:ring-0 focus:outline-none active:bg-red-200 active:shadow-lg disabled:cursor-not-allowed"
 						>Pay Registration of ${costOfRegistration}</button
 					>
 				</div>
@@ -380,7 +380,7 @@
 					<button
 						onclick={() => finishRegistration()}
 						disabled={fetchingData}
-						class="mt-2 inline-block rounded-lg bg-primary-400 px-7 py-2 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-primary-500 hover:shadow-lg focus:bg-primary-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primary-200 active:shadow-lg"
+						class="bg-primary-400 hover:bg-primary-500 focus:bg-primary-500 active:bg-primary-200 mt-2 inline-block rounded-lg px-7 py-2 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:ring-0 focus:outline-none active:shadow-lg"
 						>Registration is now Complete</button
 					>
 				</div>

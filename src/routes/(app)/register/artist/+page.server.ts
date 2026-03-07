@@ -3,12 +3,12 @@ import type { RequestEvent } from './$types';
 
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
-import { prisma } from '$lib/components/server/prisma';
 
 import { GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
 
 import { artistSchemaUI } from '$lib/zod-schemas';
-import { getSubmission, updateArtist, type User } from '$lib/components/server/registrationDB';
+import { createArtist, getSubmission, updateArtist, type User } from '$lib/components/server/registrationDB';
+import { getArtistEmail, returnWithUpdatedSubmission } from '$lib/server/helpers';
 import { logger } from '$lib/server/logger';
 
 const artistUpdate = async (event: RequestEvent) => {
@@ -20,14 +20,11 @@ const artistUpdate = async (event: RequestEvent) => {
 	}
 	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
-	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
+	const artistEmail = getArtistEmail(user as User);
 
 	try {
-		// Find the artist by email to get their ID
-		const artist = await prisma.artistTable.findUnique({
-			where: { email: artistEmail },
-			select: { id: true }
-		});
+		const submissionFromDb = await getSubmission(user as User);
+		const artist = submissionFromDb ? { id: submissionFromDb.id } : null;
 
 		if (!artist) {
 			return message(formValidationResult, GENERIC_ERROR_MESSAGE);
@@ -63,8 +60,7 @@ const artistUpdate = async (event: RequestEvent) => {
 
 	// Return the updated submission
 	const updatedSubmission = await getSubmission(user as User);
-	const returnData = { formValidationResult, updatedSubmission };
-	return returnData;
+	return returnWithUpdatedSubmission(formValidationResult, updatedSubmission);
 };
 
 const artistCreate = async (event: RequestEvent) => {
@@ -77,11 +73,11 @@ const artistCreate = async (event: RequestEvent) => {
 
 	const { user } = await event.locals.V1safeGetSession();
 	// If the user is an admin, they can update any artist
-	const artistEmail = user.isSuperAdmin ? user.proxyEmail : user.email;
+	const artistEmail = getArtistEmail(user as User);
 	const newArtist = { ...formValidationResult.data, email: artistEmail };
 
 	try {
-		const createdArtist = await prisma.artistTable.create({ data: newArtist });
+		const createdArtist = await createArtist(newArtist);
 
 		// Log successful creation
 		await logger.info('Artist created successfully', {
@@ -111,8 +107,7 @@ const artistCreate = async (event: RequestEvent) => {
 
 	// Return the updated submission
 	const updatedSubmission = await getSubmission(user as User);
-	const returnData = { formValidationResult, updatedSubmission };
-	return returnData;
+	return returnWithUpdatedSubmission(formValidationResult, updatedSubmission);
 };
 
 export const actions: Actions = { artistUpdate, artistCreate };

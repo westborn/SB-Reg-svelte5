@@ -17,7 +17,7 @@
 	<!-- <div class="mx-auto max-w-xl sm:container"> -->
 	<div class="flex items-center">
 		<img src="/favicon-32x32.png" alt="Sculpture Bermagui Logo" class="mt-2 h-10" />
-		<h1 class=" px-2 text-center text-lg text-primary-400">Exhibition Registration</h1>
+		<h1 class=" text-primary-400 px-2 text-center text-lg">Exhibition Registration</h1>
 	</div>
 	<div class="">
 		<div class="flex items-center gap-2">
@@ -39,18 +39,18 @@
 </div>
 <div class="mx-auto mt-20 w-full max-w-sm">
 	{@render children()}
-	<p class="p-4 text-sm text-muted-foreground">
+	<p class="text-muted-foreground p-4 text-sm">
 		By clicking continue, you agree to our{' '}
 		<a
 			href="https://sculpturebermagui.org.au/wp-content/uploads/2025/09/Exhibiting-at-Sculpture-Bermagui-2026.pdf"
-			class="underline underline-offset-4 hover:text-primary"
+			class="hover:text-primary underline underline-offset-4"
 		>
 			Terms of Service</a
 		>
 		{' '}and{' '}
 		<a
 			href="https://sculpturebermagui.org.au/wp-content/uploads/2024/02/Edgy-Art-Privacy-Policy-Sep-2022.pdf"
-			class="underline underline-offset-4 hover:text-primary">Privacy Policy.</a
+			class="hover:text-primary underline underline-offset-4">Privacy Policy.</a
 		>
 	</p>
 </div>

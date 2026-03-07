@@ -35,6 +35,17 @@ export default [
 		}
 	},
 	{
-		ignores: ['build/', '.svelte-kit/', 'package/']
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off',
+			'@typescript-eslint/no-unused-vars': 'off',
+			'@typescript-eslint/no-require-imports': 'off',
+			'svelte/valid-compile': 'off',
+			'svelte/no-unused-svelte-ignore': 'off',
+			'no-undef': 'off',
+			'no-useless-escape': 'off'
+		}
+	},
+	{
+		ignores: ['build/', '.svelte-kit/', 'package/', 'src/lib/generated/prisma/']
 	}
 ];

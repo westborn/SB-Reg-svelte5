@@ -10,7 +10,7 @@
 </script>
 
 <Dialog.Root bind:open={myState.entryUpdateDialogOpen}>
-	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
+	<Dialog.Content class="bg-card max-h-full max-w-[400px] overflow-y-auto">
 		<Dialog.Header>
 			<Dialog.Title>Edit Entry</Dialog.Title>
 			<Dialog.Description>Make changes to your entry.<br />Click save when you're done.</Dialog.Description>

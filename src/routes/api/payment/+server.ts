@@ -1,31 +1,54 @@
 import { json } from '@sveltejs/kit';
-// https://github.com/square/square-nodejs-sdk/blob/e66c2d9e32225b800be6d7f15ef9a5d9f5d516aa/README.md
-// TODO: switch to modern SDK when time is available
-import { Client, Environment } from 'square/legacy';
 import { randomUUID } from 'crypto';
 import { SECRET_SQUARE_ACCESS_TOKEN } from '$env/static/private';
 import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 import { logger } from '$lib/server/logger';
+import { createSquareClient } from '$lib/server/squareClient';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(BigInt.prototype as any).toJSON = function () {
-	return this.toString();
+const squareClient = createSquareClient(SECRET_SQUARE_ACCESS_TOKEN, PUBLIC_SQUARE_ENVIRONMENT);
+
+type PaymentErrorShape = {
+	message: string;
+	errors: unknown[];
 };
 
-const { paymentsApi } = new Client({
-	accessToken: SECRET_SQUARE_ACCESS_TOKEN,
-	environment: PUBLIC_SQUARE_ENVIRONMENT.toLowerCase() === 'production' ? Environment.Production : Environment.Sandbox
-});
+function buildPaymentErrorResponse(message: string, errors: unknown[], status: number) {
+	const payload: PaymentErrorShape = {
+		message,
+		errors
+	};
+
+	return json(payload, { status });
+}
+
+function normalizeBigInts<T>(value: T): T {
+	return JSON.parse(
+		JSON.stringify(value, (_, currentValue) =>
+			typeof currentValue === 'bigint' ? currentValue.toString() : currentValue
+		)
+	) as T;
+}
 
 export async function POST({ request }) {
 	const { locationId, sourceId, amount, email, note, reference_id } = await request.json();
+
+	const numericAmount = typeof amount === 'string' ? Number(amount) : amount;
+	if (typeof numericAmount !== 'number' || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+		return buildPaymentErrorResponse(
+			'Invalid payment amount',
+			[{ path: ['amountMoney', 'amount'], message: 'Amount must be a positive whole number of cents.' }],
+			400
+		);
+	}
+	const amountInCents = BigInt(Math.round(numericAmount));
+
 	try {
-		const { result } = await paymentsApi.createPayment({
+		const result = await squareClient.payments.create({
 			locationId,
 			sourceId,
 			idempotencyKey: randomUUID(),
 			amountMoney: {
-				amount: amount,
+				amount: amountInCents,
 				currency: 'AUD'
 			},
 			buyerEmailAddress: email,
@@ -33,28 +56,44 @@ export async function POST({ request }) {
 			referenceId: reference_id,
 			statementDescriptionIdentifier: 'Sculpture Fee'
 		});
-		await logger.warn('Payment created successfully', {
+		const safeResult = normalizeBigInts(result);
+		const safePaymentDetails =
+			safeResult && typeof safeResult === 'object' ? (safeResult as { payment?: unknown }).payment : null;
+
+		await logger.info('Payment created successfully', {
 			routeId: '/api/payment',
 			userEmail: email,
-			amount,
+			amount: amountInCents.toString(),
 			referenceId: reference_id,
-			paymentDetails: result.payment
+			paymentDetails: safePaymentDetails
 		});
-		return json(result);
+		return json(safeResult);
 	} catch (err) {
-		const errorObj = err as any;
+		const errorObj = err as {
+			statusCode?: number;
+			status?: number;
+			errors?: unknown;
+			message?: string;
+		};
+		const normalizedErrors = Array.isArray(errorObj.errors)
+			? errorObj.errors
+			: [{ detail: errorObj.message ?? 'Payment failed' }];
+		const statusCode =
+			typeof errorObj.statusCode === 'number'
+				? errorObj.statusCode
+				: typeof errorObj.status === 'number'
+					? errorObj.status
+					: 400;
+
 		await logger.error('Payment creation failed', err as Error, {
 			routeId: '/api/payment',
 			userEmail: email,
-			amount,
+			amount: amountInCents.toString(),
 			referenceId: reference_id,
-			errorStatus: errorObj.status,
-			errorResult: errorObj.result,
-			errorDetails: errorObj.errors
+			errorStatus: statusCode,
+			errorDetails: normalizedErrors
 		});
-		const data = JSON.stringify(errorObj.errors, null, 4);
-		const myOptions = { status: 400, statusText: 'It was NOT good!' };
-		const myResponse = new Response(data, myOptions);
-		return myResponse;
+
+		return buildPaymentErrorResponse('Payment failed', normalizedErrors, statusCode);
 	}
 }

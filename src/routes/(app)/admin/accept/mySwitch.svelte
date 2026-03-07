@@ -19,7 +19,7 @@
 			/>
 			<label
 				for="switch-component-on"
-				class="absolute left-0 top-0 h-5 w-5 cursor-pointer rounded-full border border-slate-300 bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-6"
+				class="absolute top-0 left-0 h-5 w-5 cursor-pointer rounded-full border border-slate-300 bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-6"
 			>
 			</label>
 		</div>

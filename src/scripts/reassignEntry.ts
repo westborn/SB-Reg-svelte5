@@ -1,6 +1,14 @@
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../lib/generated/prisma/client';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+	throw new Error('DATABASE_URL is required');
+}
+
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 // Simple arg parser: accepts either positional (entryId newRegistrationId newArtistId)
 // or flags --entryId= --newRegistrationId= --newArtistId= and an optional --execute flag.

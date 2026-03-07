@@ -1,8 +1,7 @@
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
-import { prisma } from '$lib/components/server/prisma';
 
-import { getExhibits, type Exhibit } from '$lib/components/server/registrationDB';
+import { getExhibits, type Exhibit, upsertEntryLocation } from '$lib/components/server/registrationDB';
 import { locationSchemaUI } from '$lib/zod-schemas';
 import { EXHIBITION_YEAR, GENERIC_ERROR_MESSAGE, GENERIC_ERROR_UNEXPECTED } from '$lib/constants';
 import { logger } from '$lib/server/logger';
@@ -62,11 +61,7 @@ const locationUpdate = async (event: RequestEvent) => {
 				status: 400
 			});
 		}
-		await prisma.locationTable.upsert({
-			where: { entryId: entryId },
-			update: { exhibitNumber: formValidationResult.data.location },
-			create: { entryId: formValidationResult.data.entryId, exhibitNumber: formValidationResult.data.location }
-		});
+		await upsertEntryLocation(entryId, formValidationResult.data.location);
 
 		// Log successful location update
 		await logger.info('Location updated successfully', {

@@ -38,7 +38,7 @@
 			class="h-32 w-32 overflow-hidden rounded object-contain {sold ? 'opacity-60 grayscale' : ''}"
 		/>
 		{#if hasMultipleImages}
-			<div class="absolute right-1 top-1 rounded-full bg-black bg-opacity-70 p-1">
+			<div class="bg-opacity-70 absolute top-1 right-1 rounded-full bg-black p-1">
 				<Camera class="h-3 w-3 text-white" />
 			</div>
 		{/if}

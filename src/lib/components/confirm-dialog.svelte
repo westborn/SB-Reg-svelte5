@@ -20,7 +20,7 @@
 	{:else}
 		<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update these Details?</Dialog.Trigger>
 	{/if}
-	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
+	<Dialog.Content class="bg-card max-h-full max-w-[400px] overflow-y-auto">
 		<Dialog.Header>
 			<Dialog.Title>Exhibition Confirmation</Dialog.Title>
 			<Dialog.Description>Make changes to your details here.<br />Click save when you're done.</Dialog.Description>

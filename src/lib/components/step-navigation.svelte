@@ -41,7 +41,7 @@
 			{#if index < STEPS.length - 1}
 				<div class="flex-auto border-t-4 {index <= currentStep.step ? 'border-primary-400' : 'border-gray-300'}"></div>
 				{#if index == currentStep.step}
-					<div class="border-y-8 border-l-8 border-r-0 border-solid border-primary-400 border-y-transparent"></div>
+					<div class="border-primary-400 border-y-8 border-r-0 border-l-8 border-solid border-y-transparent"></div>
 				{/if}
 			{/if}
 		</div>

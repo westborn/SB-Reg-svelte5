@@ -188,7 +188,7 @@
 <div class="grid place-items-center">
 	<div class="inline-grid w-full max-w-screen-lg gap-2 p-2">
 		<div class="flex items-center justify-between">
-			<h4 class="text-xl font-bold text-primary">Accept/Reject Exhibits</h4>
+			<h4 class="text-primary text-xl font-bold">Accept/Reject Exhibits</h4>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props })}
@@ -289,7 +289,7 @@
 								<Pagination.Item>
 									<Pagination.Link
 										size="default"
-										class="min-w-3 max-w-14 px-3 sm:px-4"
+										class="max-w-14 min-w-3 px-3 sm:px-4"
 										{page}
 										isActive={currentPage === page.value}
 										onclick={() => table.setPageIndex(page.value - 1)}

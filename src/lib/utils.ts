@@ -111,10 +111,28 @@ export function handleUnexpectedError(error: Error) {
  */
 export function handleError(lastStatus: LastStatus) {
 	let msg = '';
+	const extractErrorMessage = (payload: unknown) => {
+		if (typeof payload === 'string') return payload;
+		if (Array.isArray(payload) && payload.length > 0) {
+			const first = payload[0] as { detail?: string; message?: string; path?: string[] };
+			if (first?.detail) return first.detail;
+			if (first?.message && first?.path?.length) return `${first.path.join('.')} - ${first.message}`;
+			if (first?.message) return first.message;
+		}
+		if (typeof payload === 'object' && payload !== null) {
+			const obj = payload as { message?: string; detail?: string; errors?: unknown[] };
+			if (obj.detail) return obj.detail;
+			if (Array.isArray(obj.errors) && obj.errors.length > 0) {
+				return extractErrorMessage(obj.errors);
+			}
+			if (obj.message) return obj.message;
+		}
+		return 'Something went wrong.';
+	};
 	// console.log(lastStatus.status)
 	switch (lastStatus.status) {
 		case 400:
-			msg = lastStatus.response[0] || 'something bad happened!';
+			msg = extractErrorMessage(lastStatus.response);
 			break;
 		case 404:
 			// console.log(404);

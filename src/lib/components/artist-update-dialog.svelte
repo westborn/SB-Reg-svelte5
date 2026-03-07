@@ -10,7 +10,7 @@
 
 <Dialog.Root bind:open={myState.artistUpdateDialogOpen}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'default' })}>Update Your Details?</Dialog.Trigger>
-	<Dialog.Content class="max-h-full max-w-[400px] overflow-y-auto bg-card">
+	<Dialog.Content class="bg-card max-h-full max-w-[400px] overflow-y-auto">
 		<Dialog.Header>
 			<Dialog.Title>Edit Registration</Dialog.Title>
 			<Dialog.Description>Make changes to your profile here.<br />Click save when you're done.</Dialog.Description>

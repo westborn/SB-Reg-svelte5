@@ -1,6 +1,14 @@
-import { EntryType, Indigenous, PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { EntryType, Indigenous, PrismaClient } from '../lib/generated/prisma/client';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+	throw new Error('DATABASE_URL is required');
+}
+
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 import registrations from '$lib/data/2024 Registrations.json';
 import entries from '$lib/data/2024 Entries.json';

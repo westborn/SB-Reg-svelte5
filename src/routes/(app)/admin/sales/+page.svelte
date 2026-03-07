@@ -132,9 +132,10 @@
 			month: 'short',
 			day: '2-digit',
 			hour: '2-digit',
+			hour12: false,
 			minute: '2-digit',
-			second: '2-digit',
-			timeZoneName: 'short'
+			second: '2-digit'
+			// timeZoneName: 'short'
 		}).format(date);
 	}
 
@@ -250,7 +251,7 @@
 <div class="container mx-auto max-w-5xl space-y-6 px-4 py-8">
 	<div>
 		<h1 class="text-3xl font-bold">Admin Sales Update</h1>
-		<p class="mt-2 text-muted-foreground">Review orders and entries, confirm updates, and mark entries as sold.</p>
+		<p class="text-muted-foreground mt-2">Review orders and entries, confirm updates, and mark entries as sold.</p>
 	</div>
 
 	<Card.Root>
@@ -283,7 +284,7 @@
 				</div>
 
 				{#if quickRange}
-					<div class="rounded-md border border-border bg-muted/40 p-3 text-sm">
+					<div class="border-border bg-muted/40 rounded-md border p-3 text-sm">
 						<p class="font-medium">Calculated range</p>
 						<p class="text-muted-foreground">
 							{formatDisplayDate(quickRange.start)} → {formatDisplayDate(quickRange.end)}
@@ -311,7 +312,7 @@
 					<Button type="submit" disabled={isPreviewSubmitting}>
 						{isPreviewSubmitting ? 'Loading Preview…' : 'Preview Sales Orders'}
 					</Button>
-					<p class="text-sm text-muted-foreground">Fetch and classify Square rows (no DB updates in this step).</p>
+					<p class="text-muted-foreground text-sm">Fetch and classify Square rows (no DB updates in this step).</p>
 				</div>
 			</form>
 		</Card.Content>
@@ -320,7 +321,7 @@
 	{#if isPreviewSubmitting}
 		<Card.Root>
 			<Card.Content class="pt-6">
-				<p class="text-sm text-muted-foreground">Loading preview response…</p>
+				<p class="text-muted-foreground text-sm">Loading preview response…</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}
@@ -328,7 +329,7 @@
 	{#if !isPreviewSubmitting && !form?.preview && !form?.error}
 		<Card.Root>
 			<Card.Content class="pt-6">
-				<p class="text-sm text-muted-foreground">
+				<p class="text-muted-foreground text-sm">
 					Choose a date range, then preview Square order rows to see matched, unmatched, and excluded results.
 				</p>
 			</Card.Content>
@@ -425,18 +426,19 @@
 					<div class="flex items-center gap-2 pt-1">
 						<Button type="button" variant="outline" size="sm" onclick={selectAllMatchedRows}>Select all</Button>
 						<Button type="button" variant="outline" size="sm" onclick={clearSelectedRows}>Clear selection</Button>
-						<span class="text-xs text-muted-foreground">{selectedEntryIds.length} selected</span>
+						<span class="text-muted-foreground text-xs">{selectedEntryIds.length} selected</span>
 					</div>
 					<div class="overflow-x-auto pt-2">
 						<Table.Root>
 							<Table.Header>
 								<Table.Row>
 									<Table.Head>Select</Table.Head>
-									<Table.Head>SKU</Table.Head>
+									<Table.Head>DateTime</Table.Head>
 									<Table.Head>Entry Id</Table.Head>
-									<Table.Head>Exhibit Number</Table.Head>
+									<Table.Head>Exhibit</Table.Head>
 									<Table.Head>Artist</Table.Head>
 									<Table.Head>Title</Table.Head>
+									<Table.Head>Price</Table.Head>
 								</Table.Row>
 							</Table.Header>
 							<Table.Body>
@@ -449,11 +451,12 @@
 												onchange={(e) => toggleSelectedEntry(row.matchedEntry.entryId, e.currentTarget.checked)}
 											/>
 										</Table.Cell>
-										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.exhibitNumber}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
+										<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
 									</Table.Row>
 								{/each}
 							</Table.Body>
@@ -474,7 +477,7 @@
 				{/if}
 
 				{#if form.preview.sections.summary.totalLineItems > 0 && matchedRows.length === 0}
-					<p class="pt-4 text-sm text-muted-foreground">
+					<p class="text-muted-foreground pt-4 text-sm">
 						No rows are currently eligible for sold updates in this result set.
 					</p>
 				{/if}
@@ -486,6 +489,7 @@
 							<Table.Header>
 								<Table.Row>
 									<Table.Head>SKU</Table.Head>
+									<Table.Head>DateTime</Table.Head>
 									<Table.Head>Entry Id</Table.Head>
 									<Table.Head>State</Table.Head>
 									<Table.Head>Reason</Table.Head>
@@ -495,6 +499,7 @@
 								{#each canceledRows as row}
 									<Table.Row class="bg-red-50 text-red-700">
 										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
 										<Table.Cell>{row.parsedSku.entryId}</Table.Cell>
 										<Table.Cell>{row.state}</Table.Cell>
 										<Table.Cell>{row.reason}</Table.Cell>
@@ -585,14 +590,14 @@
 
 				{#if showAllOrderRows}
 					{#if displayOrderRows.length === 0}
-						<p class="pt-2 text-sm text-muted-foreground">No order rows were returned for this date range.</p>
+						<p class="text-muted-foreground pt-2 text-sm">No order rows were returned for this date range.</p>
 					{:else}
 						<p class="pt-2 text-sm font-semibold">All Order Rows</p>
 						<div class="overflow-x-auto pt-2">
 							<table class="w-full border-collapse text-sm">
 								<thead>
 									<tr class="text-left">
-										<th class="whitespace-nowrap pr-4 font-medium">Created</th>
+										<th class="pr-4 font-medium whitespace-nowrap">Created</th>
 										<th class="pr-4 font-medium">Location</th>
 										<th class="pr-4 font-medium">State</th>
 										<th class="pr-4 font-medium">Item</th>
@@ -603,7 +608,7 @@
 								<tbody>
 									{#each displayOrderRows as row}
 										<tr class={row.state === 'CANCELLED' ? 'text-red-700' : ''}>
-											<td class="whitespace-nowrap pr-4">{formatFromISO(row.createdDateTime)}</td>
+											<td class="pr-4 whitespace-nowrap">{formatSydneyDateTime(row.createdDateTime)}</td>
 											<td class="pr-4">{row.location}</td>
 											<td class="pr-4">{row.state}</td>
 											<td class="pr-4">{row.item}</td>
@@ -617,7 +622,7 @@
 					{/if}
 				{/if}
 
-				<p class="text-sm text-muted-foreground">Generated at: {formatSydneyDateTime(form.preview.generatedAt)}</p>
+				<p class="text-muted-foreground text-sm">Generated at: {formatSydneyDateTime(form.preview.generatedAt)}</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}

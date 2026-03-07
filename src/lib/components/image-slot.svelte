@@ -64,22 +64,22 @@
 </script>
 
 <div
-	class="group relative aspect-square w-full overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/10 transition-colors hover:bg-muted/20"
+	class="group border-muted-foreground/25 bg-muted/10 hover:bg-muted/20 relative aspect-square w-full overflow-hidden rounded-lg border-2 border-dashed transition-colors"
 >
 	{#if isLoading}
 		<!-- Loading State -->
 		<div class="flex h-full items-center justify-center">
-			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
+			<LoaderCircle class="text-muted-foreground h-8 w-8 animate-spin" />
 		</div>
 	{:else if isEmpty || !image}
 		<!-- Empty State -->
 		<button
-			class="flex h-full w-full flex-col items-center justify-center transition-colors hover:bg-muted/30"
+			class="hover:bg-muted/30 flex h-full w-full flex-col items-center justify-center transition-colors"
 			onclick={handleUpload}
 			type="button"
 		>
-			<Upload class="mb-2 h-8 w-8 text-muted-foreground" />
-			<span class="text-sm text-muted-foreground">Add Image</span>
+			<Upload class="text-muted-foreground mb-2 h-8 w-8" />
+			<span class="text-muted-foreground text-sm">Add Image</span>
 		</button>
 	{:else}
 		<!-- Image Display -->
@@ -94,7 +94,7 @@
 
 			<!-- Primary Badge -->
 			{#if isPrimary}
-				<Badge class="absolute left-2 top-2 bg-primary text-primary-foreground">
+				<Badge class="bg-primary text-primary-foreground absolute top-2 left-2">
 					<Star class="mr-1 h-3 w-3" />
 					Primary
 				</Badge>

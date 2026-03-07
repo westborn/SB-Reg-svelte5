@@ -320,7 +320,7 @@
 								<Pagination.Item>
 									<Pagination.Link
 										size="default"
-										class="min-w-3 max-w-14 px-3 sm:px-4"
+										class="max-w-14 min-w-3 px-3 sm:px-4"
 										{page}
 										isActive={currentPage === page.value}
 										onclick={() => table.setPageIndex(page.value - 1)}

@@ -138,7 +138,7 @@
 											<Table.Cell>
 												<Badge class={getLogLevelColor(log.level)}>{log.level}</Badge>
 											</Table.Cell>
-											<Table.Cell class="whitespace-nowrap text-sm">{formatDate(log.createdAt)}</Table.Cell>
+											<Table.Cell class="text-sm whitespace-nowrap">{formatDate(log.createdAt)}</Table.Cell>
 											<Table.Cell class="max-w-md">
 												<div class="line-clamp-2">{log.message}</div>
 											</Table.Cell>
@@ -269,7 +269,7 @@
 											<div>
 												<div class="font-medium text-red-700">Stack Trace:</div>
 												<div class="mt-1 max-h-48 overflow-auto rounded bg-white p-2">
-													<pre class="whitespace-pre-wrap text-xs text-red-800">{errorData.stack}</pre>
+													<pre class="text-xs whitespace-pre-wrap text-red-800">{errorData.stack}</pre>
 												</div>
 											</div>
 										{/if}
