@@ -67,6 +67,7 @@
 	let isPreviewSubmitting = $state(false);
 	let isUpdateSubmitting = $state(false);
 	let showAllOrderRows = $state(false);
+	let showCancelledRows = $state(false);
 
 	function getMidnight(date: Date): Date {
 		const d = new Date(date);
@@ -482,7 +483,12 @@
 					</p>
 				{/if}
 
-				{#if canceledRows.length > 0}
+				<div class="pt-2">
+					<Button type="button" variant="outline" size="sm" onclick={() => (showCancelledRows = !showCancelledRows)}>
+						{showCancelledRows ? 'Hide Cancelled Rows' : 'Show Cancelled Rows'}
+					</Button>
+				</div>
+				{#if showCancelledRows && canceledRows.length > 0}
 					<p class="pt-4 text-sm font-semibold text-red-700">Canceled Rows (Excluded from updates)</p>
 					<div class="overflow-x-auto pt-2">
 						<Table.Root>
