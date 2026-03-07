@@ -132,9 +132,10 @@
 			month: 'short',
 			day: '2-digit',
 			hour: '2-digit',
+			hour12: false,
 			minute: '2-digit',
-			second: '2-digit',
-			timeZoneName: 'short'
+			second: '2-digit'
+			// timeZoneName: 'short'
 		}).format(date);
 	}
 
@@ -432,11 +433,12 @@
 							<Table.Header>
 								<Table.Row>
 									<Table.Head>Select</Table.Head>
-									<Table.Head>SKU</Table.Head>
+									<Table.Head>DateTime</Table.Head>
 									<Table.Head>Entry Id</Table.Head>
-									<Table.Head>Exhibit Number</Table.Head>
+									<Table.Head>Exhibit</Table.Head>
 									<Table.Head>Artist</Table.Head>
 									<Table.Head>Title</Table.Head>
+									<Table.Head>Price</Table.Head>
 								</Table.Row>
 							</Table.Header>
 							<Table.Body>
@@ -449,11 +451,12 @@
 												onchange={(e) => toggleSelectedEntry(row.matchedEntry.entryId, e.currentTarget.checked)}
 											/>
 										</Table.Cell>
-										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.exhibitNumber}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
+										<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
 									</Table.Row>
 								{/each}
 							</Table.Body>
@@ -486,6 +489,7 @@
 							<Table.Header>
 								<Table.Row>
 									<Table.Head>SKU</Table.Head>
+									<Table.Head>DateTime</Table.Head>
 									<Table.Head>Entry Id</Table.Head>
 									<Table.Head>State</Table.Head>
 									<Table.Head>Reason</Table.Head>
@@ -495,6 +499,7 @@
 								{#each canceledRows as row}
 									<Table.Row class="bg-red-50 text-red-700">
 										<Table.Cell>{row.sku}</Table.Cell>
+										<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
 										<Table.Cell>{row.parsedSku.entryId}</Table.Cell>
 										<Table.Cell>{row.state}</Table.Cell>
 										<Table.Cell>{row.reason}</Table.Cell>
@@ -603,7 +608,7 @@
 								<tbody>
 									{#each displayOrderRows as row}
 										<tr class={row.state === 'CANCELLED' ? 'text-red-700' : ''}>
-											<td class="pr-4 whitespace-nowrap">{formatFromISO(row.createdDateTime)}</td>
+											<td class="pr-4 whitespace-nowrap">{formatSydneyDateTime(row.createdDateTime)}</td>
 											<td class="pr-4">{row.location}</td>
 											<td class="pr-4">{row.state}</td>
 											<td class="pr-4">{row.item}</td>
