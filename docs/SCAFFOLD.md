@@ -47,7 +47,7 @@ pnpm dlx shadcn-svelte@latest add alert-dialog avatar button card dialog form in
 
 ## Tailwind Theme Configuration
 
-Update `src/app.pcss` with custom theme colors:
+Update `src/app.css` with custom theme colors:
 
 ```css
 @tailwind base;

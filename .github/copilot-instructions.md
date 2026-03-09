@@ -6,6 +6,14 @@ This is a **SvelteKit 5** application (modern Svelte with runes) managing artist
 
 **Tech Stack**: SvelteKit 5 + TypeScript + PostgreSQL/Prisma + Supabase Auth + Tailwind/bits-ui + Cloudinary + Nodemailer
 
+### Tailwind 4 Integration
+
+This project uses **Tailwind CSS v4 via the Vite plugin**.
+
+- Global stylesheet entry is [`src/app.css`](../src/app.css)
+- Tailwind is configured through [`vite.config.ts`](../vite.config.ts)
+- **Do not** reintroduce a PostCSS Tailwind pipeline unless explicitly required
+
 ## Critical Architectural Patterns
 
 ### Database Schema & Relationships
@@ -95,6 +103,8 @@ const { form: formData, enhance, errors, delayed } = form;
 ```
 
 Forms use `method="POST" action="?/actionName" use:enhance`.
+
+**Important**: Keep using the documented import path `sveltekit-superforms/adapters` in application code. Vite resolves that path to a local Zod-only shim to avoid unused adapter bundling issues in the browser.
 
 #### Form ID Conventions
 
