@@ -4,7 +4,7 @@ import { SECRET_SQUARE_ACCESS_TOKEN } from '$env/static/private';
 import { PUBLIC_SQUARE_ENVIRONMENT } from '$env/static/public';
 import SquareOrderChecker, { type OrderSummaryRow } from '$lib/server/squareOrderChecker';
 import { logger } from '$lib/server/logger';
-import { getExhibits, updateEntry, type Exhibit } from '$lib/components/server/registrationDB';
+import { getExhibits, markEntriesSold, type Exhibit } from '$lib/components/server/registrationDB';
 import { EXHIBITION_YEAR } from '$lib/constants';
 
 type RangePreset = '2' | '7' | '10' | 'custom';
@@ -125,6 +125,31 @@ type SoldUpdateResult = {
 	failedEntries: Array<{ entryId: number; reason: string }>;
 };
 
+type SalesActionName = 'preview' | 'sold update';
+
+type SalesActionContext = {
+	filter: FilterPayload;
+	selectedEntryIds: number[];
+	logContext: ReturnType<typeof buildLoggerContext>;
+	entryYear: string;
+	rows: OrderSummaryRow[];
+	preview: PreviewPayload;
+};
+
+type SalesValidationResult =
+	| {
+			ok: true;
+			searchRange: { start: Date; end: Date };
+			entryYear: string;
+	  }
+	| {
+			ok: false;
+			status: number;
+			error: string;
+			logReason: string;
+			logDetails?: Record<string, string>;
+	  };
+
 const DEFAULT_FILTER: FilterPayload = getDefaultFilter();
 
 function isRangePreset(value: string): value is RangePreset {
@@ -178,6 +203,14 @@ function buildPlaceholderPreview(filter: FilterPayload): PreviewPayload {
 		},
 		generatedAt: new Date().toISOString()
 	};
+}
+
+function failWithPlaceholder(filter: FilterPayload, status: number, error: string) {
+	return fail(status, {
+		error,
+		submittedFilter: filter,
+		preview: buildPlaceholderPreview(filter)
+	});
 }
 
 function normalizeArtistName(value: string): string {
@@ -491,6 +524,198 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 	};
 }
 
+function getSalesActionMessages(actionName: SalesActionName) {
+	if (actionName === 'preview') {
+		return {
+			start: 'Sales preview fetch started',
+			validationPrefix: 'Sales preview rejected',
+			squareFailureLog: 'Sales preview fetch failed',
+			exhibitFailureLog: 'Sales preview matching failed while loading exhibits',
+			exhibitFailureUser: 'Failed to load exhibit data for matching. Please try again.'
+		};
+	}
+
+	return {
+		start: 'Sales sold update started',
+		validationPrefix: 'Sales sold update rejected',
+		squareFailureLog: 'Sales sold update failed during Square fetch',
+		exhibitFailureLog: 'Sales sold update failed while loading exhibits',
+		exhibitFailureUser: 'Failed to load exhibit data for sold update. Please try again.'
+	};
+}
+
+function validateSalesFilter(filter: FilterPayload): SalesValidationResult {
+	if (filter.rangePreset === 'custom' && (!filter.startDate || !filter.endDate)) {
+		return {
+			ok: false,
+			status: 400,
+			error: 'Start and end dates are required when using a custom range.',
+			logReason: 'custom date range missing values',
+			logDetails: {
+				rangePreset: filter.rangePreset
+			}
+		};
+	}
+
+	if (!filter.startDate || !filter.endDate) {
+		return {
+			ok: false,
+			status: 400,
+			error: 'A start and end date are required to fetch Square orders.',
+			logReason: 'date range missing values',
+			logDetails: {
+				rangePreset: filter.rangePreset
+			}
+		};
+	}
+
+	const start = parseDateInput(filter.startDate);
+	const end = parseDateInput(filter.endDate);
+
+	if (!start || !end) {
+		return {
+			ok: false,
+			status: 400,
+			error: 'Invalid date format provided. Please choose valid date values.',
+			logReason: 'invalid date format',
+			logDetails: {
+				startDate: filter.startDate,
+				endDate: filter.endDate,
+				rangePreset: filter.rangePreset
+			}
+		};
+	}
+
+	const searchRange = toFullDaySearchRange(start, end);
+
+	if (searchRange.start > searchRange.end) {
+		return {
+			ok: false,
+			status: 400,
+			error: 'Start date must be before or equal to end date.',
+			logReason: 'start date is after end date',
+			logDetails: {
+				startDate: filter.startDate,
+				endDate: filter.endDate,
+				rangePreset: filter.rangePreset
+			}
+		};
+	}
+
+	return {
+		ok: true,
+		searchRange,
+		entryYear: getEntryYearForDate(searchRange.start)
+	};
+}
+
+async function buildPreviewForEntryYear(
+	filter: FilterPayload,
+	rows: OrderSummaryRow[],
+	entryYear: string
+): Promise<PreviewPayload> {
+	const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
+	return buildLivePreview(filter, rows, exhibits);
+}
+
+async function loadSalesActionContext(
+	event: RequestEvent,
+	options: { actionName: SalesActionName; requireSelectedEntryIds?: boolean }
+): Promise<{ ok: true; context: SalesActionContext } | { ok: false; response: any }> {
+	const formData = await event.request.formData();
+	const filter = getFilterPayload(formData);
+	const selectedEntryIds = parseSelectedEntryIds(formData);
+	const { user } = await event.locals.V1safeGetSession();
+	const logContext = buildLoggerContext(event, user);
+	const messages = getSalesActionMessages(options.actionName);
+
+	if (options.requireSelectedEntryIds && selectedEntryIds.length === 0) {
+		await logger.warn(`${messages.validationPrefix}: no matched rows selected`, {
+			...logContext,
+			rangePreset: filter.rangePreset
+		});
+
+		return {
+			ok: false,
+			response: failWithPlaceholder(filter, 400, 'Select at least one matched row before updating sold status.')
+		};
+	}
+
+	const validation = validateSalesFilter(filter);
+	if (!validation.ok) {
+		await logger.warn(`${messages.validationPrefix}: ${validation.logReason}`, {
+			...logContext,
+			...(validation.logDetails ?? {})
+		});
+
+		return {
+			ok: false,
+			response: failWithPlaceholder(filter, validation.status, validation.error)
+		};
+	}
+
+	await logger.info(messages.start, {
+		...logContext,
+		...(options.requireSelectedEntryIds && { requestedEntryCount: selectedEntryIds.length }),
+		rangePreset: filter.rangePreset,
+		startDate: filter.startDate,
+		endDate: filter.endDate
+	});
+
+	const checker = new SquareOrderChecker(SECRET_SQUARE_ACCESS_TOKEN, PUBLIC_SQUARE_ENVIRONMENT);
+	const [squareError, rows] = await checker.getOrderSummaryByDateRange(
+		validation.searchRange.start,
+		validation.searchRange.end
+	);
+
+	if (squareError || !rows) {
+		const status = squareError?.status ?? 502;
+		const message = squareError?.message ?? 'Failed to fetch Square orders for selected range.';
+
+		await logger.error(messages.squareFailureLog, new Error(message), {
+			...logContext,
+			rangePreset: filter.rangePreset,
+			startDate: filter.startDate,
+			endDate: filter.endDate,
+			squareStatus: status
+		});
+
+		return {
+			ok: false,
+			response: failWithPlaceholder(filter, status, message)
+		};
+	}
+
+	try {
+		const preview = await buildPreviewForEntryYear(filter, rows, validation.entryYear);
+
+		return {
+			ok: true,
+			context: {
+				filter,
+				selectedEntryIds,
+				logContext,
+				entryYear: validation.entryYear,
+				rows,
+				preview
+			}
+		};
+	} catch (error) {
+		await logger.error(messages.exhibitFailureLog, error as Error, {
+			...logContext,
+			rangePreset: filter.rangePreset,
+			startDate: filter.startDate,
+			endDate: filter.endDate,
+			entryYear: validation.entryYear
+		});
+
+		return {
+			ok: false,
+			response: failWithPlaceholder(filter, 500, messages.exhibitFailureUser)
+		};
+	}
+}
+
 export const load = async () => {
 	return {
 		filterDefaults: DEFAULT_FILTER,
@@ -509,118 +734,12 @@ export const load = async () => {
 
 export const actions: Actions = {
 	preview: async (event: RequestEvent) => {
-		const { request } = event;
-		const formData = await request.formData();
-		const filter = getFilterPayload(formData);
-		const { user } = await event.locals.V1safeGetSession();
-		const logContext = buildLoggerContext(event, user);
-
-		if (filter.rangePreset === 'custom' && (!filter.startDate || !filter.endDate)) {
-			await logger.warn('Sales preview rejected: custom date range missing values', {
-				...logContext,
-				rangePreset: filter.rangePreset
-			});
-			return fail(400, {
-				error: 'Start and end dates are required when using a custom range.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
+		const loaded = await loadSalesActionContext(event, { actionName: 'preview' });
+		if (!loaded.ok) {
+			return loaded.response;
 		}
 
-		if (!filter.startDate || !filter.endDate) {
-			await logger.warn('Sales preview rejected: date range missing values', {
-				...logContext,
-				rangePreset: filter.rangePreset
-			});
-			return fail(400, {
-				error: 'A start and end date are required to fetch Square orders.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		const start = parseDateInput(filter.startDate);
-		const end = parseDateInput(filter.endDate);
-
-		if (!start || !end) {
-			await logger.warn('Sales preview rejected: invalid date format', {
-				...logContext,
-				startDate: filter.startDate,
-				endDate: filter.endDate,
-				rangePreset: filter.rangePreset
-			});
-			return fail(400, {
-				error: 'Invalid date format provided. Please choose valid date values.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		const searchRange = toFullDaySearchRange(start, end);
-
-		if (searchRange.start > searchRange.end) {
-			await logger.warn('Sales preview rejected: start date is after end date', {
-				...logContext,
-				startDate: filter.startDate,
-				endDate: filter.endDate,
-				rangePreset: filter.rangePreset
-			});
-			return fail(400, {
-				error: 'Start date must be before or equal to end date.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		await logger.info('Sales preview fetch started', {
-			...logContext,
-			rangePreset: filter.rangePreset,
-			startDate: filter.startDate,
-			endDate: filter.endDate
-		});
-
-		const checker = new SquareOrderChecker(SECRET_SQUARE_ACCESS_TOKEN, PUBLIC_SQUARE_ENVIRONMENT);
-		const [squareError, rows] = await checker.getOrderSummaryByDateRange(searchRange.start, searchRange.end);
-
-		if (squareError || !rows) {
-			const status = squareError?.status ?? 502;
-			const message = squareError?.message ?? 'Failed to fetch Square orders for selected range.';
-
-			await logger.error('Sales preview fetch failed', new Error(message), {
-				...logContext,
-				rangePreset: filter.rangePreset,
-				startDate: filter.startDate,
-				endDate: filter.endDate,
-				squareStatus: status
-			});
-
-			return fail(status, {
-				error: message,
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		let preview: PreviewPayload;
-		const entryYear = getEntryYearForDate(searchRange.start);
-		try {
-			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
-			preview = buildLivePreview(filter, rows, exhibits);
-		} catch (error) {
-			await logger.error('Sales preview matching failed while loading exhibits', error as Error, {
-				...logContext,
-				rangePreset: filter.rangePreset,
-				startDate: filter.startDate,
-				endDate: filter.endDate,
-				entryYear
-			});
-
-			return fail(500, {
-				error: 'Failed to load exhibit data for matching. Please try again.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
+		const { filter, logContext, entryYear, preview } = loaded.context;
 
 		await logger.info('Sales preview fetch completed', {
 			...logContext,
@@ -643,105 +762,15 @@ export const actions: Actions = {
 	},
 
 	updateSold: async (event: RequestEvent) => {
-		const { request } = event;
-		const formData = await request.formData();
-		const filter = getFilterPayload(formData);
-		const selectedEntryIds = parseSelectedEntryIds(formData);
-		const { user } = await event.locals.V1safeGetSession();
-		const logContext = buildLoggerContext(event, user);
-
-		if (selectedEntryIds.length === 0) {
-			return fail(400, {
-				error: 'Select at least one matched row before updating sold status.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		if (filter.rangePreset === 'custom' && (!filter.startDate || !filter.endDate)) {
-			return fail(400, {
-				error: 'Start and end dates are required when using a custom range.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		if (!filter.startDate || !filter.endDate) {
-			return fail(400, {
-				error: 'A start and end date are required to fetch Square orders.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		const start = parseDateInput(filter.startDate);
-		const end = parseDateInput(filter.endDate);
-
-		if (!start || !end) {
-			return fail(400, {
-				error: 'Invalid date format provided. Please choose valid date values.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		const searchRange = toFullDaySearchRange(start, end);
-
-		if (searchRange.start > searchRange.end) {
-			return fail(400, {
-				error: 'Start date must be before or equal to end date.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
-
-		await logger.info('Sales sold update started', {
-			...logContext,
-			requestedEntryCount: selectedEntryIds.length,
-			rangePreset: filter.rangePreset,
-			startDate: filter.startDate,
-			endDate: filter.endDate
+		const loaded = await loadSalesActionContext(event, {
+			actionName: 'sold update',
+			requireSelectedEntryIds: true
 		});
-
-		const checker = new SquareOrderChecker(SECRET_SQUARE_ACCESS_TOKEN, PUBLIC_SQUARE_ENVIRONMENT);
-		const [squareError, rows] = await checker.getOrderSummaryByDateRange(searchRange.start, searchRange.end);
-
-		if (squareError || !rows) {
-			const status = squareError?.status ?? 502;
-			const message = squareError?.message ?? 'Failed to fetch Square orders for selected range.';
-
-			await logger.error('Sales sold update failed during Square fetch', new Error(message), {
-				...logContext,
-				rangePreset: filter.rangePreset,
-				startDate: filter.startDate,
-				endDate: filter.endDate,
-				squareStatus: status
-			});
-
-			return fail(status, {
-				error: message,
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
+		if (!loaded.ok) {
+			return loaded.response;
 		}
 
-		let previewBeforeUpdate: PreviewPayload;
-		const entryYear = getEntryYearForDate(searchRange.start);
-		try {
-			const exhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
-			previewBeforeUpdate = buildLivePreview(filter, rows, exhibits);
-		} catch (error) {
-			await logger.error('Sales sold update failed while loading exhibits', error as Error, {
-				...logContext,
-				entryYear
-			});
-
-			return fail(500, {
-				error: 'Failed to load exhibit data for sold update. Please try again.',
-				submittedFilter: filter,
-				preview: buildPlaceholderPreview(filter)
-			});
-		}
+		const { filter, selectedEntryIds, logContext, entryYear, rows, preview: previewBeforeUpdate } = loaded.context;
 
 		const eligibleIds = new Set(previewBeforeUpdate.sections.matchedRows.map((row) => row.matchedEntry.entryId));
 		const alreadySoldIds = new Set(previewBeforeUpdate.sections.alreadySoldRows.map((row) => row.matchedEntry.entryId));
@@ -754,6 +783,7 @@ export const actions: Actions = {
 			failed: 0,
 			failedEntries: []
 		};
+		const entryIdsToUpdate: number[] = [];
 
 		for (const entryId of selectedEntryIds) {
 			if (alreadySoldIds.has(entryId)) {
@@ -766,23 +796,29 @@ export const actions: Actions = {
 				continue;
 			}
 
+			entryIdsToUpdate.push(entryId);
+		}
+
+		if (entryIdsToUpdate.length > 0) {
 			try {
-				await updateEntry(entryId, { sold: true });
-				result.updated += 1;
+				result.updated = await markEntriesSold(entryIdsToUpdate);
+
+				if (result.updated < entryIdsToUpdate.length) {
+					result.failed = entryIdsToUpdate.length - result.updated;
+				}
 			} catch (error) {
-				result.failed += 1;
-				result.failedEntries.push({
+				result.failed = entryIdsToUpdate.length;
+				result.failedEntries = entryIdsToUpdate.map((entryId) => ({
 					entryId,
 					reason: error instanceof Error ? error.message : 'Unknown error'
-				});
+				}));
 			}
 		}
 
 		let previewAfterUpdate = previewBeforeUpdate;
 		if (result.updated > 0) {
 			try {
-				const refreshedExhibits = await getExhibits({ rows: 999, offset: 0, entryYear });
-				previewAfterUpdate = buildLivePreview(filter, rows, refreshedExhibits);
+				previewAfterUpdate = await buildPreviewForEntryYear(filter, rows, entryYear);
 			} catch {
 				// keep pre-update preview if refresh fails
 			}

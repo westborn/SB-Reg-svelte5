@@ -731,6 +731,34 @@ export const updateEntry = async (entryId: number, data: Partial<Prisma.entryTab
 };
 
 /**
+ * Marks multiple entries as sold in a single database operation.
+ * Only updates entries that are not already sold.
+ *
+ * @param entryIds - Entry IDs to mark as sold
+ * @returns Number of rows updated
+ *
+ * @example
+ * await markEntriesSold([123, 456, 789]);
+ */
+export const markEntriesSold = async (entryIds: number[]) => {
+	if (entryIds.length === 0) {
+		return 0;
+	}
+
+	const result = await prisma.entryTable.updateMany({
+		where: {
+			id: { in: entryIds },
+			sold: false
+		},
+		data: {
+			sold: true
+		}
+	});
+
+	return result.count;
+};
+
+/**
  * Updates a registration record with partial data.
  *
  * @param registrationId - Registration ID
