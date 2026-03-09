@@ -123,6 +123,18 @@ pnpm bump:minor            # Bump minor version
 pnpm bump:major            # Bump major version
 ```
 
+## 🎨 Styling Setup
+
+- **Tailwind v4** is integrated through the Vite plugin in [vite.config.ts](vite.config.ts)
+- **Global stylesheet entry** is [src/app.css](src/app.css), imported from [src/routes/+layout.svelte](src/routes/+layout.svelte)
+- **PostCSS is not used** for the current Tailwind pipeline; there is no project PostCSS config to maintain
+
+## 🧾 Forms & Validation
+
+- App code imports `zod4` and `zod4Client` from `sveltekit-superforms/adapters`
+- Vite aliases that path to the local Zod-only adapter shim in [src/lib/superforms-zod.ts](src/lib/superforms-zod.ts)
+- This keeps the documented Superforms import style while avoiding unused adapter bundling issues in the browser
+
 ## 📁 Project Structure
 
 ```

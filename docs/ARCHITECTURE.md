@@ -6,9 +6,16 @@
 
 - **Framework**: SvelteKit 5 with TypeScript
 - **UI Components**: bits-ui with shadcn-svelte styling
-- **Styling**: Tailwind CSS with custom theme
+- **Styling**: Tailwind CSS v4 with custom theme, integrated via the Vite plugin
 - **State Management**: Svelte 5 runes with context API
 - **Form Handling**: sveltekit-superforms with Zod validation
+
+### Frontend Build Notes
+
+- **Tailwind entry file**: [src/app.css](src/app.css)
+- **Tailwind integration**: Vite plugin in [vite.config.ts](vite.config.ts)
+- **PostCSS**: not used in the current styling pipeline
+- **Superforms adapter path**: app code uses `sveltekit-superforms/adapters`, resolved by Vite to the local Zod-only shim in [src/lib/superforms-zod.ts](src/lib/superforms-zod.ts) to avoid client-side VineJS bundling warnings
 
 ### Backend
 
