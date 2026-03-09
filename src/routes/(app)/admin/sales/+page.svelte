@@ -172,7 +172,6 @@
 	const displayOrderRows = $derived(rawOrderRows.filter((row) => row.sku?.trim() !== 'Not Art'));
 	const invalidSkuRows = $derived((form?.preview?.sections?.invalidSkuRows ?? []) as InvalidSkuRow[]);
 	const matchedRows = $derived(((form as any)?.preview?.sections?.matchedRows ?? []) as MatchedRow[]);
-	const alreadySoldRows = $derived(((form as any)?.preview?.sections?.alreadySoldRows ?? []) as MatchedRow[]);
 	const unmatchedRows = $derived(((form as any)?.preview?.sections?.unmatchedRows ?? []) as UnmatchedRow[]);
 	const ambiguousRows = $derived(((form as any)?.preview?.sections?.ambiguousRows ?? []) as AmbiguousRow[]);
 	const canceledRows = $derived(((form as any)?.preview?.sections?.canceledRows ?? []) as CanceledRow[]);
@@ -413,44 +412,6 @@
 						{formatDateDdMmmYyyy(form.preview.request.startDate)} → {formatDateDdMmmYyyy(form.preview.request.endDate)}
 					</p>
 				{/if}
-				<!-- <div class="grid gap-3 pt-2 md:grid-cols-2 lg:grid-cols-4">
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Orders</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.totalOrders}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Line Items</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.totalLineItems}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Matched</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.matched}</p>
-					</div>
-					<div class="rounded border border-red-200 bg-red-50 p-3">
-						<p class="text-xs text-red-700">Canceled (Excluded)</p>
-						<p class="text-xl font-semibold text-red-700">{(form as any).preview.sections.summary.canceled ?? 0}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Already Sold</p>
-						<p class="text-xl font-semibold">{alreadySoldRows.length}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Unmatched</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.unmatched}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Ambiguous</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.ambiguous}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Ignored Not Art</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.ignoredNotArt}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Invalid SKU</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.invalidSku}</p>
-					</div>
-				</div> -->
 
 				{#if matchedRows.length > 0}
 					<p class="pt-4 text-sm font-semibold">Matched Rows (Can be updated to Sold)</p>
@@ -509,41 +470,6 @@
 							>
 						</div>
 					</form>
-				{/if}
-
-				{#if alreadySoldRows.length > 0}
-					<p class="pt-4 text-sm font-semibold">Already Sold Rows</p>
-					<div class="overflow-x-auto pt-2">
-						<Table.Root>
-							<Table.Header>
-								<Table.Row>
-									<Table.Head>DateTime</Table.Head>
-									<Table.Head>Entry Id</Table.Head>
-									<Table.Head>Exhibit</Table.Head>
-									<Table.Head>Artist</Table.Head>
-									<Table.Head>Title</Table.Head>
-									<Table.Head>Status</Table.Head>
-									<Table.Head>Price</Table.Head>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{#each alreadySoldRows as row}
-									<Table.Row>
-										<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
-										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
-										<Table.Cell>{row.matchedEntry.exhibitNumber}</Table.Cell>
-										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
-										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
-										<Table.Cell>
-											<span class="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">Already Sold</span
-											>
-										</Table.Cell>
-										<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
-									</Table.Row>
-								{/each}
-							</Table.Body>
-						</Table.Root>
-					</div>
 				{/if}
 
 				{#if form.preview.sections.summary.totalLineItems > 0 && matchedRows.length === 0}
