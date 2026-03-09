@@ -45,7 +45,6 @@
 	type MatchedRow = ParsedSkuRow & {
 		matchedEntry: MatchCandidate;
 		matchStatus: 'matched' | 'alreadySold';
-		potentialReturn: boolean;
 	};
 
 	type UnmatchedRow = ParsedSkuRow & {
@@ -173,7 +172,6 @@
 	const displayOrderRows = $derived(rawOrderRows.filter((row) => row.sku?.trim() !== 'Not Art'));
 	const invalidSkuRows = $derived((form?.preview?.sections?.invalidSkuRows ?? []) as InvalidSkuRow[]);
 	const matchedRows = $derived(((form as any)?.preview?.sections?.matchedRows ?? []) as MatchedRow[]);
-	const alreadySoldRows = $derived(((form as any)?.preview?.sections?.alreadySoldRows ?? []) as MatchedRow[]);
 	const unmatchedRows = $derived(((form as any)?.preview?.sections?.unmatchedRows ?? []) as UnmatchedRow[]);
 	const ambiguousRows = $derived(((form as any)?.preview?.sections?.ambiguousRows ?? []) as AmbiguousRow[]);
 	const canceledRows = $derived(((form as any)?.preview?.sections?.canceledRows ?? []) as CanceledRow[]);
@@ -214,8 +212,22 @@
 		selectedEntryIds = [];
 	}
 
-	function hasPotentialReturn(row: SalesOrderRow): boolean {
-		return row.orderKind !== 'return' && returnedSourceOrderIds.has(row.orderId);
+	function getOrderStatus(row: SalesOrderRow): 'returned' | 'returnRequest' | 'none' {
+		if (row.orderKind === 'return') {
+			return 'returnRequest';
+		}
+
+		if (returnedSourceOrderIds.has(row.orderId)) {
+			return 'returned';
+		}
+
+		return 'none';
+	}
+
+	function renderOrderStatus(status: ReturnType<typeof getOrderStatus>): string {
+		if (status === 'returned') return 'Returned';
+		if (status === 'returnRequest') return 'Return';
+		return '-';
 	}
 
 	function handlePreviewSubmit() {
@@ -400,44 +412,6 @@
 						{formatDateDdMmmYyyy(form.preview.request.startDate)} → {formatDateDdMmmYyyy(form.preview.request.endDate)}
 					</p>
 				{/if}
-				<!-- <div class="grid gap-3 pt-2 md:grid-cols-2 lg:grid-cols-4">
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Orders</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.totalOrders}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Line Items</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.totalLineItems}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Matched</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.matched}</p>
-					</div>
-					<div class="rounded border border-red-200 bg-red-50 p-3">
-						<p class="text-xs text-red-700">Canceled (Excluded)</p>
-						<p class="text-xl font-semibold text-red-700">{(form as any).preview.sections.summary.canceled ?? 0}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Already Sold</p>
-						<p class="text-xl font-semibold">{alreadySoldRows.length}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Unmatched</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.unmatched}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Ambiguous</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.ambiguous}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Ignored Not Art</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.ignoredNotArt}</p>
-					</div>
-					<div class="rounded border p-3">
-						<p class="text-xs text-muted-foreground">Invalid SKU</p>
-						<p class="text-xl font-semibold">{form.preview.sections.summary.invalidSku}</p>
-					</div>
-				</div> -->
 
 				{#if matchedRows.length > 0}
 					<p class="pt-4 text-sm font-semibold">Matched Rows (Can be updated to Sold)</p>
@@ -476,11 +450,7 @@
 										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
 										<Table.Cell>
-											{#if row.potentialReturn}
-												<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"> Return </span>
-											{:else}
-												<span class="text-muted-foreground text-xs">-</span>
-											{/if}
+											<span class="text-muted-foreground text-xs">-</span>
 										</Table.Cell>
 										<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
 									</Table.Row>
@@ -625,6 +595,7 @@
 							<Table.Root>
 								<Table.Header>
 									<Table.Row>
+										<Table.Head>Request Status</Table.Head>
 										<Table.Head>DateTime</Table.Head>
 										<Table.Head>Item</Table.Head>
 										<Table.Head>SKU</Table.Head>
@@ -635,17 +606,27 @@
 								<Table.Body>
 									{#each returnedRows as row}
 										<Table.Row>
+											<Table.Cell>
+												<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"> Return </span>
+											</Table.Cell>
 											<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
 											<Table.Cell>{row.item}</Table.Cell>
 											<Table.Cell>{row.sku}</Table.Cell>
 											<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
 											<Table.Cell>
 												{#if row.originalOrder}
-													<span>
-														Item: {row.originalOrder.item} | Date: {formatSydneyDateTime(
-															row.originalOrder.createdDateTime
-														)} | Amount: {formatDollars(row.originalOrder.baseAmountCents)}
-													</span>
+													<div class="space-y-1">
+														<div>
+															<span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
+																>Returned</span
+															>
+														</div>
+														<div class="text-sm">
+															Item: {row.originalOrder.item} | Date: {formatSydneyDateTime(
+																row.originalOrder.createdDateTime
+															)} | Amount: {formatDollars(row.originalOrder.baseAmountCents)}
+														</div>
+													</div>
 												{:else}
 													<span class="text-muted-foreground">Not found</span>
 												{/if}
@@ -690,12 +671,14 @@
 											<td class="pr-4">{row.state}</td>
 											<td class="pr-4">{row.item}</td>
 											<td class="pr-4">
-												{#if hasPotentialReturn(row)}
+												{#if getOrderStatus(row) === 'returned'}
+													<span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">Returned</span>
+												{:else if getOrderStatus(row) === 'returnRequest'}
 													<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">
 														Return
 													</span>
 												{:else}
-													<span class="text-muted-foreground text-xs">-</span>
+													<span class="text-muted-foreground text-xs">{renderOrderStatus(getOrderStatus(row))}</span>
 												{/if}
 											</td>
 											<td class="pr-4">{row.sku}</td>
