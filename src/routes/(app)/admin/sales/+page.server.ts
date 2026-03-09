@@ -59,7 +59,6 @@ type MatchCandidate = {
 type MatchedRow = ClassifiedOrderRow & {
 	matchedEntry: MatchCandidate;
 	matchStatus: 'matched' | 'alreadySold';
-	potentialReturn: boolean;
 };
 
 type UnmatchedRow = ClassifiedOrderRow & {
@@ -304,8 +303,7 @@ function matchParsedRows(parsedValid: ClassifiedOrderRow[], exhibits: Exhibit[])
 		const matchedRow: MatchedRow = {
 			...row,
 			matchedEntry: toMatchCandidate(matchedCandidate),
-			matchStatus: matchedCandidate.sold ? 'alreadySold' : 'matched',
-			potentialReturn: false
+			matchStatus: matchedCandidate.sold ? 'alreadySold' : 'matched'
 		};
 
 		if (matchedCandidate.sold) {
@@ -469,28 +467,20 @@ function buildReturnedRows(rows: OrderSummaryRow[]): ReturnedOrderRow[] {
 
 function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibits: Exhibit[]): PreviewPayload {
 	const returnedRows = buildReturnedRows(rows);
-	const saleRows = rows.filter((row) => row.orderKind !== 'return');
+	const returnedSourceOrderIds = new Set(returnedRows.map((row) => row.sourceOrderId));
+	const saleRows = rows.filter((row) => row.orderKind !== 'return' && !returnedSourceOrderIds.has(row.orderId));
 	const { parsedValid, invalidSkuRows, ignoredNotArtRows } = classifyRows(saleRows);
 	const { matchedRows, alreadySoldRows, unmatchedRows, ambiguousRows, canceledRows } = matchParsedRows(
 		parsedValid,
 		exhibits
 	);
-	const returnedSourceOrderIds = new Set(returnedRows.map((row) => row.sourceOrderId));
-	const flaggedMatchedRows = matchedRows.map((row) => ({
-		...row,
-		potentialReturn: returnedSourceOrderIds.has(row.orderId)
-	}));
-	const flaggedAlreadySoldRows = alreadySoldRows.map((row) => ({
-		...row,
-		potentialReturn: returnedSourceOrderIds.has(row.orderId)
-	}));
 	const totalLineItems = saleRows.length;
 	const totalOrders = saleRows.filter((row) => row.orderAmountCents > 0).length;
 	const totalReturnedOrders = new Set(returnedRows.map((row) => row.returnOrderId)).size;
 	const requestType = filter.rangePreset === 'custom' ? 'custom-range' : 'quick-range';
 
 	return {
-		message: `Retrieved ${totalLineItems} sale line items. Matched ${flaggedMatchedRows.length}, canceled ${canceledRows.length}, already sold ${flaggedAlreadySoldRows.length}, unmatched ${unmatchedRows.length}, ambiguous ${ambiguousRows.length}, invalid SKU ${invalidSkuRows.length}, Not Art ${ignoredNotArtRows.length}, Returned ${totalReturnedOrders} orders.`,
+		message: `Retrieved ${totalLineItems} active sale line items. Matched ${matchedRows.length}, canceled ${canceledRows.length}, already sold ${alreadySoldRows.length}, unmatched ${unmatchedRows.length}, ambiguous ${ambiguousRows.length}, invalid SKU ${invalidSkuRows.length}, Not Art ${ignoredNotArtRows.length}, Returned ${totalReturnedOrders} orders.`,
 		request: {
 			type: requestType,
 			rangePreset: filter.rangePreset,
@@ -501,7 +491,7 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 			summary: {
 				totalOrders,
 				totalLineItems,
-				matched: flaggedMatchedRows.length,
+				matched: matchedRows.length,
 				canceled: canceledRows.length,
 				unmatched: unmatchedRows.length,
 				ambiguous: ambiguousRows.length,
@@ -513,8 +503,8 @@ function buildLivePreview(filter: FilterPayload, rows: OrderSummaryRow[], exhibi
 			matchCandidates: parsedValid,
 			invalidSkuRows,
 			ignoredNotArtRows,
-			matchedRows: flaggedMatchedRows,
-			alreadySoldRows: flaggedAlreadySoldRows,
+			matchedRows,
+			alreadySoldRows,
 			unmatchedRows,
 			ambiguousRows,
 			canceledRows,

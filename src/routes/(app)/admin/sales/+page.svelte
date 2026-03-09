@@ -45,7 +45,6 @@
 	type MatchedRow = ParsedSkuRow & {
 		matchedEntry: MatchCandidate;
 		matchStatus: 'matched' | 'alreadySold';
-		potentialReturn: boolean;
 	};
 
 	type UnmatchedRow = ParsedSkuRow & {
@@ -214,8 +213,22 @@
 		selectedEntryIds = [];
 	}
 
-	function hasPotentialReturn(row: SalesOrderRow): boolean {
-		return row.orderKind !== 'return' && returnedSourceOrderIds.has(row.orderId);
+	function getOrderStatus(row: SalesOrderRow): 'returned' | 'returnRequest' | 'none' {
+		if (row.orderKind === 'return') {
+			return 'returnRequest';
+		}
+
+		if (returnedSourceOrderIds.has(row.orderId)) {
+			return 'returned';
+		}
+
+		return 'none';
+	}
+
+	function renderOrderStatus(status: ReturnType<typeof getOrderStatus>): string {
+		if (status === 'returned') return 'Returned';
+		if (status === 'returnRequest') return 'Return';
+		return '-';
 	}
 
 	function handlePreviewSubmit() {
@@ -476,11 +489,7 @@
 										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
 										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
 										<Table.Cell>
-											{#if row.potentialReturn}
-												<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"> Return </span>
-											{:else}
-												<span class="text-muted-foreground text-xs">-</span>
-											{/if}
+											<span class="text-muted-foreground text-xs">-</span>
 										</Table.Cell>
 										<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
 									</Table.Row>
@@ -500,6 +509,41 @@
 							>
 						</div>
 					</form>
+				{/if}
+
+				{#if alreadySoldRows.length > 0}
+					<p class="pt-4 text-sm font-semibold">Already Sold Rows</p>
+					<div class="overflow-x-auto pt-2">
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>DateTime</Table.Head>
+									<Table.Head>Entry Id</Table.Head>
+									<Table.Head>Exhibit</Table.Head>
+									<Table.Head>Artist</Table.Head>
+									<Table.Head>Title</Table.Head>
+									<Table.Head>Status</Table.Head>
+									<Table.Head>Price</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each alreadySoldRows as row}
+									<Table.Row>
+										<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.entryId}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.exhibitNumber}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.artistName}</Table.Cell>
+										<Table.Cell>{row.matchedEntry.title}</Table.Cell>
+										<Table.Cell>
+											<span class="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">Already Sold</span
+											>
+										</Table.Cell>
+										<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</div>
 				{/if}
 
 				{#if form.preview.sections.summary.totalLineItems > 0 && matchedRows.length === 0}
@@ -625,6 +669,7 @@
 							<Table.Root>
 								<Table.Header>
 									<Table.Row>
+										<Table.Head>Request Status</Table.Head>
 										<Table.Head>DateTime</Table.Head>
 										<Table.Head>Item</Table.Head>
 										<Table.Head>SKU</Table.Head>
@@ -635,17 +680,27 @@
 								<Table.Body>
 									{#each returnedRows as row}
 										<Table.Row>
+											<Table.Cell>
+												<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"> Return </span>
+											</Table.Cell>
 											<Table.Cell>{formatSydneyDateTime(row.createdDateTime)}</Table.Cell>
 											<Table.Cell>{row.item}</Table.Cell>
 											<Table.Cell>{row.sku}</Table.Cell>
 											<Table.Cell>{formatDollars(row.baseAmountCents)}</Table.Cell>
 											<Table.Cell>
 												{#if row.originalOrder}
-													<span>
-														Item: {row.originalOrder.item} | Date: {formatSydneyDateTime(
-															row.originalOrder.createdDateTime
-														)} | Amount: {formatDollars(row.originalOrder.baseAmountCents)}
-													</span>
+													<div class="space-y-1">
+														<div>
+															<span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
+																>Returned</span
+															>
+														</div>
+														<div class="text-sm">
+															Item: {row.originalOrder.item} | Date: {formatSydneyDateTime(
+																row.originalOrder.createdDateTime
+															)} | Amount: {formatDollars(row.originalOrder.baseAmountCents)}
+														</div>
+													</div>
 												{:else}
 													<span class="text-muted-foreground">Not found</span>
 												{/if}
@@ -690,12 +745,14 @@
 											<td class="pr-4">{row.state}</td>
 											<td class="pr-4">{row.item}</td>
 											<td class="pr-4">
-												{#if hasPotentialReturn(row)}
+												{#if getOrderStatus(row) === 'returned'}
+													<span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">Returned</span>
+												{:else if getOrderStatus(row) === 'returnRequest'}
 													<span class="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">
 														Return
 													</span>
 												{:else}
-													<span class="text-muted-foreground text-xs">-</span>
+													<span class="text-muted-foreground text-xs">{renderOrderStatus(getOrderStatus(row))}</span>
 												{/if}
 											</td>
 											<td class="pr-4">{row.sku}</td>
