@@ -86,16 +86,16 @@
 				<Form.Legend class="mb-2">When will you Bump In your works?</Form.Legend>
 				<RadioGroup.Root class="ml-6" bind:value={$formData.bumpIn as string} {...props}>
 					<div class="flex">
-						<RadioGroup.Item value="Thursday morning 5 March" id="bi1" />
-						<Label for="bi1">Thursday morning 5 March</Label>
+						<RadioGroup.Item value="Thursday morning 4 March" id="bi1" />
+						<Label for="bi1">Thursday morning 4 March</Label>
 					</div>
 					<div class="flex">
-						<RadioGroup.Item value="Thursday afternoon 5 March" id="bi2" />
-						<Label for="bi2">Thursday afternoon 5 March</Label>
+						<RadioGroup.Item value="Thursday afternoon 4 March" id="bi2" />
+						<Label for="bi2">Thursday afternoon 4 March</Label>
 					</div>
 					<div class="flex">
-						<RadioGroup.Item value="Friday morning 6 March (until noon)" id="bi3" />
-						<Label for="bi3">Friday morning 6 March (until noon)</Label>
+						<RadioGroup.Item value="Friday morning 5 March (until noon)" id="bi3" />
+						<Label for="bi3">Friday morning 5 March (until noon)</Label>
 					</div>
 				</RadioGroup.Root>
 			{/snippet}
@@ -109,12 +109,12 @@
 				<Form.Legend class="mb-2">When will you pick up your unsold artwork?</Form.Legend>
 				<RadioGroup.Root class="ml-6" bind:value={$formData.bumpOut as string} {...props}>
 					<div class="flex">
-						<RadioGroup.Item value="Sunday afternoon 15 March (after 3pm)" id="bo1" />
-						<Label for="bo1">Sunday afternoon 15 March (after 3pm)</Label>
+						<RadioGroup.Item value="Sunday afternoon 14 March (after 3pm)" id="bo1" />
+						<Label for="bo1">Sunday afternoon 14 March (after 3pm)</Label>
 					</div>
 					<div class="flex">
-						<RadioGroup.Item value="Monday morning 16 March (9am to noon)" id="bo2" />
-						<Label for="bo2">Monday morning 16 March (9am to noon)</Label>
+						<RadioGroup.Item value="Monday morning 15 March (9am to noon)" id="bo2" />
+						<Label for="bo2">Monday morning 15 March (9am to noon)</Label>
 					</div>
 				</RadioGroup.Root>
 			{/snippet}
