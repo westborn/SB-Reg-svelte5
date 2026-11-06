@@ -38,7 +38,8 @@ export async function POST(event: RequestEvent) {
 			return new Response(JSON.stringify({ message: 'Error in registerComplete - no registration' }), { status: 500 });
 		}
 		const updatedRegistration = await updateRegistration(registrationToUpdate, {
-			closed: true
+			closed: true,
+			registrationState: 'Submitted'
 		});
 		if (!updatedRegistration) {
 			await logger.error('Failed to update registration closed status', new Error('Update registration failed'), {
