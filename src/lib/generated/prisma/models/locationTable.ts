@@ -1117,6 +1117,11 @@ export type locationTableFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` locationTables.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of locationTables.
+   */
   distinct?: Prisma.LocationTableScalarFieldEnum | Prisma.LocationTableScalarFieldEnum[]
 }
 

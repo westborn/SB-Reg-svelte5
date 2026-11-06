@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.4.2
- * Query Engine version: 94a226be1cf2967af2541cca5529f0f7ba866919
+ * Prisma Client JS version: 7.5.0
+ * Query Engine version: 280c870be64f457428992c43c1f6d557fab6e29e
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.4.2",
-  engine: "94a226be1cf2967af2541cca5529f0f7ba866919"
+  client: "7.5.0",
+  engine: "280c870be64f457428992c43c1f6d557fab6e29e"
 }
 
 /**
@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   artistTable: 'artistTable',
   registrationTable: 'registrationTable',
+  registrationPaymentTable: 'registrationPaymentTable',
   entryTable: 'entryTable',
   imageTable: 'imageTable',
   locationTable: 'locationTable',
@@ -406,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "artistTable" | "registrationTable" | "entryTable" | "imageTable" | "locationTable" | "primaryImageTable" | "logTable"
+    modelProps: "artistTable" | "registrationTable" | "registrationPaymentTable" | "entryTable" | "imageTable" | "locationTable" | "primaryImageTable" | "logTable"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -555,6 +556,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.registrationTableCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RegistrationTableCountAggregateOutputType> | number
+        }
+      }
+    }
+    registrationPaymentTable: {
+      payload: Prisma.$registrationPaymentTablePayload<ExtArgs>
+      fields: Prisma.registrationPaymentTableFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.registrationPaymentTableFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.registrationPaymentTableFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>
+        }
+        findFirst: {
+          args: Prisma.registrationPaymentTableFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.registrationPaymentTableFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>
+        }
+        findMany: {
+          args: Prisma.registrationPaymentTableFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>[]
+        }
+        create: {
+          args: Prisma.registrationPaymentTableCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>
+        }
+        createMany: {
+          args: Prisma.registrationPaymentTableCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.registrationPaymentTableCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>[]
+        }
+        delete: {
+          args: Prisma.registrationPaymentTableDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>
+        }
+        update: {
+          args: Prisma.registrationPaymentTableUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>
+        }
+        deleteMany: {
+          args: Prisma.registrationPaymentTableDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.registrationPaymentTableUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.registrationPaymentTableUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>[]
+        }
+        upsert: {
+          args: Prisma.registrationPaymentTableUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$registrationPaymentTablePayload>
+        }
+        aggregate: {
+          args: Prisma.RegistrationPaymentTableAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRegistrationPaymentTable>
+        }
+        groupBy: {
+          args: Prisma.registrationPaymentTableGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RegistrationPaymentTableGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.registrationPaymentTableCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RegistrationPaymentTableCountAggregateOutputType> | number
         }
       }
     }
@@ -989,6 +1064,7 @@ export const RegistrationTableScalarFieldEnum = {
   id: 'id',
   artistId: 'artistId',
   registrationYear: 'registrationYear',
+  registrationState: 'registrationState',
   closed: 'closed',
   bumpIn: 'bumpIn',
   bumpOut: 'bumpOut',
@@ -1001,6 +1077,26 @@ export const RegistrationTableScalarFieldEnum = {
 } as const
 
 export type RegistrationTableScalarFieldEnum = (typeof RegistrationTableScalarFieldEnum)[keyof typeof RegistrationTableScalarFieldEnum]
+
+
+export const RegistrationPaymentTableScalarFieldEnum = {
+  id: 'id',
+  registrationId: 'registrationId',
+  paymentState: 'paymentState',
+  feeInCents: 'feeInCents',
+  paymentAttemptKey: 'paymentAttemptKey',
+  squarePaymentId: 'squarePaymentId',
+  squareLocationId: 'squareLocationId',
+  currency: 'currency',
+  receiptURL: 'receiptURL',
+  resolvedAt: 'resolvedAt',
+  confirmationEmailSentAt: 'confirmationEmailSentAt',
+  confirmationEmailError: 'confirmationEmailError',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RegistrationPaymentTableScalarFieldEnum = (typeof RegistrationPaymentTableScalarFieldEnum)[keyof typeof RegistrationPaymentTableScalarFieldEnum]
 
 
 export const EntryTableScalarFieldEnum = {
@@ -1179,9 +1275,37 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'RegistrationState'
+ */
+export type EnumRegistrationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegistrationState'>
+    
+
+
+/**
+ * Reference to a field of type 'RegistrationState[]'
+ */
+export type ListEnumRegistrationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegistrationState[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentState'
+ */
+export type EnumPaymentStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentState'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentState[]'
+ */
+export type ListEnumPaymentStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentState[]'>
     
 
 
@@ -1337,6 +1461,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   artistTable?: Prisma.artistTableOmit
   registrationTable?: Prisma.registrationTableOmit
+  registrationPaymentTable?: Prisma.registrationPaymentTableOmit
   entryTable?: Prisma.entryTableOmit
   imageTable?: Prisma.imageTableOmit
   locationTable?: Prisma.locationTableOmit

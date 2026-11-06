@@ -40,6 +40,7 @@ export type RegistrationTableMinAggregateOutputType = {
   id: number | null
   artistId: number | null
   registrationYear: string | null
+  registrationState: $Enums.RegistrationState | null
   closed: boolean | null
   bumpIn: string | null
   bumpOut: string | null
@@ -55,6 +56,7 @@ export type RegistrationTableMaxAggregateOutputType = {
   id: number | null
   artistId: number | null
   registrationYear: string | null
+  registrationState: $Enums.RegistrationState | null
   closed: boolean | null
   bumpIn: string | null
   bumpOut: string | null
@@ -70,6 +72,7 @@ export type RegistrationTableCountAggregateOutputType = {
   id: number
   artistId: number
   registrationYear: number
+  registrationState: number
   closed: number
   bumpIn: number
   bumpOut: number
@@ -97,6 +100,7 @@ export type RegistrationTableMinAggregateInputType = {
   id?: true
   artistId?: true
   registrationYear?: true
+  registrationState?: true
   closed?: true
   bumpIn?: true
   bumpOut?: true
@@ -112,6 +116,7 @@ export type RegistrationTableMaxAggregateInputType = {
   id?: true
   artistId?: true
   registrationYear?: true
+  registrationState?: true
   closed?: true
   bumpIn?: true
   bumpOut?: true
@@ -127,6 +132,7 @@ export type RegistrationTableCountAggregateInputType = {
   id?: true
   artistId?: true
   registrationYear?: true
+  registrationState?: true
   closed?: true
   bumpIn?: true
   bumpOut?: true
@@ -229,6 +235,7 @@ export type RegistrationTableGroupByOutputType = {
   id: number
   artistId: number
   registrationYear: string
+  registrationState: $Enums.RegistrationState
   closed: boolean
   bumpIn: string | null
   bumpOut: string | null
@@ -267,6 +274,7 @@ export type registrationTableWhereInput = {
   id?: Prisma.IntFilter<"registrationTable"> | number
   artistId?: Prisma.IntFilter<"registrationTable"> | number
   registrationYear?: Prisma.StringFilter<"registrationTable"> | string
+  registrationState?: Prisma.EnumRegistrationStateFilter<"registrationTable"> | $Enums.RegistrationState
   closed?: Prisma.BoolFilter<"registrationTable"> | boolean
   bumpIn?: Prisma.StringNullableFilter<"registrationTable"> | string | null
   bumpOut?: Prisma.StringNullableFilter<"registrationTable"> | string | null
@@ -279,12 +287,14 @@ export type registrationTableWhereInput = {
   entries?: Prisma.EntryTableListRelationFilter
   images?: Prisma.ImageTableListRelationFilter
   artist?: Prisma.XOR<Prisma.ArtistTableScalarRelationFilter, Prisma.artistTableWhereInput>
+  payment?: Prisma.XOR<Prisma.RegistrationPaymentTableNullableScalarRelationFilter, Prisma.registrationPaymentTableWhereInput> | null
 }
 
 export type registrationTableOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   artistId?: Prisma.SortOrder
   registrationYear?: Prisma.SortOrder
+  registrationState?: Prisma.SortOrder
   closed?: Prisma.SortOrder
   bumpIn?: Prisma.SortOrderInput | Prisma.SortOrder
   bumpOut?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -297,15 +307,18 @@ export type registrationTableOrderByWithRelationInput = {
   entries?: Prisma.entryTableOrderByRelationAggregateInput
   images?: Prisma.imageTableOrderByRelationAggregateInput
   artist?: Prisma.artistTableOrderByWithRelationInput
+  payment?: Prisma.registrationPaymentTableOrderByWithRelationInput
 }
 
 export type registrationTableWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  artistId_registrationYear?: Prisma.registrationTableArtistIdRegistrationYearCompoundUniqueInput
   AND?: Prisma.registrationTableWhereInput | Prisma.registrationTableWhereInput[]
   OR?: Prisma.registrationTableWhereInput[]
   NOT?: Prisma.registrationTableWhereInput | Prisma.registrationTableWhereInput[]
   artistId?: Prisma.IntFilter<"registrationTable"> | number
   registrationYear?: Prisma.StringFilter<"registrationTable"> | string
+  registrationState?: Prisma.EnumRegistrationStateFilter<"registrationTable"> | $Enums.RegistrationState
   closed?: Prisma.BoolFilter<"registrationTable"> | boolean
   bumpIn?: Prisma.StringNullableFilter<"registrationTable"> | string | null
   bumpOut?: Prisma.StringNullableFilter<"registrationTable"> | string | null
@@ -318,12 +331,14 @@ export type registrationTableWhereUniqueInput = Prisma.AtLeast<{
   entries?: Prisma.EntryTableListRelationFilter
   images?: Prisma.ImageTableListRelationFilter
   artist?: Prisma.XOR<Prisma.ArtistTableScalarRelationFilter, Prisma.artistTableWhereInput>
-}, "id">
+  payment?: Prisma.XOR<Prisma.RegistrationPaymentTableNullableScalarRelationFilter, Prisma.registrationPaymentTableWhereInput> | null
+}, "id" | "artistId_registrationYear">
 
 export type registrationTableOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   artistId?: Prisma.SortOrder
   registrationYear?: Prisma.SortOrder
+  registrationState?: Prisma.SortOrder
   closed?: Prisma.SortOrder
   bumpIn?: Prisma.SortOrderInput | Prisma.SortOrder
   bumpOut?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -347,6 +362,7 @@ export type registrationTableScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"registrationTable"> | number
   artistId?: Prisma.IntWithAggregatesFilter<"registrationTable"> | number
   registrationYear?: Prisma.StringWithAggregatesFilter<"registrationTable"> | string
+  registrationState?: Prisma.EnumRegistrationStateWithAggregatesFilter<"registrationTable"> | $Enums.RegistrationState
   closed?: Prisma.BoolWithAggregatesFilter<"registrationTable"> | boolean
   bumpIn?: Prisma.StringNullableWithAggregatesFilter<"registrationTable"> | string | null
   bumpOut?: Prisma.StringNullableWithAggregatesFilter<"registrationTable"> | string | null
@@ -360,6 +376,7 @@ export type registrationTableScalarWhereWithAggregatesInput = {
 
 export type registrationTableCreateInput = {
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -372,12 +389,14 @@ export type registrationTableCreateInput = {
   entries?: Prisma.entryTableCreateNestedManyWithoutRegistrationInput
   images?: Prisma.imageTableCreateNestedManyWithoutRegistrationInput
   artist: Prisma.artistTableCreateNestedOneWithoutRegistrationsInput
+  payment?: Prisma.registrationPaymentTableCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableUncheckedCreateInput = {
   id?: number
   artistId: number
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -389,10 +408,12 @@ export type registrationTableUncheckedCreateInput = {
   updatedAt?: Date | string
   entries?: Prisma.entryTableUncheckedCreateNestedManyWithoutRegistrationInput
   images?: Prisma.imageTableUncheckedCreateNestedManyWithoutRegistrationInput
+  payment?: Prisma.registrationPaymentTableUncheckedCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableUpdateInput = {
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -405,12 +426,14 @@ export type registrationTableUpdateInput = {
   entries?: Prisma.entryTableUpdateManyWithoutRegistrationNestedInput
   images?: Prisma.imageTableUpdateManyWithoutRegistrationNestedInput
   artist?: Prisma.artistTableUpdateOneRequiredWithoutRegistrationsNestedInput
+  payment?: Prisma.registrationPaymentTableUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   artistId?: Prisma.IntFieldUpdateOperationsInput | number
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -422,12 +445,14 @@ export type registrationTableUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.entryTableUncheckedUpdateManyWithoutRegistrationNestedInput
   images?: Prisma.imageTableUncheckedUpdateManyWithoutRegistrationNestedInput
+  payment?: Prisma.registrationPaymentTableUncheckedUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableCreateManyInput = {
   id?: number
   artistId: number
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -441,6 +466,7 @@ export type registrationTableCreateManyInput = {
 
 export type registrationTableUpdateManyMutationInput = {
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -456,6 +482,7 @@ export type registrationTableUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   artistId?: Prisma.IntFieldUpdateOperationsInput | number
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -477,10 +504,16 @@ export type registrationTableOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type registrationTableArtistIdRegistrationYearCompoundUniqueInput = {
+  artistId: number
+  registrationYear: string
+}
+
 export type registrationTableCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   artistId?: Prisma.SortOrder
   registrationYear?: Prisma.SortOrder
+  registrationState?: Prisma.SortOrder
   closed?: Prisma.SortOrder
   bumpIn?: Prisma.SortOrder
   bumpOut?: Prisma.SortOrder
@@ -501,6 +534,7 @@ export type registrationTableMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   artistId?: Prisma.SortOrder
   registrationYear?: Prisma.SortOrder
+  registrationState?: Prisma.SortOrder
   closed?: Prisma.SortOrder
   bumpIn?: Prisma.SortOrder
   bumpOut?: Prisma.SortOrder
@@ -516,6 +550,7 @@ export type registrationTableMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   artistId?: Prisma.SortOrder
   registrationYear?: Prisma.SortOrder
+  registrationState?: Prisma.SortOrder
   closed?: Prisma.SortOrder
   bumpIn?: Prisma.SortOrder
   bumpOut?: Prisma.SortOrder
@@ -584,8 +619,26 @@ export type registrationTableUncheckedUpdateManyWithoutArtistNestedInput = {
   deleteMany?: Prisma.registrationTableScalarWhereInput | Prisma.registrationTableScalarWhereInput[]
 }
 
+export type EnumRegistrationStateFieldUpdateOperationsInput = {
+  set?: $Enums.RegistrationState
+}
+
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type registrationTableCreateNestedOneWithoutPaymentInput = {
+  create?: Prisma.XOR<Prisma.registrationTableCreateWithoutPaymentInput, Prisma.registrationTableUncheckedCreateWithoutPaymentInput>
+  connectOrCreate?: Prisma.registrationTableCreateOrConnectWithoutPaymentInput
+  connect?: Prisma.registrationTableWhereUniqueInput
+}
+
+export type registrationTableUpdateOneRequiredWithoutPaymentNestedInput = {
+  create?: Prisma.XOR<Prisma.registrationTableCreateWithoutPaymentInput, Prisma.registrationTableUncheckedCreateWithoutPaymentInput>
+  connectOrCreate?: Prisma.registrationTableCreateOrConnectWithoutPaymentInput
+  upsert?: Prisma.registrationTableUpsertWithoutPaymentInput
+  connect?: Prisma.registrationTableWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.registrationTableUpdateToOneWithWhereWithoutPaymentInput, Prisma.registrationTableUpdateWithoutPaymentInput>, Prisma.registrationTableUncheckedUpdateWithoutPaymentInput>
 }
 
 export type registrationTableCreateNestedOneWithoutEntriesInput = {
@@ -620,6 +673,7 @@ export type registrationTableUpdateOneWithoutImagesNestedInput = {
 
 export type registrationTableCreateWithoutArtistInput = {
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -631,11 +685,13 @@ export type registrationTableCreateWithoutArtistInput = {
   updatedAt?: Date | string
   entries?: Prisma.entryTableCreateNestedManyWithoutRegistrationInput
   images?: Prisma.imageTableCreateNestedManyWithoutRegistrationInput
+  payment?: Prisma.registrationPaymentTableCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableUncheckedCreateWithoutArtistInput = {
   id?: number
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -647,6 +703,7 @@ export type registrationTableUncheckedCreateWithoutArtistInput = {
   updatedAt?: Date | string
   entries?: Prisma.entryTableUncheckedCreateNestedManyWithoutRegistrationInput
   images?: Prisma.imageTableUncheckedCreateNestedManyWithoutRegistrationInput
+  payment?: Prisma.registrationPaymentTableUncheckedCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableCreateOrConnectWithoutArtistInput = {
@@ -682,6 +739,7 @@ export type registrationTableScalarWhereInput = {
   id?: Prisma.IntFilter<"registrationTable"> | number
   artistId?: Prisma.IntFilter<"registrationTable"> | number
   registrationYear?: Prisma.StringFilter<"registrationTable"> | string
+  registrationState?: Prisma.EnumRegistrationStateFilter<"registrationTable"> | $Enums.RegistrationState
   closed?: Prisma.BoolFilter<"registrationTable"> | boolean
   bumpIn?: Prisma.StringNullableFilter<"registrationTable"> | string | null
   bumpOut?: Prisma.StringNullableFilter<"registrationTable"> | string | null
@@ -693,8 +751,95 @@ export type registrationTableScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"registrationTable"> | Date | string
 }
 
+export type registrationTableCreateWithoutPaymentInput = {
+  registrationYear: string
+  registrationState?: $Enums.RegistrationState
+  closed?: boolean
+  bumpIn?: string | null
+  bumpOut?: string | null
+  displayRequirements?: string | null
+  accommodation?: boolean
+  crane?: boolean
+  transport?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  entries?: Prisma.entryTableCreateNestedManyWithoutRegistrationInput
+  images?: Prisma.imageTableCreateNestedManyWithoutRegistrationInput
+  artist: Prisma.artistTableCreateNestedOneWithoutRegistrationsInput
+}
+
+export type registrationTableUncheckedCreateWithoutPaymentInput = {
+  id?: number
+  artistId: number
+  registrationYear: string
+  registrationState?: $Enums.RegistrationState
+  closed?: boolean
+  bumpIn?: string | null
+  bumpOut?: string | null
+  displayRequirements?: string | null
+  accommodation?: boolean
+  crane?: boolean
+  transport?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  entries?: Prisma.entryTableUncheckedCreateNestedManyWithoutRegistrationInput
+  images?: Prisma.imageTableUncheckedCreateNestedManyWithoutRegistrationInput
+}
+
+export type registrationTableCreateOrConnectWithoutPaymentInput = {
+  where: Prisma.registrationTableWhereUniqueInput
+  create: Prisma.XOR<Prisma.registrationTableCreateWithoutPaymentInput, Prisma.registrationTableUncheckedCreateWithoutPaymentInput>
+}
+
+export type registrationTableUpsertWithoutPaymentInput = {
+  update: Prisma.XOR<Prisma.registrationTableUpdateWithoutPaymentInput, Prisma.registrationTableUncheckedUpdateWithoutPaymentInput>
+  create: Prisma.XOR<Prisma.registrationTableCreateWithoutPaymentInput, Prisma.registrationTableUncheckedCreateWithoutPaymentInput>
+  where?: Prisma.registrationTableWhereInput
+}
+
+export type registrationTableUpdateToOneWithWhereWithoutPaymentInput = {
+  where?: Prisma.registrationTableWhereInput
+  data: Prisma.XOR<Prisma.registrationTableUpdateWithoutPaymentInput, Prisma.registrationTableUncheckedUpdateWithoutPaymentInput>
+}
+
+export type registrationTableUpdateWithoutPaymentInput = {
+  registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
+  closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayRequirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accommodation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crane?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  entries?: Prisma.entryTableUpdateManyWithoutRegistrationNestedInput
+  images?: Prisma.imageTableUpdateManyWithoutRegistrationNestedInput
+  artist?: Prisma.artistTableUpdateOneRequiredWithoutRegistrationsNestedInput
+}
+
+export type registrationTableUncheckedUpdateWithoutPaymentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  artistId?: Prisma.IntFieldUpdateOperationsInput | number
+  registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
+  closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayRequirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accommodation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crane?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  entries?: Prisma.entryTableUncheckedUpdateManyWithoutRegistrationNestedInput
+  images?: Prisma.imageTableUncheckedUpdateManyWithoutRegistrationNestedInput
+}
+
 export type registrationTableCreateWithoutEntriesInput = {
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -706,12 +851,14 @@ export type registrationTableCreateWithoutEntriesInput = {
   updatedAt?: Date | string
   images?: Prisma.imageTableCreateNestedManyWithoutRegistrationInput
   artist: Prisma.artistTableCreateNestedOneWithoutRegistrationsInput
+  payment?: Prisma.registrationPaymentTableCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableUncheckedCreateWithoutEntriesInput = {
   id?: number
   artistId: number
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -722,6 +869,7 @@ export type registrationTableUncheckedCreateWithoutEntriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.imageTableUncheckedCreateNestedManyWithoutRegistrationInput
+  payment?: Prisma.registrationPaymentTableUncheckedCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableCreateOrConnectWithoutEntriesInput = {
@@ -742,6 +890,7 @@ export type registrationTableUpdateToOneWithWhereWithoutEntriesInput = {
 
 export type registrationTableUpdateWithoutEntriesInput = {
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -753,12 +902,14 @@ export type registrationTableUpdateWithoutEntriesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.imageTableUpdateManyWithoutRegistrationNestedInput
   artist?: Prisma.artistTableUpdateOneRequiredWithoutRegistrationsNestedInput
+  payment?: Prisma.registrationPaymentTableUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableUncheckedUpdateWithoutEntriesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   artistId?: Prisma.IntFieldUpdateOperationsInput | number
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -769,10 +920,12 @@ export type registrationTableUncheckedUpdateWithoutEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.imageTableUncheckedUpdateManyWithoutRegistrationNestedInput
+  payment?: Prisma.registrationPaymentTableUncheckedUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableCreateWithoutImagesInput = {
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -784,12 +937,14 @@ export type registrationTableCreateWithoutImagesInput = {
   updatedAt?: Date | string
   entries?: Prisma.entryTableCreateNestedManyWithoutRegistrationInput
   artist: Prisma.artistTableCreateNestedOneWithoutRegistrationsInput
+  payment?: Prisma.registrationPaymentTableCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableUncheckedCreateWithoutImagesInput = {
   id?: number
   artistId: number
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -800,6 +955,7 @@ export type registrationTableUncheckedCreateWithoutImagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   entries?: Prisma.entryTableUncheckedCreateNestedManyWithoutRegistrationInput
+  payment?: Prisma.registrationPaymentTableUncheckedCreateNestedOneWithoutRegistrationInput
 }
 
 export type registrationTableCreateOrConnectWithoutImagesInput = {
@@ -820,6 +976,7 @@ export type registrationTableUpdateToOneWithWhereWithoutImagesInput = {
 
 export type registrationTableUpdateWithoutImagesInput = {
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -831,12 +988,14 @@ export type registrationTableUpdateWithoutImagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.entryTableUpdateManyWithoutRegistrationNestedInput
   artist?: Prisma.artistTableUpdateOneRequiredWithoutRegistrationsNestedInput
+  payment?: Prisma.registrationPaymentTableUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableUncheckedUpdateWithoutImagesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   artistId?: Prisma.IntFieldUpdateOperationsInput | number
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -847,11 +1006,13 @@ export type registrationTableUncheckedUpdateWithoutImagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.entryTableUncheckedUpdateManyWithoutRegistrationNestedInput
+  payment?: Prisma.registrationPaymentTableUncheckedUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableCreateManyArtistInput = {
   id?: number
   registrationYear: string
+  registrationState?: $Enums.RegistrationState
   closed?: boolean
   bumpIn?: string | null
   bumpOut?: string | null
@@ -865,6 +1026,7 @@ export type registrationTableCreateManyArtistInput = {
 
 export type registrationTableUpdateWithoutArtistInput = {
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -876,11 +1038,13 @@ export type registrationTableUpdateWithoutArtistInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.entryTableUpdateManyWithoutRegistrationNestedInput
   images?: Prisma.imageTableUpdateManyWithoutRegistrationNestedInput
+  payment?: Prisma.registrationPaymentTableUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableUncheckedUpdateWithoutArtistInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -892,11 +1056,13 @@ export type registrationTableUncheckedUpdateWithoutArtistInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.entryTableUncheckedUpdateManyWithoutRegistrationNestedInput
   images?: Prisma.imageTableUncheckedUpdateManyWithoutRegistrationNestedInput
+  payment?: Prisma.registrationPaymentTableUncheckedUpdateOneWithoutRegistrationNestedInput
 }
 
 export type registrationTableUncheckedUpdateManyWithoutArtistInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   registrationYear?: Prisma.StringFieldUpdateOperationsInput | string
+  registrationState?: Prisma.EnumRegistrationStateFieldUpdateOperationsInput | $Enums.RegistrationState
   closed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bumpIn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bumpOut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -952,6 +1118,7 @@ export type registrationTableSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   artistId?: boolean
   registrationYear?: boolean
+  registrationState?: boolean
   closed?: boolean
   bumpIn?: boolean
   bumpOut?: boolean
@@ -964,6 +1131,7 @@ export type registrationTableSelect<ExtArgs extends runtime.Types.Extensions.Int
   entries?: boolean | Prisma.registrationTable$entriesArgs<ExtArgs>
   images?: boolean | Prisma.registrationTable$imagesArgs<ExtArgs>
   artist?: boolean | Prisma.artistTableDefaultArgs<ExtArgs>
+  payment?: boolean | Prisma.registrationTable$paymentArgs<ExtArgs>
   _count?: boolean | Prisma.RegistrationTableCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["registrationTable"]>
 
@@ -971,6 +1139,7 @@ export type registrationTableSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   artistId?: boolean
   registrationYear?: boolean
+  registrationState?: boolean
   closed?: boolean
   bumpIn?: boolean
   bumpOut?: boolean
@@ -987,6 +1156,7 @@ export type registrationTableSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   artistId?: boolean
   registrationYear?: boolean
+  registrationState?: boolean
   closed?: boolean
   bumpIn?: boolean
   bumpOut?: boolean
@@ -1003,6 +1173,7 @@ export type registrationTableSelectScalar = {
   id?: boolean
   artistId?: boolean
   registrationYear?: boolean
+  registrationState?: boolean
   closed?: boolean
   bumpIn?: boolean
   bumpOut?: boolean
@@ -1014,11 +1185,12 @@ export type registrationTableSelectScalar = {
   updatedAt?: boolean
 }
 
-export type registrationTableOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "artistId" | "registrationYear" | "closed" | "bumpIn" | "bumpOut" | "displayRequirements" | "accommodation" | "crane" | "transport" | "createdAt" | "updatedAt", ExtArgs["result"]["registrationTable"]>
+export type registrationTableOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "artistId" | "registrationYear" | "registrationState" | "closed" | "bumpIn" | "bumpOut" | "displayRequirements" | "accommodation" | "crane" | "transport" | "createdAt" | "updatedAt", ExtArgs["result"]["registrationTable"]>
 export type registrationTableInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   entries?: boolean | Prisma.registrationTable$entriesArgs<ExtArgs>
   images?: boolean | Prisma.registrationTable$imagesArgs<ExtArgs>
   artist?: boolean | Prisma.artistTableDefaultArgs<ExtArgs>
+  payment?: boolean | Prisma.registrationTable$paymentArgs<ExtArgs>
   _count?: boolean | Prisma.RegistrationTableCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type registrationTableIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1034,11 +1206,13 @@ export type $registrationTablePayload<ExtArgs extends runtime.Types.Extensions.I
     entries: Prisma.$entryTablePayload<ExtArgs>[]
     images: Prisma.$imageTablePayload<ExtArgs>[]
     artist: Prisma.$artistTablePayload<ExtArgs>
+    payment: Prisma.$registrationPaymentTablePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     artistId: number
     registrationYear: string
+    registrationState: $Enums.RegistrationState
     closed: boolean
     bumpIn: string | null
     bumpOut: string | null
@@ -1445,6 +1619,7 @@ export interface Prisma__registrationTableClient<T, Null = never, ExtArgs extend
   entries<T extends Prisma.registrationTable$entriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.registrationTable$entriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$entryTablePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   images<T extends Prisma.registrationTable$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.registrationTable$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$imageTablePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   artist<T extends Prisma.artistTableDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.artistTableDefaultArgs<ExtArgs>>): Prisma.Prisma__artistTableClient<runtime.Types.Result.GetResult<Prisma.$artistTablePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  payment<T extends Prisma.registrationTable$paymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.registrationTable$paymentArgs<ExtArgs>>): Prisma.Prisma__registrationPaymentTableClient<runtime.Types.Result.GetResult<Prisma.$registrationPaymentTablePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1477,6 +1652,7 @@ export interface registrationTableFieldRefs {
   readonly id: Prisma.FieldRef<"registrationTable", 'Int'>
   readonly artistId: Prisma.FieldRef<"registrationTable", 'Int'>
   readonly registrationYear: Prisma.FieldRef<"registrationTable", 'String'>
+  readonly registrationState: Prisma.FieldRef<"registrationTable", 'RegistrationState'>
   readonly closed: Prisma.FieldRef<"registrationTable", 'Boolean'>
   readonly bumpIn: Prisma.FieldRef<"registrationTable", 'String'>
   readonly bumpOut: Prisma.FieldRef<"registrationTable", 'String'>
@@ -1682,6 +1858,11 @@ export type registrationTableFindManyArgs<ExtArgs extends runtime.Types.Extensio
    * Skip the first `n` registrationTables.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of registrationTables.
+   */
   distinct?: Prisma.RegistrationTableScalarFieldEnum | Prisma.RegistrationTableScalarFieldEnum[]
 }
 
@@ -1927,6 +2108,25 @@ export type registrationTable$imagesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.ImageTableScalarFieldEnum | Prisma.ImageTableScalarFieldEnum[]
+}
+
+/**
+ * registrationTable.payment
+ */
+export type registrationTable$paymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the registrationPaymentTable
+   */
+  select?: Prisma.registrationPaymentTableSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the registrationPaymentTable
+   */
+  omit?: Prisma.registrationPaymentTableOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.registrationPaymentTableInclude<ExtArgs> | null
+  where?: Prisma.registrationPaymentTableWhereInput
 }
 
 /**

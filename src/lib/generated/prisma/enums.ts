@@ -26,6 +26,25 @@ export const EntryType = {
 export type EntryType = (typeof EntryType)[keyof typeof EntryType]
 
 
+export const RegistrationState = {
+  Draft: 'Draft',
+  Submitted: 'Submitted'
+} as const
+
+export type RegistrationState = (typeof RegistrationState)[keyof typeof RegistrationState]
+
+
+export const PaymentState = {
+  Unpaid: 'Unpaid',
+  Processing: 'Processing',
+  Paid: 'Paid',
+  Waived: 'Waived',
+  NeedsReview: 'NeedsReview'
+} as const
+
+export type PaymentState = (typeof PaymentState)[keyof typeof PaymentState]
+
+
 export const LogLevel = {
   DEBUG: 'DEBUG',
   INFO: 'INFO',

@@ -1077,6 +1077,11 @@ export type logTableFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` logTables.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of logTables.
+   */
   distinct?: Prisma.LogTableScalarFieldEnum | Prisma.LogTableScalarFieldEnum[]
 }
 

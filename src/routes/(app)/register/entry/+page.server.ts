@@ -5,6 +5,7 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { fail, message, superValidate, withFiles } from 'sveltekit-superforms';
 import { prisma } from '$lib/components/server/prisma';
+import { Prisma } from '$lib/generated/prisma/client';
 
 import {
 	GENERIC_ERROR_MESSAGE,
@@ -244,6 +245,15 @@ const entryCreate = async (event: RequestEvent) => {
 			registrationId = firstRegistration.id;
 		}
 	} catch (error) {
+		if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+			return message(
+				formValidationResult,
+				'A registration already exists for this year. Please reload and try again.',
+				{
+					status: 400
+				}
+			);
+		}
 		return message(formValidationResult, GENERIC_ERROR_UNEXPECTED);
 	}
 
