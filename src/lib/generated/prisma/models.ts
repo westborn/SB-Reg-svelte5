@@ -10,6 +10,7 @@
  */
 export type * from './models/artistTable.ts'
 export type * from './models/registrationTable.ts'
+export type * from './models/registrationPaymentTable.ts'
 export type * from './models/entryTable.ts'
 export type * from './models/imageTable.ts'
 export type * from './models/locationTable.ts'

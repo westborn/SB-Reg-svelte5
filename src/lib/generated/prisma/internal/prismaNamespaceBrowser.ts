@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   artistTable: 'artistTable',
   registrationTable: 'registrationTable',
+  registrationPaymentTable: 'registrationPaymentTable',
   entryTable: 'entryTable',
   imageTable: 'imageTable',
   locationTable: 'locationTable',
@@ -98,6 +99,7 @@ export const RegistrationTableScalarFieldEnum = {
   id: 'id',
   artistId: 'artistId',
   registrationYear: 'registrationYear',
+  registrationState: 'registrationState',
   closed: 'closed',
   bumpIn: 'bumpIn',
   bumpOut: 'bumpOut',
@@ -110,6 +112,26 @@ export const RegistrationTableScalarFieldEnum = {
 } as const
 
 export type RegistrationTableScalarFieldEnum = (typeof RegistrationTableScalarFieldEnum)[keyof typeof RegistrationTableScalarFieldEnum]
+
+
+export const RegistrationPaymentTableScalarFieldEnum = {
+  id: 'id',
+  registrationId: 'registrationId',
+  paymentState: 'paymentState',
+  feeInCents: 'feeInCents',
+  paymentAttemptKey: 'paymentAttemptKey',
+  squarePaymentId: 'squarePaymentId',
+  squareLocationId: 'squareLocationId',
+  currency: 'currency',
+  receiptURL: 'receiptURL',
+  resolvedAt: 'resolvedAt',
+  confirmationEmailSentAt: 'confirmationEmailSentAt',
+  confirmationEmailError: 'confirmationEmailError',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RegistrationPaymentTableScalarFieldEnum = (typeof RegistrationPaymentTableScalarFieldEnum)[keyof typeof RegistrationPaymentTableScalarFieldEnum]
 
 
 export const EntryTableScalarFieldEnum = {

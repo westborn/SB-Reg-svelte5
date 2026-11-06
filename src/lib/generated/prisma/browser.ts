@@ -28,6 +28,11 @@ export type artistTable = Prisma.artistTableModel
  */
 export type registrationTable = Prisma.registrationTableModel
 /**
+ * Model registrationPaymentTable
+ * 
+ */
+export type registrationPaymentTable = Prisma.registrationPaymentTableModel
+/**
  * Model entryTable
  * 
  */

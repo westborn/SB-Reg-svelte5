@@ -1615,6 +1615,11 @@ export type artistTableFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` artistTables.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of artistTables.
+   */
   distinct?: Prisma.ArtistTableScalarFieldEnum | Prisma.ArtistTableScalarFieldEnum[]
 }
 

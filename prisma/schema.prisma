@@ -28,23 +28,47 @@ model artistTable {
 }
 
 model registrationTable {
-  id                  Int          @id @default(autoincrement())
-  artistId            Int          @map("artist_id")
-  registrationYear    String       @map("registration_year")
-  closed              Boolean      @default(false)
-  bumpIn              String?      @map("bump_in")
-  bumpOut             String?      @map("bump_out")
-  displayRequirements String?      @map("display_requirements")
-  accommodation       Boolean      @default(false)
-  crane               Boolean      @default(false)
-  transport           Boolean      @default(false)
-  createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt           DateTime     @updatedAt @map("updated_at")
+  id                  Int                       @id @default(autoincrement())
+  artistId            Int                       @map("artist_id")
+  registrationYear    String                    @map("registration_year")
+  registrationState   RegistrationState         @default(Draft) @map("registration_state")
+  closed              Boolean                   @default(false)
+  bumpIn              String?                   @map("bump_in")
+  bumpOut             String?                   @map("bump_out")
+  displayRequirements String?                   @map("display_requirements")
+  accommodation       Boolean                   @default(false)
+  crane               Boolean                   @default(false)
+  transport           Boolean                   @default(false)
+  createdAt           DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
   entries             entryTable[]
   images              imageTable[]
-  artist              artistTable  @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artist              artistTable               @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  payment             registrationPaymentTable?
 
+  @@unique([artistId, registrationYear], map: "registration_artist_id_registration_year_key")
   @@map("registration")
+}
+
+model registrationPaymentTable {
+  id                      Int               @id @default(autoincrement())
+  registrationId          Int               @unique @map("registration_id")
+  paymentState            PaymentState      @default(Unpaid) @map("payment_state")
+  feeInCents              Int               @map("fee_in_cents")
+  paymentAttemptKey       String?           @unique @map("payment_attempt_key")
+  squarePaymentId         String?           @unique @map("square_payment_id")
+  squareLocationId        String?           @map("square_location_id")
+  currency                String?           @db.VarChar(3)
+  receiptURL              String?           @map("receipt_url")
+  resolvedAt              DateTime?         @map("resolved_at") @db.Timestamp(6)
+  confirmationEmailSentAt DateTime?         @map("confirmation_email_sent_at") @db.Timestamp(6)
+  confirmationEmailError  String?           @map("confirmation_email_error") @db.Text
+  createdAt               DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt               DateTime          @updatedAt @map("updated_at")
+  registration            registrationTable @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([paymentState, updatedAt], map: "registration_payment_state_updated_at_idx")
+  @@map("registration_payment")
 }
 
 model entryTable {
@@ -140,6 +164,23 @@ enum EntryType {
   Outdoor
 
   @@map("entry_type")
+}
+
+enum RegistrationState {
+  Draft     @map("draft")
+  Submitted @map("submitted")
+
+  @@map("registration_state")
+}
+
+enum PaymentState {
+  Unpaid      @map("unpaid")
+  Processing  @map("processing")
+  Paid        @map("paid")
+  Waived      @map("waived")
+  NeedsReview @map("needs_review")
+
+  @@map("payment_state")
 }
 
 enum LogLevel {

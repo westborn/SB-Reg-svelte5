@@ -1746,6 +1746,11 @@ export type imageTableFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` imageTables.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of imageTables.
+   */
   distinct?: Prisma.ImageTableScalarFieldEnum | Prisma.ImageTableScalarFieldEnum[]
 }
 

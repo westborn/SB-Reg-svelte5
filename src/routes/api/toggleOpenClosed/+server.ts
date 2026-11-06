@@ -35,8 +35,10 @@ export async function POST(event: RequestEvent) {
 		if (!registrationToUpdate) {
 			return new Response(JSON.stringify({ message: 'Error in toggleOpenClosed - no registration' }), { status: 500 });
 		}
+		const closed = !submissionFromDB.registrations[0].closed;
 		const updatedRegistration = await updateRegistration(registrationToUpdate, {
-			closed: !submissionFromDB?.registrations[0]?.closed
+			closed,
+			registrationState: closed ? 'Submitted' : 'Draft'
 		});
 		if (!updatedRegistration) {
 			await logger.error('Registration closed status update returned no result', new Error('Update failed'), {
